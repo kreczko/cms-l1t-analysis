@@ -1,0 +1,6 @@
+version: '3'
+services:
+  htcondor:
+    image: kreczko/htcondor-in-a-box
+    volumes:
+      - .:/code

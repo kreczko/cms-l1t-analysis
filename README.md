@@ -42,7 +42,7 @@ make setup
 
 ### running tests
 Tests can be run either on an SL 6 machine or in the Vagrant box:
-```
+```bash
 make test
 # if a grid proxy is provided (e.g. via voms-proxy-init --voms cms)
 # you can also run tests that require grid access:
@@ -50,7 +50,7 @@ make test-all
 ```
 
 ### running benchmark
-```
+```bash
 # install python requirements
 pip install -r requirements.txt --user
 make benchmark
@@ -72,6 +72,7 @@ make docs-latex # produces output in docs/_build/latex
 # you might need to
 # export PATH:/cvmfs/sft.cern.ch/lcg/external/texlive/2014/bin/x86_64-linux:$PATH
 # for docs-latex
+```
 
 #### Prerequisites
 ```bash
@@ -88,11 +89,26 @@ You can see an example of an analyzer at: `cmsl1t/analyzers/demo_analyzer.py`.
 To implement your own analyzer, all you need to do is make a new class in a file under `cmsl1t/analyzers/` which inherits from `cmsl1t.analyzers.BaseAnalyzer.BaseAnalyzer`.  You then need to implement two or three methods: `prepare_for_event`, ` fill_histograms`, `write_histograms`, and `make_plots`.  See the BaseAnalyzer class and the demo_analyzer for examples and documentation of these methods.
 
 Once you have implemented an analyzer and written a simple configuration for it, you can run it with `cmsl1t` command:
-```
+```bash
 cmsl1t -c config/demo.yaml -n 1000
 ```
 
 Get help on the command line options by doing:
-```
+```bash
 cmsl1t --help
+```
+
+### Testing HTCondor submission
+
+For HTCondor we have an all-in-one Docker container. From the code repo:
+```bash
+docker-compose up -d
+docker exec -ti cmsl1tanalysis_htcondor_1 bash
+cd /code
+# do your tests
+
+# logout once done
+
+# shut down the container(s)
+docker-compose down
 ```
