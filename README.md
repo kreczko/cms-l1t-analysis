@@ -112,3 +112,10 @@ cd /code
 # shut down the container(s)
 docker-compose down
 ```
+
+**NOTE**: If you are on Linux you have to install `docker-compose` by hand:
+```bash
+sudo curl -L https://github.com/docker/compose/releases/download/1.15.0/docker-compose-`uname -s`-`uname -m` > /usr/local/bin/docker-compose
+sudo chmod +x /usr/local/bin/docker-compose
+```
+to update you have to `sudo rm -f /usr/local/bin/docker-compose` first.
