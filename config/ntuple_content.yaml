@@ -534,7 +534,7 @@ content:
         - event.Muon_hlt_mu
       Muon.isLooseMuon:
         aliases:
-        - event.emu_Muon_isLooseMuon
+        - event.Muon_isLooseMuon
       Muon.isMediumMuon:
         aliases:
         - event.Muon_isMediumMuon
@@ -555,7 +555,7 @@ content:
         - event.Muon_nMuons
       Muon.passesSingleMuon:
         aliases:
-        - event.emu_Muon_passesSingleMuon
+        - event.Muon_passesSingleMuon
       Muon.phi:
         aliases:
         - event.Muon_phi
