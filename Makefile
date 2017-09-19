@@ -2,6 +2,7 @@
 
 PYTHON := $(shell which python)
 NOSETESTS := $(shell which nosetests)
+NOSE2 := $(shell which nose2)
 
 all: clean setup
 
@@ -76,6 +77,9 @@ test-all: test-code-full flake8
 
 test-code:
 	@$(NOSETESTS) -v -A "not slow and not grid_access" -s test
+	@echo ">> Running new-style tests"
+	@$(NOSE2) -v
+
 
 test-code-full:
 	@$(NOSETESTS) -v -s test
