@@ -9,6 +9,8 @@ import ROOT
 from rootpy.io import root_open
 from rootpy.tree import Tree
 from cmsl1t.utils.module import load_L1TNTupleLibrary
+from cmsl1t.io.mapfile import \
+    default_alias, full_path_alias, shorthand_alias
 import cmsl1t
 
 import yaml
@@ -63,38 +65,6 @@ def convert_to_dict(trees):
             branches={b: {} for b in tree['branches']},
         )
     return trees_dict
-
-
-def _full_path_alias(path, objName):
-    # path includes treeName
-    tokens = path.split('/')
-    tokens += objName.split('.')
-    return 'event.' + '_'.join(tokens)
-
-
-def _default_alias(path, treeName, objName):
-    tokens = []
-    if 'emu' in path.lower():
-        tokens.append('emu')
-    tokens.append(treeName)
-    tokens += objName.split('.')
-    return 'event.' + '_'.join(tokens)
-
-
-def _shorthand_alias(path, treeName, objName):
-    tokens = []
-    path_lower = path.lower()
-    obj_lower = objName.lower()
-    search_for = ['emu', 'bmt', 'emt', 'omt']
-    for s in search_for:
-        if s in path_lower or s in obj_lower:
-            tokens.append(s)
-    if 'event' in obj_lower:
-        tokens.append(objName.split('.')[-1])
-    else:
-        tokens += objName.split('.')[-2:]
-
-    return 'event.' + '_'.join(tokens)
 
 
 def getDefaultAliases(path, treeName, objName):
