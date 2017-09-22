@@ -1,4 +1,4 @@
-version: 0.0.1
+version: 1
 name: Demo
 
 input:
@@ -12,6 +12,7 @@ input:
     title: Single Muon
   pileup_file: ""
   run_number: 276243
+  mapping: config/ntuple_map.yaml
 
 analysis:
   do_fit: False
@@ -20,12 +21,20 @@ analysis:
   analyzers:
     - cmsl1t.analyzers.demo_analyzer
   producers:
-    - cmsl1t.recalc.met.l1MetNot28:
-        in: event.caloTowers
-        out: event.l1MetNot28
-    - cmsl1t.recalc.met.l1MetNot28HF:
-        in: event.caloTowers
-        out: event.l1MetNot28HF
+    - cmsl1t.producers.met.l1MetNot28:
+        in:
+          - event.L1CaloTower_iphi
+          - event.L1CaloTower_ieta
+          - event.L1CaloTower_iet
+        out:
+          - event.l1MetNot28
+    - cmsl1t.producers.met.l1MetNot28HF:
+        in:
+          - event.L1CaloTower_iphi
+          - event.L1CaloTower_ieta
+          - event.L1CaloTower_iet
+        out:
+          - event.l1MetNot28HF
 
 output:
   # template is a list here that is joined (os.path.join) in the config parser
