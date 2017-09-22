@@ -103,7 +103,7 @@ class ConfigParser(object):
         results = [self.validate_sections()]
         results += [self.validate_input_files()]
         results += [self.validate_analyzers()]
-        results += [self.validate_modifiers()]
+        results += [self.validate_producers()]
         return all(results)
 
     def validate_sections(self):
@@ -149,8 +149,8 @@ class ConfigParser(object):
     def validate_analyzers(self):
         return self.__validate_module_imports(['analysis', 'analyzers'])
 
-    def validate_modifiers(self):
-        return self.__validate_module_imports(['analysis', 'modifiers'])
+    def validate_producers(self):
+        return self.__validate_module_imports(['analysis', 'producers'])
 
     def __validate_module_imports(self, config_keys):
         modules = deepcopy(self.config)

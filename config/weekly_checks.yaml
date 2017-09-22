@@ -27,7 +27,7 @@ analysis:
   analyzers:
       - cmsl1t.analyzers.weekly_analyzer
       - cmsl1t.analyzers.offline_met_analyzer
-  modifiers: []
+  producers: []
   progress_bar:
     report_every: 1000
 
