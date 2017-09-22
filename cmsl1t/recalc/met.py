@@ -1,6 +1,7 @@
 import math
 import numpy as np
 
+from cmsl1t.utils.decorators import deprecated
 
 class MET(object):
     def __init__(self, metx, mety):
@@ -12,6 +13,7 @@ class MET(object):
         return np.linalg.norm([self.x, self.y])
 
 
+@deprecated('cmsl1t.producers.met.recalcMET')
 def recalcMET(caloTowers, exclude=None):
     ets = []
     phis = []
