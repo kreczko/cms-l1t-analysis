@@ -71,7 +71,7 @@ class Producer(object):
 
     def produce(self, event):
         if hasattr(event, self.outputCollection):
-            return
+            return True
         nJets = event[self.prefix + 'nJets']
         jets = []
         for i in range(nJets):
@@ -90,5 +90,4 @@ class Producer(object):
         )
 
         setattr(event, self.outputCollection, sorted_jets)
-        assert(hasattr(event, self.outputCollection))
         return True
