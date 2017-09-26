@@ -3,7 +3,11 @@ FROM kreczko/htcondor-in-a-box
 ENV CMSL1T_CONDA_PATH /software/cmsl1t/miniconda
 
 # ROOT requirements
-RUN sudo apt install -y libxpm-dev libxft-dev
+RUN sudo apt install -y \
+             libjpeg-dev \
+             libpng++-dev
+             libxft-dev \
+             libxpm-dev \
 
 RUN sudo mkdir -p ${CMSL1T_CONDA_PATH};\
   cd ${CMSL1T_CONDA_PATH};\
