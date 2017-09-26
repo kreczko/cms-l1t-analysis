@@ -81,7 +81,7 @@ class Analyzer(BaseAnalyzer):
         l1MetBERecalc = l1MetBERecalc.mag
 
         l1MetBEEmu = event.emu_L1Upgrade_sumEt[event.energySumTypes['Met']]
-        l1MetBERecalcEmu =  event['l1MetBERecalcEmu']
+        l1MetBERecalcEmu = event['l1MetBERecalcEmu']
         l1MetBERecalcEmu = l1MetBERecalcEmu.mag
 
         l1Htt = event.L1Upgrade_sumEt[event.energySumTypes['Htt']]

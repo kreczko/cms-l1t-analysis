@@ -125,7 +125,7 @@ class Event(object):
         return object.__getattribute__(self, '__getattr__')(name)
 
     def _map_energy_sums(self):
-        #TODO: use Event.energySumTypes to map
+        # TODO: use Event.energySumTypes to map
         '''
             event.L1Upgrade_sumEt[event.energySumTypes['Htt']]
             to

@@ -5,6 +5,7 @@ From http://code.activestate.com/recipes/577819-deprecated-decorator/
 import warnings
 import functools
 
+
 def deprecated(replacement=None):
     def outer(fun):
         msg = "{0} is deprecated".format(fun.__name__)

@@ -64,7 +64,7 @@ class cmsl1t_batch_job_bsub(object):
         setup_script = os.path.join(os.environ["PROJECT_ROOT"], "bin", "env.sh")
 
         run_script_contents = dedent("""\
-        #! /bin/bash
+        #!/bin/bash
         pushd {project_root}
         source {setup_script}
         popd

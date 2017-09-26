@@ -3,7 +3,9 @@ import numpy as np
 
 from cmsl1t.utils.decorators import deprecated
 
+
 class MET(object):
+
     def __init__(self, metx, mety):
         self.x = metx
         self.y = mety
