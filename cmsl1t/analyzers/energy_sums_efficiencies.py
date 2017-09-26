@@ -3,16 +3,16 @@ Study the efficiencies of L1 energy sums
 """
 
 import math
-import ROOT
 import os
 import numpy as np
 from functools import partial
+
+import ROOT
 
 from cmsl1t.analyzers.BaseAnalyzer import BaseAnalyzer
 from cmsl1t.collections import EfficiencyCollection
 from cmsl1t.filters import muonfilter
 from cmsl1t.geometry import is_in_region
-from cmsl1t.recalc.met import recalcMET
 
 
 class Analyzer(BaseAnalyzer):
@@ -68,29 +68,32 @@ class Analyzer(BaseAnalyzer):
 
     def fill_histograms(self, entry, event):
         if self.triggerName == 'SingleMu':
-            if not muonfilter(event.muons):
+            if not muonfilter(event):
                 return True
-        if not event.passesMETFilter():
+        if not event['MetFilters_hbheNoiseFilter']:
             return True
 
-        pileup = event.nVertex
+        pileup = event['Vertex_nVtx']
         self.efficiencies.set_pileup(pileup)
 
-        l1MetBE = event.l1Sums['L1Met'].et
-        l1MetBERecalc = recalcMET(event.caloTowers).mag
+        l1MetBE = event.L1Upgrade_sumEt[event.energySumTypes['Met']]
+        l1MetBERecalc = event['l1MetBERecalc']
+        l1MetBERecalc = l1MetBERecalc.mag
 
-        l1MetBEEmu = event.l1Sums['L1EmuMet'].et
-        l1MetBERecalcEmu = recalcMET(event.emuCaloTowers).mag
+        l1MetBEEmu = event.emu_L1Upgrade_sumEt[event.energySumTypes['Met']]
+        l1MetBERecalcEmu =  event['l1MetBERecalcEmu']
+        l1MetBERecalcEmu = l1MetBERecalcEmu.mag
 
-        l1Htt = event.l1Sums['L1Htt'].et
+        l1Htt = event.L1Upgrade_sumEt[event.energySumTypes['Htt']]
 
-        offlineMetBE = event.sums.caloMetBE
-        recoHtt = event.sums.Ht
+        offlineMetBE = event.Sums_caloMetBE
+        recoHtt = event.Sums_Ht
 
         self.efficiencies.fill('metBE', offlineMetBE, l1MetBE)
         self.efficiencies.fill('metBERecalc', offlineMetBE, l1MetBERecalc)
         self.efficiencies.fill('metBEEmu', offlineMetBE, l1MetBEEmu)
-        self.efficiencies.fill('metBERecalcEmu', offlineMetBE, l1MetBERecalcEmu)
+        self.efficiencies.fill(
+            'metBERecalcEmu', offlineMetBE, l1MetBERecalcEmu)
 
         self.efficiencies.fill('htt', recoHtt, l1Htt)
 

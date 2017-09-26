@@ -1,13 +1,15 @@
 """
 Study the MET distibutions and various PUS schemes
 """
+import math
+import os
+
+import ROOT
 
 from BaseAnalyzer import BaseAnalyzer
 from cmsl1t.collections import ResolutionCollection
-import math
-import ROOT
-import os
 from cmsl1t.filters import muonfilter
+from cmsl1t.producers.match import get_matched_l1_jet
 
 
 class Analyzer(BaseAnalyzer):
@@ -22,9 +24,18 @@ class Analyzer(BaseAnalyzer):
         puBins = range(0, 50, 10) + [999]
 
         self.resolutions = ResolutionCollection(pileupBins=puBins)
-        self.resolutions.add_variable('JetEt', vtype='energy')
-        self.resolutions.add_variable('JetEta', vtype='position')
-        self.resolutions.add_variable('JetPhi', vtype='position')
+        self.resolutions.add_variable(
+            'JetEt',
+            bins=ResolutionCollection.BINS['energy'],
+        )
+        self.resolutions.add_variable(
+            'JetEta',
+            bins=ResolutionCollection.BINS['position'],
+        )
+        self.resolutions.add_variable(
+            'JetPhi',
+            bins=ResolutionCollection.BINS['position'],
+        )
 
         return True
 
@@ -35,12 +46,17 @@ class Analyzer(BaseAnalyzer):
 
     def fill_histograms(self, entry, event):
         if self.triggerName == 'SingleMu':
-            if not muonfilter(event.muons):
+            if not muonfilter(event):
                 return True
-        pileup = event.nVertex
+        pileup = event['Vertex_nVtx']
 
-        leadingRecoJet = event.getLeadingRecoJet()
-        matchedL1Jet = event.getMatchedL1Jet(leadingRecoJet)
+        recoJets = event['goodRecoJets']
+        if not recoJets:
+            return True
+        leadingRecoJet = recoJets[0]
+        l1Jets = event['l1Jets']
+        # TODO, this will be replaced by a proper producer
+        matchedL1Jet = get_matched_l1_jet(leadingRecoJet, l1Jets)
 
         if not leadingRecoJet or not matchedL1Jet:
             return True
@@ -49,9 +65,9 @@ class Analyzer(BaseAnalyzer):
         recoEta = leadingRecoJet.eta
         recoPhi = foldPhi(leadingRecoJet.phi)
 
-        l1Et = matchedL1Jet.et
-        l1Eta = matchedL1Jet.eta
-        l1Phi = foldPhi(matchedL1Jet.phi)
+        l1Et = matchedL1Jet.jetEt
+        l1Eta = matchedL1Jet.jetEta
+        l1Phi = foldPhi(matchedL1Jet.jetPhi)
 
         resolution_et = (l1Et - recoEt) / recoEt if recoEt != 0 else 0
 

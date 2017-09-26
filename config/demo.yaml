@@ -21,20 +21,24 @@ analysis:
   analyzers:
     - cmsl1t.analyzers.demo_analyzer
   producers:
-    - cmsl1t.producers.met.l1MetNot28:
-        in:
-          - event.L1CaloTower_iphi
-          - event.L1CaloTower_ieta
-          - event.L1CaloTower_iet
-        out:
-          - event.l1MetNot28
-    - cmsl1t.producers.met.l1MetNot28HF:
-        in:
-          - event.L1CaloTower_iphi
-          - event.L1CaloTower_ieta
-          - event.L1CaloTower_iet
-        out:
-          - event.l1MetNot28HF
+    - cmsl1t.producers.met:
+        inputs:
+          - L1CaloTower_iphi
+          - L1CaloTower_ieta
+          - L1CaloTower_iet
+        outputs:
+          - l1MetNot28
+        params:
+          method: l1MetNot28
+    - cmsl1t.producers.met:
+        inputs:
+          - L1CaloTower_iphi
+          - L1CaloTower_ieta
+          - L1CaloTower_iet
+        outputs:
+          - l1MetNot28HF
+        params:
+          method: l1MetNot28HF
 
 output:
   # template is a list here that is joined (os.path.join) in the config parser

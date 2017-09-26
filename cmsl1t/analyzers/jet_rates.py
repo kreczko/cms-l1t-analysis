@@ -35,10 +35,10 @@ class Analyzer(BaseAnalyzer):
         return True
 
     def fill_histograms(self, entry, event):
-        pileup = event.nVertex
+        pileup = event['Vertex_nVtx']
         self.rates.set_pileup(pileup)
 
-        l1JetEts = [jet.et for jet in event._l1Jets]
+        l1JetEts = [jet['jetEt'] for jet in event.l1Jets]
         nJets = len(l1JetEts)
         if nJets == 0:
             return True

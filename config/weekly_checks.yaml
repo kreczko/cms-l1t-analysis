@@ -5,7 +5,8 @@ input:
   files:
       # Single Muons
       # -   root://eoscms.cern.ch//eos/cms/store/group/dpg_trigger/comm_trigger/L1Trigger/safarzad/2017/SingleMuon/Collision2017-wRECO-l1t-integration-v96p27/SingleMuon/crab_Collision2017-wRECO-l1t-integration-v96p27__SingleMuon/170818_102121/000*/L1Ntuple_*.root
-      -  root://eoscms.cern.ch//eos/cms/store/group/dpg_trigger/comm_trigger/L1Trigger/safarzad/2017/SingleMuon/Fill*/Collision2017-wRECO-l1t-integration-v96p27_CaloMode/SingleMuon/crab_Collision2017-wRECO-l1t-integration-v96p27_CaloMode__SingleMuon/*/0000/L1Ntuple_*root
+      # -  root://eoscms.cern.ch//eos/cms/store/group/dpg_trigger/comm_trigger/L1Trigger/safarzad/2017/SingleMuon/Fill*/Collision2017-wRECO-l1t-integration-v96p27_CaloMode/SingleMuon/crab_Collision2017-wRECO-l1t-integration-v96p27_CaloMode__SingleMuon/*/0000/L1Ntuple_*root
+      - data/L1Ntuple*.root
       # Zero Bias
       # -  root://eoscms.cern.ch//eos/cms/store/group/dpg_trigger/comm_trigger/L1Trigger/safarzad/2017/ZeroBias/Fill6*/Collision2017-noRECO-l1t-integration-96p27_NoPUS/ZeroBias/crab_Collision2017-noRECO-l1t-integration-96p27_NoPUS__ZeroBias_Run2017C/*/0000/L1Ntuple_*root
       # -  root://eoscms.cern.ch//eos/cms/store/group/dpg_trigger/comm_trigger/L1Trigger/safarzad/2017/ZeroBias/Collision2017-noRECO-l1t-integration-96p20/ZeroBias/crab_Collision2017-noRECO-l1t-integration-96p20__ZeroBias_Run2017C/170726_094745/0000/*root
@@ -27,9 +28,19 @@ analysis:
   analyzers:
       - cmsl1t.analyzers.weekly_analyzer
       - cmsl1t.analyzers.offline_met_analyzer
-  producers: []
-  progress_bar:
-    report_every: 1000
+  producers:
+    - cmsl1t.producers.jets:
+        inputs:
+          - L1Upgrade_*
+        outputs:
+          - l1Jets
+    - cmsl1t.producers.jets:
+        inputs:
+          - Jet_*
+        outputs:
+          - goodRecoJets
+        params:
+          filter: cmsl1t.filters.jets.defaultJetFilter
 
 output:
   template:

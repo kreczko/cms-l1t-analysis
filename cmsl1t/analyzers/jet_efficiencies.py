@@ -12,6 +12,7 @@ from cmsl1t.analyzers.BaseAnalyzer import BaseAnalyzer
 from cmsl1t.collections import EfficiencyCollection
 from cmsl1t.filters import muonfilter
 from cmsl1t.geometry import is_in_region
+from cmsl1t.producers.match import get_matched_l1_jet
 
 
 class Analyzer(BaseAnalyzer):
@@ -49,12 +50,17 @@ class Analyzer(BaseAnalyzer):
 
     def fill_histograms(self, entry, event):
         if self.triggerName == 'SingleMu':
-            if not muonfilter(event.muons):
+            if not muonfilter(event):
                 return True
-        pileup = event.nVertex
+        pileup = event['Vertex_nVtx']
 
-        leadingRecoJet = event.getLeadingRecoJet()
-        matchedL1Jet = event.getMatchedL1Jet(leadingRecoJet)
+        recoJets = event['goodRecoJets']
+        if not recoJets:
+            return True
+        leadingRecoJet = recoJets[0]
+        l1Jets = event['l1Jets']
+        # TODO, this will be replaced by a proper producer
+        matchedL1Jet = get_matched_l1_jet(leadingRecoJet, l1Jets)
 
         if not leadingRecoJet or not matchedL1Jet:
             return True
@@ -62,7 +68,7 @@ class Analyzer(BaseAnalyzer):
         recoEt = leadingRecoJet.etCorr
         recoEta = leadingRecoJet.eta
 
-        l1Et = matchedL1Jet.et
+        l1Et = matchedL1Jet['jetEt']
 
         self.efficiencies.set_pileup(pileup)
         if is_in_region('B', recoEta):
