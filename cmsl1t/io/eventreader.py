@@ -111,7 +111,7 @@ class Event(object):
         if name in object.__getattribute__(self, '_cache'):
             return object.__getattribute__(self, '_cache')[name]
 
-        if not name in object.__getattribute__(self, '_map'):
+        if name not in object.__getattribute__(self, '_map'):
             return object.__getattribute__(self, name)
         treeName, treeAttr = object.__getattribute__(self, '_map')[name]
         tree = object.__getattribute__(self, '_trees')[treeName]

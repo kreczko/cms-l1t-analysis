@@ -34,7 +34,7 @@ analysis:
   pu_bins: 0,13,20,999
   analyzers:
     - cmsl1t.analyzers.demo_analyzer
-  modifiers:
+  producers:
     - cmsl1t.recalc.met.l1MetNot28:
         in: event.caloTowers
         out: event.l1MetNot28
