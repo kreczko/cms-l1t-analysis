@@ -68,13 +68,10 @@ def convert_to_dict(trees):
 
 
 def getDefaultAliases(path, treeName, objName):
-    # full_path_alias = _full_path_alias(path, objName)
-    # default_alias = _default_alias(path, treeName, objName)
-    shorthand_alias = _shorthand_alias(path, treeName, objName)
     return [
-        # full_path_alias,
-        # default_alias,
-        shorthand_alias,
+        # full_path_alias(path, objName),
+        # default_alias(path, treeName, objName),
+        shorthand_alias(path, treeName, objName),
     ]
 
 

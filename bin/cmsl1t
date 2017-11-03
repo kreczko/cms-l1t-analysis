@@ -202,5 +202,6 @@ def load_producer(producer, config):
     logger.info("Successfully loaded producer:" + name)
     return module.Producer(**params)
 
+
 if __name__ == '__main__':
     analyze()
