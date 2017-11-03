@@ -10,8 +10,10 @@ before_install:
   - docker pull hepsw/cvmfs-cms
 
 install:
- - sudo docker build -t cms-l1t-offline/cms-l1t-analysis -f ci/Dockerfile .
+ - cd ci
+ - sudo docker build -t cms-l1t-offline/cms-l1t-analysis .
+ - cd -
 
 script:
-  - sudo docker run -t -v $PWD:/analysis --privileged=true cms-l1t-offline/cms-l1t-analysis
+  - sudo docker run -t -v $PWD:/analysis --privileged cms-l1t-offline/cms-l1t-analysis
 cache: apt
