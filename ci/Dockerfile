@@ -17,4 +17,4 @@ WORKDIR /analysis
 # need to execute env.sh and ntp setup in CMD
 # as CVMFS needs 'privileged' rights,
 # but cannot do that when building the container
-CMD ["/bin/bash", "-c", "source bin/env.sh;export PATH=~/.local/bin:$PATH;make test"]
+CMD ["/bin/bash", "-c", "source bin/env.sh;export PATH=~/.local/bin:$PATH;make setup;make test"]
