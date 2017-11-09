@@ -123,7 +123,9 @@ class Analyzer(BaseAnalyzer):
             setattr(self, name + "_eff_HR", eff_plot_HR)
             setattr(self, name + "_2D_HR", twoD_plot_HR)
 
-        for angle in sum_types[2:]:
+        for angle in sum_types:
+            if 'HTT' in angle:
+                continue
             name = angle + "_phi"
             res_plot = ResolutionPlot("phi", "L1", "offline_" + name)
             twoD_plot = OnlineVsOffline("L1", "offline_" + name)
