@@ -92,14 +92,18 @@ class cmsl1t_batch_job_bsub(object):
         logger.info("    Check job status using:\n\n         bjobs -g {group}".format(group=job_group))
         return results
 
-    def _submit_one(self, config, group=None):
+    def _submit_one(self, config_file, group=None):
+        config = ConfigParser()
+        config.read(config_file)
+        output_folder = config.config['output']['folder']
+        error_log = os.path.join(output_folder, 'error.log')
+        out_log = os.path.join(output_folder, 'out.log')
         # Prepare the args
         args = ["bsub", "-q", "1nh"]
         if group:
             args += ["-g", group]
-        if not self.debug:
-            args += ["-eo", os.devnull, "-oo", os.devnull]
-        command = ' '.join([self.run_script, config])
+        args += ["-eo", error_log, "-oo", out_log]
+        command = ' '.join([self.run_script, config_file])
         args += [command]
 
         try:
