@@ -1,0 +1,88 @@
+#!/usr/bin/env python
+import click
+import click_log
+import glob
+import logging
+import pandas as pd
+import re
+import sys
+from tabulate import tabulate
+
+if sys.version_info[0] < 3:
+    from StringIO import StringIO
+else:
+    from io import StringIO
+
+logger = logging.getLogger(__name__)
+click_log.basic_config(logger)
+
+bjobs_test_out = """
+JOBID     USER    STAT  QUEUE      FROM_HOST   EXEC_HOST   JOB_NAME   SUBMIT_TIME
+141968756 kreczko RUN   8nm        lxplus050.c b6e374f7fa  *s_10.yaml Feb  8 18:09
+"""
+
+
+def update_job_status(df):
+    # skip update of finished jobs
+    finished_jobs = df.status == 'FINISHED'
+    print(df[~finished_jobs])
+    __update__(df[~finished_jobs])
+    return df
+
+
+def __update__(df):
+    pass
+
+
+def get_job_status(jobs):
+    for j in jobs:
+        # search for ROOT files
+        if has_output_files(j):
+            yield (j, 'FINISHED')
+            continue
+
+        if is_running(j):
+            yield (j, 'RUNNING')
+            continue
+
+        yield(j, 'UNKNOWN')
+
+
+def has_output_files(job_path):
+    path = os.path.join(job_path, 'plots-v1', '*.root')
+    output_files = glob.glob(path)
+    return output_files
+
+
+def is_running(job_path):
+    pass
+
+
+def is_running_lsf(job_id):
+    pass
+
+
+def parse_bjobs_output(bjobs_output):
+    bjobs_output = bjobs_output.lstrip('\n')
+    entries = re.split("\n+", bjobs_output)
+    job_id = entries[1].split(' ')[0]
+    return int(job_id)
+
+
+@click.command()
+@click.option(
+    '-i', '--info_file', help='path to info.csv', type=click.Path(exists=True),
+    required=True,
+)
+@click_log.simple_verbosity_option(logger)
+def run(info_file):
+    df = pd.read_csv(info_file)
+
+    df = update_job_status(df)
+
+    print(tabulate(df[['local_id', 'output_folder', 'status']],
+                   headers='keys', tablefmt='psql'))
+
+
+if __name__ == '__main__':
+    run()
