@@ -1,7 +1,25 @@
 import logging
 import os
+import subprocess
 from textwrap import dedent
 
+from .common import Status
+
+logger = logging.getLogger(__name__)
+
+__bjobs_status = dict(
+    PEND=Status.PENDING,
+    PROV=Status.RUNNING,
+    PSUSP=Status.FAILED,
+    RUN='The job is currently running.',
+    USUSP=Status.FAILED,
+    SSUSP=Status.FAILED,
+    DONE=Status.FINISHED,
+    EXIT=Status.FAILED,
+    UNKWN=Status.UNKNOWN,
+    WAIT=Status.PENDING,
+    ZOMBI=Status.FAILED,
+)
 
 def submit(config_files, batch_directory, run_script):
     logger.info("Will submit {0} jobs using bsub".format(len(config_files)))
@@ -44,3 +62,26 @@ def __submit_one(config, run_script, group=None):
         logger.error(msg.format(e=e))
         return False
     return True
+
+
+def get_status(batch_id):
+    args = ['bjobs', str(batch_id)]
+    bjobs_output = subprocess.check_output(args)
+    job_id, status = __parse_bjobs_output(bjobs_output)
+    if job_id != batch_id:
+        msg = 'Checked job ID "{0}" but found "{1}" - something went wrong'.format(
+            batch_id, job_id)
+        logger.error(msg)
+        return Status.UNKNOWN
+    return status
+
+
+def __parse_bjobs_output(bjobs_output):
+    bjobs_output = bjobs_output.lstrip('\n')
+    entries = re.split("\n+", bjobs_output)
+    tokens = entries[1].split(' ')
+    tokens = [t for t in tokens if t != '']
+
+    job_id = tokens[0]
+    status = tokens[2]
+    return int(job_id), bjobs_status[status]
