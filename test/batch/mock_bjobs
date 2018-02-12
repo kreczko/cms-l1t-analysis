@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+job_id=$1
+echo "JOBID     USER    STAT  QUEUE      FROM_HOST   EXEC_HOST   JOB_NAME   SUBMIT_TIME"
+echo "${job_id}     user2   RUN   normal     hostA       hostA       myjob     Jun 14 15:13"
