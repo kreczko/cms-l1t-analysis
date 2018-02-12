@@ -1,1 +1,92 @@
 #!/usr/bin/env python
+from __future__ import print_function
+import click
+import click_log
+import yaml
+import os
+import htcondor
+import sys
+import math
+from textwrap import dedent
+import logging
+import subprocess
+
+from cmsl1t.config import ConfigParser, get_unique_out_dir
+from cmsl1t.batch import Batch, prepare_input_file_groups, condor_submit, lsf_submit
+
+logger = logging.getLogger(__name__)
+click_log.basic_config(logger)
+
+
+def prepare_output_folders(output_folder):
+    batch_dir = os.path.join(output_folder, "batch")
+    batch_dir = get_unique_out_dir(batch_dir)
+    batch_config_dir = os.path.join(batch_dir, "_configs")
+    logger.info("Batch config files will be placed under: " + batch_config_dir)
+    os.makedirs(batch_config_dir)
+    return batch_dir, batch_config_dir
+
+def get_config_name_template(config_file, batch_config_dir):
+    batch_filename = os.path.basename(config_file.name)
+    batch_filename = list(os.path.splitext(batch_filename))
+    batch_filename.insert(1, "_{index}")
+    batch_filename = "".join(batch_filename)
+    batch_filename = os.path.join(batch_config_dir, batch_filename)
+    return batch_filename
+
+def prepare_jobs(config, batch_filename_template, outdir):
+    # Get the list of input files
+    input_ntuples = config.get('input', 'files')
+    input_ntuples = prepare_input_file_groups(input_ntuples, files_per_job)
+
+    n_jobs = len(input_ntuples)
+    n_jobs_pad_width = int(math.log10(n_jobs)) + 1
+    padding = "{{:0{}}}".format(n_jobs_pad_width)
+
+    for i, in_files in enumerate(input_ntuples):
+        padded_index = padding.format(i)
+
+        # Reset the input file list
+        config.config['input']['files'] = in_files
+
+        # Reset the output directory
+        config.config['output']['folder'] = outdir.format(index=padded_index)
+
+        # Dump the config file
+        batch_file = batch_filename.format(index=padded_index)
+        config.dump(batch_file)
+
+        job_configs.append(batch_file)
+
+
+@click.command()
+@click.option('-c', '--config_file', help='YAML style config file', type=click.File(), required=True)
+@click.option('-f', '--files-per-job', help='Give each job this many files', type=int, default=1)
+@click.option('--debug/--no-debug', help='Debug mode for the job submission', default=False)
+@click.option('--batch', default="htcondor", type=click.Choice(["LSF", "htcondor"]),
+              help='Select the job submission system to use')
+def run(config_file, debug, batch, files_per_job):
+    if batch == Batch.lsf:
+        logger.warn('Legacy LSF system is no longer supported for cmsl1t.')
+        logger.warn(' see http://information-technology.web.cern.ch/services/batch')
+    # Read the config file
+    config = ConfigParser()
+    config.read(config_file)
+
+
+
+    # Get the output directory
+    output_folder = config.get('output', 'folder')
+    batch_dir, batch_config_dir = prepare_output_folder(output_folder)
+
+    # Sort out a name for the batch config files
+    batch_filename = get_config_name_template(config_file, batch_config_dir)
+
+
+    # Prepare input jobs
+    outdir = "job_{index}"
+    outdir = os.path.join(batch_dir, outdir)
+    job_configs = prepare_jobs(config, batch_filename, outdir)
+
+if __name__ == '__main__':
+    run()
