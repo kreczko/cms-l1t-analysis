@@ -1,5 +1,7 @@
 import htcondor
 
+from .common import Status
+
 def submit(config_files, batch_directory, run_script):
     logger.info("Will submit {0} jobs".format(len(config_files)))
     schedd = htcondor.Schedd()
@@ -19,3 +21,7 @@ def submit(config_files, batch_directory, run_script):
         condor_q $USER """))
 
     return results
+
+def get_status(batch_id):
+    raise NotImplementedError('condor.get_status is not implemented (yet)')
+    return Status.UNKNOWN
