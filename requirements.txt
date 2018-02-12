@@ -12,3 +12,4 @@ rootpy
 dill
 mock
 boltons
+tabulate
