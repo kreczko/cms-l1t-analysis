@@ -1,5 +1,6 @@
 import logging
 import os
+import re
 import subprocess
 from textwrap import dedent
 
@@ -20,6 +21,7 @@ __bjobs_status = dict(
     WAIT=Status.PENDING,
     ZOMBI=Status.FAILED,
 )
+
 
 def submit(config_files, batch_directory, run_script):
     logger.info("Will submit {0} jobs using bsub".format(len(config_files)))
@@ -77,6 +79,7 @@ def get_status(batch_id):
 
 
 def __parse_bjobs_output(bjobs_output):
+    global __bjobs_status
     bjobs_output = bjobs_output.lstrip('\n')
     entries = re.split("\n+", bjobs_output)
     tokens = entries[1].split(' ')
@@ -84,4 +87,4 @@ def __parse_bjobs_output(bjobs_output):
 
     job_id = tokens[0]
     status = tokens[2]
-    return int(job_id), bjobs_status[status]
+    return int(job_id), __bjobs_status[status]

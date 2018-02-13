@@ -1,3 +1,4 @@
+import os
 from textwrap import dedent
 
 from .common import Status, Batch
@@ -48,6 +49,7 @@ def prepare_input_file_groups(input_ntuples, files_per_job):
         file_lists.append(current_list)
 
     return file_lists
+
 
 __all__ = [
     'Status',

@@ -6,6 +6,7 @@ class Status:
     FINISHED = 'FINISHED'
     UNKNOWN = 'UNKNOWN'
 
+
 class Batch:
     lsf = 'LSF'
     condor = 'HTCondor'

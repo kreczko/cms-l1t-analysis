@@ -22,7 +22,6 @@ click_log.basic_config(logger)
 
 
 def update_job_status(row):
-    job = row.local_id
     batch = row.batch
     batch_id = row.batch_id
     job_path = row.output_folder
@@ -73,6 +72,7 @@ def run(info_file):
     shutil.copy(info_file, info_file + '.bak')
     # update status file
     df.to_csv(info_file)
+
 
 if __name__ == '__main__':
     run()
