@@ -65,7 +65,7 @@ def prepare_jobs(config, batch_filename_template, outdir):
 @click.option('-c', '--config_file', help='YAML style config file', type=click.File(), required=True)
 @click.option('-f', '--files-per-job', help='Give each job this many files', type=int, default=1)
 @click.option('--debug/--no-debug', help='Debug mode for the job submission', default=False)
-@click.option('--batch', default="htcondor", type=click.Choice(["LSF", "htcondor"]),
+@click.option('--batch', default="htcondor", type=click.Choice([Batch.lsf, Batch.condor]),
               help='Select the job submission system to use')
 def run(config_file, debug, batch, files_per_job):
     if batch == Batch.lsf:
@@ -87,6 +87,8 @@ def run(config_file, debug, batch, files_per_job):
     outdir = "job_{index}"
     outdir = os.path.join(batch_dir, outdir)
     job_configs = prepare_jobs(config, batch_filename, outdir)
+
+    # submit jobs
 
 if __name__ == '__main__':
     run()
