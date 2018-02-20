@@ -55,19 +55,37 @@ def get_batch_status(batch, batch_id):
     return Status.UNKNOWN
 
 
+def job_summary(series, max_width=80):
+    def wrap_format(x,y):
+        string = '{0}, {1}'.format(x, y)
+        # TODO: make sure to insert a line break (\n) for every max_width
+        # characters (after the next comma)
+        # all_commas = string.find_all(',')
+        # insert every max_width if not already present
+        return string
+    return reduce(wrap_format, series)
+
+
 @click.command()
 @click.option(
     '-i', '--info_file', help='path to info.csv', type=click.Path(exists=True),
     required=True,
 )
+@click.option('-s', '--summary', help='print summary', default=False, is_flag=True)
 @click_log.simple_verbosity_option(logger)
-def run(info_file):
+def run(info_file, summary):
     df = pd.read_csv(info_file)
 
     df['status'] = df.apply(update_job_status, axis=1)
 
-    print(tabulate(df[['local_id', 'status', 'output_folder']],
-                   headers='keys', tablefmt='psql', showindex=False))
+    if summary:
+        summarised_df = df.groupby(['status']).agg(dict(
+            batch_id=['count', job_summary],
+        ))
+        print(tabulate(summarised_df, headers=['status', '# jobs', 'job IDs']))
+    else:
+        print(tabulate(df[['local_id', 'status', 'output_folder']],
+                       headers='keys', tablefmt='psql', showindex=False))
     # make backup file
     shutil.copy(info_file, info_file + '.bak')
     # update status file
