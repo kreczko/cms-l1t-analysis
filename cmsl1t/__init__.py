@@ -13,7 +13,7 @@ logger.setLevel(logging.DEBUG)
 # add loggers
 ch = logging.StreamHandler()
 if not os.environ.get("DEBUG", False):
-    ch.setLevel(logging.WARNING)
+    ch.setLevel(logging.INFO)
 else:
     ch.setLevel(logging.DEBUG)
 # log format

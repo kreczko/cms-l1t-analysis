@@ -23,7 +23,7 @@ __bjobs_status = dict(
 )
 
 
-def submit(config_files, batch_directory, run_script):
+def submit(config_files, batch_directory, batch_log_dir, run_script):
     logger.info("Will submit {0} jobs using bsub".format(len(config_files)))
 
     job_group = "/CMS-L1T--"
@@ -33,7 +33,17 @@ def submit(config_files, batch_directory, run_script):
     results = []
     for i, cfg in enumerate(config_files):
         logger.info("submitting: " + cfg)
-        results.append(__submit_one(cfg, run_script, job_group))
+        results.append(
+            dict(
+                batch_id=__submit_one(cfg, run_script, job_group),
+                batch=Batch.lsf,
+                config_file=cfg,
+                stderr_log=None,
+                stdout_log=None,
+                job_log=None,
+                status=Status.CREATED,
+            )
+        )
 
     logger.info(
         "\tCheck job status using:\n\n\t\tbjobs -g {0}".format(job_group)
@@ -50,9 +60,10 @@ def __submit_one(config, run_script, group=None):
         args += ["-eo", os.devnull, "-oo", os.devnull]
     command = ' '.join([run_script, config])
     args += [command]
-
+    job_id = 0
     try:
-        subprocess.check_output(args)
+        out = subprocess.check_output(args)
+        job_id = __parse_bsub_output(out)
     except subprocess.CalledProcessError as e:
         msg = dedent("""\
             Error submitting to bsub.
@@ -63,7 +74,18 @@ def __submit_one(config, run_script, group=None):
             {e.returncode}""")
         logger.error(msg.format(e=e))
         return False
-    return True
+    finally:
+        return False
+    return job_id
+
+
+def __parse_bsub_output(bsub_output):
+    """
+    Job <145417932> is submitted to default queue <8nm>.
+    """
+    job_id = re.search(r'\d+', headline).group()
+    job_id = int(job_id)
+    return job_id
 
 
 def get_status(batch_id):

@@ -2,6 +2,7 @@
 from __future__ import print_function
 import click
 import click_log
+import collections
 import yaml
 import os
 import htcondor
@@ -10,9 +11,13 @@ import math
 from textwrap import dedent
 import logging
 import subprocess
+import pandas as pd
+import stat
+from itertools import izip
 
 from cmsl1t.config import ConfigParser, get_unique_out_dir
-from cmsl1t.batch import Batch, prepare_input_file_groups, condor_submit, lsf_submit
+from cmsl1t.batch import Batch, prepare_input_file_groups, condor_submit, \
+    lsf_submit, get_run_script
 
 logger = logging.getLogger(__name__)
 click_log.basic_config(logger)
@@ -22,9 +27,11 @@ def prepare_output_folders(output_folder):
     batch_dir = os.path.join(output_folder, "batch")
     batch_dir = get_unique_out_dir(batch_dir)
     batch_config_dir = os.path.join(batch_dir, "_configs")
+    batch_log_dir = os.path.join(batch_dir, "logs")
     logger.info("Batch config files will be placed under: " + batch_config_dir)
     os.makedirs(batch_config_dir)
-    return batch_dir, batch_config_dir
+    os.makedirs(batch_log_dir)
+    return batch_dir, batch_config_dir, batch_log_dir
 
 
 def get_config_name_template(config_file, batch_config_dir):
@@ -36,7 +43,7 @@ def get_config_name_template(config_file, batch_config_dir):
     return batch_filename
 
 
-def prepare_jobs(config, batch_filename_template, outdir):
+def prepare_jobs(config, batch_filename_template, outdir, files_per_job):
     # Get the list of input files
     input_ntuples = config.get('input', 'files')
     input_ntuples = prepare_input_file_groups(input_ntuples, files_per_job)
@@ -52,20 +59,41 @@ def prepare_jobs(config, batch_filename_template, outdir):
         config.config['input']['files'] = in_files
 
         # Reset the output directory
-        config.config['output']['folder'] = outdir.format(index=padded_index)
+        # TODO: assumes shared_fs
+        output_folder = outdir.format(index=padded_index)
+        config.config['output']['folder'] = output_folder
+        os.makedirs(output_folder)
 
         # Dump the config file
-        batch_file = batch_filename.format(index=padded_index)
+        batch_file = batch_filename_template.format(index=padded_index)
         config.dump(batch_file)
 
-        job_configs.append(batch_file)
+        yield (batch_file, padded_index, output_folder)
+
+
+def create_run_script(setup_script, project_root, batch_dir):
+    run_script_content = get_run_script(setup_script, project_root)
+    run_script = os.path.join(batch_dir, 'run.sh')
+    with open(run_script, 'w') as f:
+        f.write(run_script_content)
+    # make executable
+    st = os.stat(run_script)
+    os.chmod(run_script, st.st_mode | stat.S_IEXEC)
+    return run_script
+
+
+def create_info_file(info, batch_dir):
+    info_file = os.path.join(batch_dir, 'info.csv')
+    df = pd.DataFrame(info)
+    df.to_csv(info_file)
+    return info_file
 
 
 @click.command()
 @click.option('-c', '--config_file', help='YAML style config file', type=click.File(), required=True)
 @click.option('-f', '--files-per-job', help='Give each job this many files', type=int, default=1)
 @click.option('--debug/--no-debug', help='Debug mode for the job submission', default=False)
-@click.option('--batch', default="htcondor", type=click.Choice([Batch.lsf, Batch.condor]),
+@click.option('--batch', default=Batch.condor, type=click.Choice([Batch.lsf, Batch.condor]),
               help='Select the job submission system to use')
 def run(config_file, debug, batch, files_per_job):
     if batch == Batch.lsf:
@@ -78,17 +106,39 @@ def run(config_file, debug, batch, files_per_job):
 
     # Get the output directory
     output_folder = config.get('output', 'folder')
-    batch_dir, batch_config_dir = prepare_output_folder(output_folder)
+    batch_dir, batch_config_dir, batch_log_dir = prepare_output_folders(
+        output_folder)
 
     # Sort out a name for the batch config files
     batch_filename = get_config_name_template(config_file, batch_config_dir)
-
     # Prepare input jobs
-    outdir = "job_{index}"
-    outdir = os.path.join(batch_dir, outdir)
-    job_configs = prepare_jobs(config, batch_filename, outdir)
+    outdir = os.path.join(batch_dir, "job_{index}")
+    job_generator = prepare_jobs(config, batch_filename, outdir, files_per_job)
+    job_configs, job_ids, output_folders = izip(*job_generator)
 
+    project_root = os.environ["PROJECT_ROOT"]
+    setup_script = os.path.join(project_root, "bin", "env.sh")
+    run_script = create_run_script(setup_script, project_root, batch_dir)
     # submit jobs
+    submit = condor_submit
+    if batch == Batch.lsf:
+        submit = lsf_submit
+    results = submit(job_configs, batch_dir, batch_log_dir, run_script)
+    # from list of dict to dict of lists
+    info = collections.defaultdict(list)
+    for r in results:
+        for k, v in r.items():
+            info[k].append(v)
+    info['local_id'] = job_ids
+    info['output_folder'] = output_folders
+
+    info_file = create_info_file(info, batch_dir)
+
+    logger.info(dedent("""\
+    Submitted jobs in {0}.
+    To check their status run
+
+      cmsl1t_batch_status -i {1}""".format(batch_dir, info_file)))
 
 if __name__ == '__main__':
     run()

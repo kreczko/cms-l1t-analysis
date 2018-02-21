@@ -5,6 +5,7 @@ class Status:
     FAILED = 'FAILED'
     FINISHED = 'FINISHED'
     UNKNOWN = 'UNKNOWN'
+    HELD = 'HELD'
 
 
 class Batch:

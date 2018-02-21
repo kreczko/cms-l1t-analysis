@@ -9,8 +9,7 @@ from .lsf import submit as lsf_submit
 from .lsf import get_status as lsf_status
 
 
-def get_run_script(setup_script, shared_fs=True):
-    project_root = os.environ["PROJECT_ROOT"]
+def get_run_script(setup_script, project_root, shared_fs=True):
     run_script_contents = [
         '#!/usr/bin/env bash',
         'pushd {project_root}',
