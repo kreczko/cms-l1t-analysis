@@ -10,8 +10,8 @@ import logging
 from itertools import izip
 
 from cmsl1t.config import ConfigParser
-from cmsl1t.batch import Batch, condor_submit, lsf_submit, prepare_output_folders
-from cmsl1t.batch import lsf_submit, get_config_name_template
+from cmsl1t.batch import Batch, condor_submit, lsf_submit
+from cmsl1t.batch import prepare_output_folders, get_config_name_template
 
 from cmsl1t.batch import create_run_script, create_info_file, prepare_jobs
 
@@ -69,6 +69,7 @@ def run(config_file, debug, batch, files_per_job):
     To check their status run
 
       cmsl1t_batch_status -i {1}""".format(batch_dir, info_file)))
+
 
 if __name__ == '__main__':
     run()

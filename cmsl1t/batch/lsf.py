@@ -4,7 +4,7 @@ import re
 import subprocess
 from textwrap import dedent
 
-from .common import Status
+from .common import Batch, Status
 
 logger = logging.getLogger(__name__)
 
@@ -63,7 +63,7 @@ def __submit_one(config, run_script, group=None):
     job_id = 0
     try:
         out = subprocess.check_output(args)
-        job_id = __parse_bsub_output(out)
+        job_id = _parse_bsub_output(out)
     except subprocess.CalledProcessError as e:
         msg = dedent("""\
             Error submitting to bsub.
@@ -79,11 +79,11 @@ def __submit_one(config, run_script, group=None):
     return job_id
 
 
-def __parse_bsub_output(bsub_output):
+def _parse_bsub_output(bsub_output):
     """
     Job <145417932> is submitted to default queue <8nm>.
     """
-    job_id = re.search(r'\d+', headline).group()
+    job_id = re.search(r'\d+', bsub_output).group()
     job_id = int(job_id)
     return job_id
 
@@ -91,7 +91,7 @@ def __parse_bsub_output(bsub_output):
 def get_status(batch_id):
     args = ['bjobs', str(batch_id)]
     bjobs_output = subprocess.check_output(args)
-    job_id, status = __parse_bjobs_output(bjobs_output)
+    job_id, status = _parse_bjobs_output(bjobs_output)
     if job_id != batch_id:
         msg = 'Checked job ID "{0}" but found "{1}" - something went wrong'.format(
             batch_id, job_id)
@@ -100,7 +100,7 @@ def get_status(batch_id):
     return status
 
 
-def __parse_bjobs_output(bjobs_output):
+def _parse_bjobs_output(bjobs_output):
     global __bjobs_status
     bjobs_output = bjobs_output.lstrip('\n')
     entries = re.split("\n+", bjobs_output)
