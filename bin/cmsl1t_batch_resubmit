@@ -1,0 +1,64 @@
+#!/usr/bin/env python
+import click
+import click_log
+import glob
+import logging
+import pandas as pd
+import re
+import os
+import sys
+from tabulate import tabulate
+import shutil
+
+from cmsl1t.batch import Batch, Status, condor_resubmit
+from cmsl1t.batch.common import PATHS
+
+if sys.version_info[0] < 3:
+    from StringIO import StringIO
+else:
+    from io import StringIO
+
+logger = logging.getLogger(__name__)
+click_log.basic_config(logger)
+
+
+def resubmit_jobs(df, batch_dir):
+    config_files = list(df['config_file'])
+    config_files = [batch_dir + cfg for cfg in config_files]
+    local_ids = list(df['local_id'])
+    batch_log_dir = os.path.join(batch_dir, PATHS.LOG)
+    run_script = os.path.join(batch_dir, PATHS.RUN_SCRIPT)
+
+    results = condor_resubmit(config_files, local_ids, batch_dir,
+                              batch_log_dir, run_script)
+    new_df = pd.DataFrame(results)
+    new_df['local_id'] = local_ids
+    return new_df
+
+
+@click.command()
+@click.option(
+    '-i', '--info_file', help='path to info.csv', type=click.Path(exists=True),
+    required=True,
+)
+@click.option(
+    '-r', '--resubmit', default=Status.FAILED, type=click.Choice(['all', Status.FAILED, Status.UNKNOWN])
+)
+@click_log.simple_verbosity_option(logger)
+def run(info_file, resubmit):
+    df = pd.read_csv(info_file)
+    if resubmit != 'all':
+        resub_df = df[df.status == resubmit]
+    else:
+        resub_df = df
+
+    batch_directory = os.path.dirname(info_file)
+    resub_df = resubmit_jobs(resub_df, batch_directory)
+    columns_to_update = ['batch_id', 'status']
+    df.loc[df.local_id.isin(resub_df.local_id), columns_to_update] = resub_df[
+        columns_to_update]
+    df.to_csv(info_file, index=False)
+
+
+if __name__ == '__main__':
+    run()
