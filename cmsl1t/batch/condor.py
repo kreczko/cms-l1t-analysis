@@ -21,39 +21,47 @@ def submit(config_files, batch_directory, batch_log_dir, run_script):
     results = []
     with schedd.transaction() as txn:
         for i, cfg in enumerate(config_files):
-            cfg = os.path.realpath(cfg)
-            stderr_log = os.path.join(batch_log_dir, 'job_{0}.err'.format(i))
-            stdout_log = os.path.join(batch_log_dir, 'job_{0}.out'.format(i))
-            job_log = os.path.join(batch_log_dir, 'job_{0}.log'.format(i))
-            job_cfg = dict(
-                executable=run_script,
-                arguments="-c {}".format(cfg),
-                output=stdout_log,
-                error=stderr_log,
-                log=job_log,
+            result = __submit_one(
+                txn, i, cfg, batch_directory, batch_log_dir, run_script
             )
-            sub = htcondor.Submit(job_cfg)
-            out = sub.queue(txn)
-            results.append(
-                dict(
-                    batch_id=int(out),
-                    batch=Batch.condor,
-                    config_file=cfg,
-                    stderr_log=stderr_log,
-                    stdout_log=stdout_log,
-                    job_log=job_log,
-                    status=Status.CREATED,
-                )
-            )
+            results.append(result)
 
     return results
+
+
+def __submit_one(txn, index, config_file, batch_directory, batch_log_dir, run_script):
+    cfg = os.path.realpath(config_file)
+    stderr_log = os.path.join(batch_log_dir, 'job_{0}.err'.format(index))
+    stdout_log = os.path.join(batch_log_dir, 'job_{0}.out'.format(index))
+    job_log = os.path.join(batch_log_dir, 'job_{0}.log'.format(index))
+    job_cfg = dict(
+        executable=run_script,
+        arguments="-c {}".format(cfg),
+        output=stdout_log,
+        error=stderr_log,
+        log=job_log,
+    )
+    sub = htcondor.Submit(job_cfg)
+    out = sub.queue(txn)
+    return dict(
+        batch_id=int(out),
+        batch=Batch.condor,
+        config_file=cfg,
+        stderr_log=stderr_log,
+        stdout_log=stdout_log,
+        job_log=job_log,
+        status=Status.CREATED,
+    )
 
 
 def get_status(batch_id):
     schedd = htcondor.Schedd()
     status, exit_code = __status_from_schedd(batch_id, schedd)
     if status == Status.UNKNOWN:
-        status, exit_code = __status_from_history(batch_id, schedd)
+        from_history = __status_from_history(batch_id, schedd)
+        if from_history is None:
+            return Status.UNKNOWN
+        status, exit_code = from_history
 
     if exit_code is None or exit_code == 0:
         return status
@@ -62,16 +70,33 @@ def get_status(batch_id):
 
 
 def __status_from_schedd(batch_id, schedd):
-    job = schedd.query('ClusterId==38', ['JobStatus', 'ExitCode'])
-    if job:
-        exit_code = job['ExitCode'] if 'ExitCode' in job else None
-        return job['JobStatus'], exit_code
-    else:
+    query = schedd.query('ClusterId=={0:d}'.format(
+        batch_id), ['JobStatus', 'ExitCode'])
+    if not query or query is None:
         return Status.UNKNOWN, None
+    for job in query:
+        exit_code = job['ExitCode'] if 'ExitCode' in job else None
+        status = CONDOR_STATUS[job['JobStatus']]
+        return status, exit_code
 
 
 def __status_from_history(batch_id, schedd):
-    query = 'ClusterId=={0}'.format(batch_id)
+    query = 'ClusterId=={0:d}'.format(batch_id)
     for job in schedd.history(query, ['JobStatus', 'ExitCode'], 1):
         exit_code = job['ExitCode'] if 'ExitCode' in job else None
-        return job['JobStatus'], exit_code
+        status = CONDOR_STATUS[job['JobStatus']]
+        return status, exit_code
+
+
+def resubmit(config_files, local_ids, batch_directory, batch_log_dir, run_script):
+    logger.info("Will resubmit {0} jobs".format(len(config_files)))
+    schedd = htcondor.Schedd()
+    results = []
+    with schedd.transaction() as txn:
+        for i, cfg in zip(local_ids, config_files):
+            result = __submit_one(
+                txn, i, cfg, batch_directory, batch_log_dir, run_script
+            )
+            results.append(result)
+
+    return results
