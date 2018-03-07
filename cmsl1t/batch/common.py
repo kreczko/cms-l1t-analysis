@@ -76,11 +76,6 @@ def _get_run_script(setup_script, project_root, shared_fs=True):
         'cmsl1t -c "$1"',
         '',
     ]
-    run_script_contents = [
-        '#!/usr/bin/env bash',
-        'sleep 600',
-        '',
-    ]
     if not shared_fs:
         # infer project root
         pass
