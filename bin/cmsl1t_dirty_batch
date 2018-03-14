@@ -203,6 +203,8 @@ def create_info_file(batch_dir):
               help='Select the job submission system to use')
 @click_log.simple_verbosity_option(logger)
 def run(config_file, debug, batch, files_per_job):
+    logger.warning('This command is deprecated and will be removed soon.')
+    logger.warning('Please use `cmsl1t_batch` instead.')
     # Read the config file
     config = ConfigParser()
     config.read(config_file)
