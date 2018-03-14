@@ -1,3 +1,4 @@
+from itertools import izip
 import math
 import logging
 import os
@@ -120,6 +121,13 @@ def prepare_output_folders(output_folder):
 
 
 def prepare_jobs(config, batch_filename_template, outdir, files_per_job):
+    job_generator = _prepare_jobs(
+        config, batch_filename_template, outdir, files_per_job)
+    job_configs, job_ids, output_folders = izip(*job_generator)
+    return job_configs, job_ids, output_folders
+
+
+def _prepare_jobs(config, batch_filename_template, outdir, files_per_job):
     # Get the list of input files
     input_ntuples = config.get('input', 'files')
     input_ntuples = _prepare_input_file_groups(input_ntuples, files_per_job)

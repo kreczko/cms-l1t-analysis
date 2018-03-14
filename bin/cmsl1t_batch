@@ -7,7 +7,6 @@ import yaml
 import os
 from textwrap import dedent
 import logging
-from itertools import izip
 
 from cmsl1t.config import ConfigParser
 from cmsl1t.batch import Batch, condor_submit, lsf_submit
@@ -43,8 +42,8 @@ def run(config_file, debug, batch, files_per_job):
     batch_filename = get_config_name_template(config_file, batch_config_dir)
     # Prepare input jobs
     outdir = os.path.join(batch_dir, "job_{index}")
-    job_generator = prepare_jobs(config, batch_filename, outdir, files_per_job)
-    job_configs, job_ids, output_folders = izip(*job_generator)
+    job_configs, job_ids, output_folders = prepare_jobs(
+        config, batch_filename, outdir, files_per_job)
 
     project_root = os.environ["PROJECT_ROOT"]
     setup_script = os.path.join(project_root, "bin", "env.sh")
