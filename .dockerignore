@@ -103,4 +103,5 @@ external
 workspace
 data
 benchmark
+legacy
 output
