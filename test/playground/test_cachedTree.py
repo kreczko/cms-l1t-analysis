@@ -3,16 +3,16 @@ import numpy as np
 from cmsl1t.playground.cache import CachedIndexedTree
 
 
-class TestTree(object):
+class DummyTree(object):
     def __init__(self, size):
         self.pt = np.random.rand(size)
         self.eta = np.random.rand(size)
         self.size = size
 
 
-class TestEvent(object):
+class DummyEvent(object):
     def __init__(self):
-        self._tree = CachedIndexedTree(TestTree(3), 'size')
+        self._tree = CachedIndexedTree(DummyTree(3), 'size')
 
     @property
     def tree(self):
@@ -22,7 +22,7 @@ class TestEvent(object):
 class TestCachedIndexedTree(unittest.TestCase):
 
     def test_access(self):
-        event = TestEvent()
+        event = DummyEvent()
         self.assertEqual(event.tree[0].pt, event.tree.pt[0])
 
         for t in event.tree:

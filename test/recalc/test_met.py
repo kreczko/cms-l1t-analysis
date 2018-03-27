@@ -4,7 +4,7 @@ from cmsl1t.recalc.met import l1Met28Only
 import math
 
 
-class TestCaloTower(object):
+class DummyCaloTower(object):
 
     def __init__(self, ieta, iet, iphi):
         self.ieta = ieta
@@ -20,8 +20,8 @@ class TestCaloTower(object):
 class TestRecalcMET(unittest.TestCase):
 
     def test_l1Met28Only(self):
-        c1 = TestCaloTower(28, 30, 0)
-        c2 = TestCaloTower(22, 30, 0)
+        c1 = DummyCaloTower(28, 30, 0)
+        c2 = DummyCaloTower(22, 30, 0)
         met = l1Met28Only([c1, c2])
         self.assertEqual(met.x, -c1.ex)
         self.assertEqual(met.y, -c1.ey)
