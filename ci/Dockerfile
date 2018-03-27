@@ -15,7 +15,6 @@ ENV CODE_PATH /analysis
 RUN useradd cmsl1t
 RUN mkdir ${CODE_PATH} && chown -R cmsl1t ${CODE_PATH}
 
-ADD ci/test.sh /ci/test.sh
 WORKDIR ${CODE_PATH}
 #USER cmsl1t
 
