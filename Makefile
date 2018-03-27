@@ -1,7 +1,6 @@
 # simple makefile to simplify repetitive build env management tasks under posix
 
 PYTHON := $(shell which python)
-NOSETESTS := $(shell which nosetests)
 
 all: clean setup
 
