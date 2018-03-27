@@ -11,7 +11,7 @@ before_install:
   - docker pull kreczko/cms-l1t-analysis:travis
 
 install:
-  - docker run -d -v $PWD:/analysis --privileged=true --name=cmsl1t_test kreczko/cms-l1t-analysis:travis
+  - docker run -d -v $PWD:/analysis --privileged --name=cmsl1t_test kreczko/cms-l1t-analysis:travis
   - docker ps -a
   - echo "Waiting for CVMFS to start up"
   - sleep 30
