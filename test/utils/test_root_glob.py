@@ -12,6 +12,7 @@ except ImportError:
     from mock import patch
 
 from cmsl1t.utils.root_glob import glob as root_glob
+import pytest
 
 # Create a faked file system
 fs = fake_fs.FakeFilesystem()
@@ -44,14 +45,14 @@ def test_glob_local_multiple_wildcards():
         assert_equal(root_glob(filename), py_glob(filename))
 
 
-@attr('grid_access')
+@pytest.mark.xrootdtest
 def test_glob_xrootd_single():
     filename = "root://lcgse01.phy.bris.ac.uk///cms/store/PhEDEx_LoadTest07/"\
         "LoadTest07_Debug_T2_UK_SGrid_Bristol/LoadTest07_SouthGrid_Bristol_3B"
     assert_equal(root_glob(filename), [filename])
 
 
-@attr('grid_access')
+@pytest.mark.xrootdtest
 def test_glob_xrootd_wildcard():
     filename = "root://lcgse01.phy.bris.ac.uk///cms/store/PhEDEx_LoadTest07/"\
         "LoadTest07_Debug_T2_UK_SGrid_Bristol/*"
