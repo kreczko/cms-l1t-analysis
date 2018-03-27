@@ -18,7 +18,7 @@ def test__create_output_dict_sym():
 
     params = fit._create_output_dict(success, [test_func], "")
 
-    assert params["success"] == False
+    assert not params["success"]
     assert params["mu"] == (1, 3)
     assert params["sigma_inv"] == (2, 4)
     assert params["sigma"][0] == 1. / 2

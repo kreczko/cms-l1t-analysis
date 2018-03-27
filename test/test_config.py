@@ -130,7 +130,7 @@ def test_input_section():
         parser._read_config(yaml.load(TEST_CONFIG))
         assert parser.get('input', 'files') == ALL_EXISTING_FILES
         assert parser.get('input', 'sample') == {
-                     'name': 'Data', 'title': '2016 Data'}
+            'name': 'Data', 'title': '2016 Data'}
 
 
 def test_input_section_missing_files():

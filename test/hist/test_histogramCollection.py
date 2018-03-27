@@ -54,7 +54,7 @@ def test_flatten_bin_list():
     assert flat_list == [(1, )]
     bin_list = [[1], [2, 3]]
     flat_list = hist.HistogramCollection._flatten_bins(bin_list)
-    assert flat_list  == [(1, 2), (1, 3)]
+    assert flat_list == [(1, 2), (1, 3)]
 
 
 def test_find_bins():
