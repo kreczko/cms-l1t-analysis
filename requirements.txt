@@ -12,4 +12,4 @@ dill
 mock
 boltons
 tabulate
-pytest
+pytest>=3.5.0

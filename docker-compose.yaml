@@ -15,3 +15,18 @@ services:
     tty: true
     domainname: foo.bar
     hostname: cmsl1t
+
+  ci:
+    build:
+      context: .
+      dockerfile: ci/Dockerfile
+      args:
+        USERID: ${USERID}
+    image: kreczko/cms-l1t-analysis:ci
+    volumes:
+      - .:/code
+    environment:
+      NO_CVMFS: 1
+    working_dir: /code
+    hostname: cmsl1t-ci
+    privileged: true

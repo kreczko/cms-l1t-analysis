@@ -8,17 +8,13 @@ services:
 
 before_install:
   - docker pull hepsw/cvmfs-cms
-  - docker pull kreczko/cms-l1t-analysis:travis
+  - docker pull kreczko/cms-l1t-analysis:ci
 
 install:
-  - docker run -d -v $PWD:/analysis --privileged --name=cmsl1t_test kreczko/cms-l1t-analysis:travis
-  - docker ps -a
-  - echo "Waiting for CVMFS to start up"
-  - sleep 30
+  - source ci/mapping.sh
+  - docker-compose build ci
 
 script:
-  - docker exec -t cmsl1t_test /bin/bash -c 'source /analysis/ci/test.sh'
+  - docker-compose up ci
 
-after_script:
-  - docker stop cmsl1t_test
 cache: apt
