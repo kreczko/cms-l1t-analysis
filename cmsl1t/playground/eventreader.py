@@ -4,7 +4,6 @@ import six
 import os
 import math
 
-from boltons.cacheutils import cached
 from cmsl1t.playground.jetfilters import pfJetFilter
 from metfilters import pfMetFilter
 from cmsl1t.playground.cache import CachedIndexedTree
@@ -44,7 +43,6 @@ def get_trees(load_emu_trees, load_reco_trees):
     return trees
 
 
-@cached
 def _energySumTypes():
     load_ROOT_library('L1TAnalysisDataformats.so')
     sumTypes = ROOT.l1t.EtSum
