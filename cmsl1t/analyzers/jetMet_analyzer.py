@@ -1,4 +1,4 @@
-from BaseAnalyzer import BaseAnalyzer
+from cmsl1t.analyzers.BaseAnalyzer import BaseAnalyzer
 from cmsl1t.plotting.efficiency import EfficiencyPlot
 from cmsl1t.collections import EfficiencyCollection
 from cmsl1t.plotting.onlineVsOffline import OnlineVsOffline
@@ -6,7 +6,7 @@ from cmsl1t.plotting.resolution import ResolutionPlot
 from cmsl1t.plotting.resolution_vs_X import ResolutionVsXPlot
 from cmsl1t.playground.jetfilters import pfJetFilter
 from cmsl1t.playground.metfilters import pfMetFilter
-from cmsl1t.playground.lumifilters import lumiFilter
+from cmsl1t.filters import LuminosityFilter
 import cmsl1t.recalc.met as recalc
 from cmsl1t.energySums import EnergySum, Met
 from math import pi
@@ -106,9 +106,14 @@ class Analyzer(BaseAnalyzer):
     def __init__(self, config, **kwargs):
         super(Analyzer, self).__init__("jetMet_analyzer", config)
 
+        self._lumiFilter = None
         self._lumiJson = config.try_get('input', 'lumi_json', '')
-        self._lastLumi = -1
+        if self._lumiJson:
+            self._lumiFilter = LuminosityFilter(self._lumiJson)
+
+        self._lastRunAndLumi = (-1, -1)
         self._processLumi = True
+
         self._doEmu = config.try_get('analysis', 'do_emu', False)
         self._sumTypes, self._jetTypes = types(self._doEmu)
 
@@ -305,16 +310,7 @@ class Analyzer(BaseAnalyzer):
 
     def fill_histograms(self, entry, event):
 
-        if self._lumiJson:
-            if event._lumi != self._lastLumi:
-                self._lastLumi = event._lumi
-                if lumiFilter(event._run, event._lumi, self._lumiJson):
-                    self._processLumi = True
-                else:
-                    self._processLumi = False
-                    return True
-
-        if not self._processLumi:
+        if not self._passesLumiFilter(event._run, event._lumi):
             return True
 
         offline, online = extractSums(event, self._doEmu)
@@ -430,6 +426,17 @@ class Analyzer(BaseAnalyzer):
                     )
 
         return True
+
+    def _passesLumiFilter(self, run, lumi):
+        if self._lumiFilter is None:
+            return True
+        if (run, lumi) == self._lastRunAndLumi:
+            return self._processLumi
+
+        self._lastRunAndLumi = (run, lumi)
+        self._processLumi = self._lumiFilter(run, lumi)
+
+        return self._processLumi
 
     def make_plots(self):
         """
