@@ -20,7 +20,7 @@ def cumulative_sum_and_error(hist):
 
 
 def _reversed_cumulative_sum(values):
-    reversed_values = np.flipud(values)
+    reversed_values = np.array(np.flipud(values))
     cumsum = np.cumsum(reversed_values)
-    reversed_cumsum = np.flipud(cumsum)
+    reversed_cumsum = np.array(np.flipud(cumsum))
     return reversed_cumsum
