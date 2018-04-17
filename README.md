@@ -14,6 +14,7 @@ This includes nodes lxplus.cern.ch & private clusters
 git clone https://github.com/<your github user name>/cms-l1t-analysis.git
 cd cms-l1t-analysis
 git remote add upstream https://github.com/cms-l1t-offline/cms-l1t-analysis.git
+git pull --rebase upstream master
 source bin/env.sh
 # you will need your grid cert
 voms-proxy-init --voms cms
