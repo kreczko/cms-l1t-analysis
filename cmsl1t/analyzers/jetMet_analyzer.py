@@ -232,7 +232,7 @@ class Analyzer(BaseAnalyzer):
             for l1trig, thresh in allThresholds.items():
                 if emulator and "Emu" not in l1trig or not emulator and "Emu" in l1trig:
                     continue
-                if l1trig.replace("_Emu","") in cfg.name:
+                if l1trig.replace("_Emu", "") in cfg.name:
                     thresholds = thresh
                     break
             if 'pfMET' in cfg.name:
