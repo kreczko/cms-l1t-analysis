@@ -16,6 +16,12 @@ services:
     domainname: foo.bar
     hostname: cmsl1t
 
+  ci-base:
+    build:
+      context: .
+      dockerfile: ci/Dockerfile.base
+    image: kreczko/cms-l1t-analysis-ci-base
+
   ci:
     build:
       context: .
