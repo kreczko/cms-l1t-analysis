@@ -35,17 +35,16 @@ class RateVsPileupPlot(BasePlotter):
 
         self.filename_format = name
 
-
     def fill(self, pileup, online):
         self.plots[online].fill(pileup)
 
     def draw(self, with_fits=False):
 
-         for (threshold, ), hist in self.plots.flat_items_all():
-            hists=[]
-            labels=[]
-            fits=[]
-            thresholds=[]
+        for (threshold, ), hist in self.plots.flat_items_all():
+            hists = []
+            labels = []
+            fits = []
+            thresholds = []
             if not isinstance(threshold, int):
                 continue
             label_template = '{online_title} > {threshold} GeV'
@@ -57,7 +56,7 @@ class RateVsPileupPlot(BasePlotter):
             hist.drawstyle = "EP"
             hist.SetMarkerSize(0.5)
             hist.SetMarkerColor(2)
-            #if with_fits:
+            # if with_fits:
             #    fit = self.fits.get_bin_contents([threshold])
             #    fits.append(fit)
             hists.append(hist)
@@ -66,15 +65,13 @@ class RateVsPileupPlot(BasePlotter):
 
             self.__make_overlay(hists, fits, labels, thresholds)
 
-
-
     def overlay_with_emu(self, emu_plotter, with_fits=False):
 
-         for (threshold, ), hist in self.plots.flat_items_all():
-            hists=[]
-            labels=[]
-            fits=[]
-            thresholds=[]
+        for (threshold, ), hist in self.plots.flat_items_all():
+            hists = []
+            labels = []
+            fits = []
+            thresholds = []
             if not isinstance(threshold, int):
                 continue
             label_template = '{online_title} > {threshold} GeV'
@@ -86,34 +83,32 @@ class RateVsPileupPlot(BasePlotter):
             hist.drawstyle = "EP"
             hist.SetMarkerSize(0.5)
             hist.SetMarkerColor(1)
-            #if with_fits:
+            # if with_fits:
             #    fit = self.fits.get_bin_contents([threshold])
             #    fits.append(fit)
             hists.append(hist)
             labels.append(label)
             thresholds.append(threshold)
             for (emu_threshold, ), emu_hist in emu_plotter.plots.flat_items_all():
-                    if emu_threshold == threshold:
-                        label_template = '{online_title} > {threshold} GeV'
-                        emu_label = label_template.format(
-                            online_title=emu_plotter.online_title,
-                            threshold=emu_plotter.thresholds.bins[threshold],
-                            )
-                        emu_hist.Divide(emu_plotter.plots.get_bin_contents([bn.Base.everything]))
-                        emu_hist.drawstyle = "EP"
-                        emu_hist.SetMarkerSize(0.5)
-                        emu_hist.SetMarkerColor(2)
-                        #if with_fits:
-                        #    emu_fit = self.fits.get_bin_contents([threshold])
-                        #    fits.append(emu_fit)
-                        hists.append(emu_hist)
-                        labels.append(emu_label)
-                        thresholds.append(emu_threshold)
-
+                if emu_threshold == threshold:
+                    label_template = '{online_title} > {threshold} GeV'
+                    emu_label = label_template.format(
+                        online_title=emu_plotter.online_title,
+                        threshold=emu_plotter.thresholds.bins[threshold],
+                    )
+                    emu_hist.Divide(emu_plotter.plots.get_bin_contents([bn.Base.everything]))
+                    emu_hist.drawstyle = "EP"
+                    emu_hist.SetMarkerSize(0.5)
+                    emu_hist.SetMarkerColor(2)
+                    # if with_fits:
+                    #    emu_fit = self.fits.get_bin_contents([threshold])
+                    #    fits.append(emu_fit)
+                    hists.append(emu_hist)
+                    labels.append(emu_label)
+                    thresholds.append(emu_threshold)
 
             self.__make_overlay(hists, fits, labels, thresholds)
 
- 
     def __make_overlay(self, hists, fits, labels, thresholds, suffix=""):
         with preserve_current_style():
             # Draw each rate vs pileup (with fit)
@@ -124,7 +119,7 @@ class RateVsPileupPlot(BasePlotter):
                 for fit, hist in zip(fits, hists):
                     fit["asymmetric"].linecolor = hist.GetLineColor()
                     fit["asymmetric"].Draw("same")
-                    
+
             # Add labels
             label_canvas()
 
@@ -143,11 +138,9 @@ class RateVsPileupPlot(BasePlotter):
                 legend.SetBorderSize(0)
                 legend.Draw()
 
-
             # Save canvas to file
             name = self.filename_format.format(threshold=thresholds[0])
             self.save_canvas(canvas, name + suffix)
-
 
     def _is_consistent(self, new):
         """

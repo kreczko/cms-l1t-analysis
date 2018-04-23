@@ -34,6 +34,7 @@ def extractSums(event):
 
     return online
 
+
 # Eta ranges so we can put |\eta| < val as the legend header on the
 # efficiency plots.
 ETA_RANGES = dict(
@@ -46,6 +47,7 @@ ETA_RANGES = dict(
     METHF_Emu="|\\eta| < 5.0",
     JetET_Emu="|\\eta| < 5.0",
 )
+
 
 class Analyzer(BaseAnalyzer):
 
@@ -78,9 +80,9 @@ class Analyzer(BaseAnalyzer):
 
         for name in self._sumTypes + self._jetTypes:
             trig_thresholds = thresholds.get(name)
-            if(trig_thresholds==None):
+            if(trig_thresholds is None):
                 if "Emu" in name:
-                    trig_thresholds = thresholds.get(name.replace('_Emu',''))
+                    trig_thresholds = thresholds.get(name.replace('_Emu', ''))
                 else:
                     print('Error: Please specify thresholds in the config .yaml in dictionary format')
 
@@ -88,7 +90,7 @@ class Analyzer(BaseAnalyzer):
             rates_plot.build(name, puBins, 400, 0, 400)
 
             rate_vs_pileup_plot = getattr(self, name + "_rate_vs_pileup")
-            rate_vs_pileup_plot.build("L1 "+name, trig_thresholds, 16, 0, 80, ETA_RANGES.get(name))
+            rate_vs_pileup_plot.build("L1 " + name, trig_thresholds, 16, 0, 80, ETA_RANGES.get(name))
 
         '''
         self.rates = HistogramsByPileUpCollection(
@@ -122,7 +124,7 @@ class Analyzer(BaseAnalyzer):
         for name in self._sumTypes:
             on = online[name]
             getattr(self, name + "_rates").fill(pileup, on.et)
-            getattr(self, name + "_rate_vs_pileup").fill(pileup,on.et)
+            getattr(self, name + "_rate_vs_pileup").fill(pileup, on.et)
 
         # Jets:
         l1JetEts = [jet.et for jet in event._l1Jets]
@@ -172,7 +174,7 @@ class Analyzer(BaseAnalyzer):
 
         # calculate cumulative histograms
         for plot in self.all_plots:
-            if not 'rate_vs_pileup' in plot.filename_format:
+            if 'rate_vs_pileup' not in plot.filename_format:
                 hist = plot.plots.get_bin_contents([bn.Base.everything])
                 hist = cumulative_hist(hist)
                 hist = normalise_to_collision_rate(hist)
@@ -182,8 +184,8 @@ class Analyzer(BaseAnalyzer):
         for histo_name in self._sumTypes + self._jetTypes:
             if "_Emu" in histo_name:
                 continue
-            plotter = getattr(self, histo_name + '_rate_vs_pileup' )
-            emu_plotter = getattr(self, histo_name + "_Emu" + '_rate_vs_pileup' )
+            plotter = getattr(self, histo_name + '_rate_vs_pileup')
+            emu_plotter = getattr(self, histo_name + "_Emu" + '_rate_vs_pileup')
             plotter.overlay_with_emu(emu_plotter)
 
         print('  thresholds:')
