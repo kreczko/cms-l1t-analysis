@@ -31,12 +31,14 @@ ALL_TREE = {
 }
 
 
-def get_trees(load_emu_trees, load_reco_trees):
+def get_trees(load_emu_trees, load_reco_trees, load_vertex_trees):
     selected_trees = ['event', 'upgrade']
     if load_emu_trees:
         selected_trees.extend(['emuCaloTowers', 'emuUpgrade'])
     if load_reco_trees:
         selected_trees.extend(['jetReco', 'metFilterReco', 'recoTree'])
+    if load_vertex_trees and not load_reco_trees:
+        selected_trees.extend(['recoTree'])
     trees = {}
     for name in selected_trees:
         trees[name] = ALL_TREE[name]
@@ -279,7 +281,7 @@ class EventReader(object):
     '''
 
     def __init__(self, files, events=-1,
-                 load_emu_trees=False, load_reco_trees=True):
+                 load_emu_trees=False, load_reco_trees=True, load_vertex_trees=False):
         from cmsl1t.utils.root_glob import glob
         input_files = []
         for f in files:
@@ -291,7 +293,7 @@ class EventReader(object):
         self._trees = []
         self._names = []
         load_ROOT_library('L1TAnalysisDataformats.so')
-        allTrees = get_trees(load_emu_trees, load_reco_trees)
+        allTrees = get_trees(load_emu_trees, load_reco_trees, load_vertex_trees)
         for name, path in allTrees.iteritems():
             try:
                 chain = TreeChain(path, input_files, cache=True, events=events)
