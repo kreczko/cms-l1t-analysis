@@ -107,12 +107,18 @@ class Event(object):
             self._readEmuUpgradeSums()
 
         if "jetReco" in tree_names:
-            self._jets = []
+            self._pfJets = []
             for i in range(self._jetReco.Jet.nJets):
-                self._jets.append(Jet(self._jetReco.Jet, i))
+                self._pfJets.append(PFJet(self._jetReco.Jet, i))
             self._caloJets = []
             for i in range(self._jetReco.Jet.nCaloJets):
                 self._caloJets.append(CaloJet(self._jetReco.Jet, i))
+
+        if "genTree" in tree_names:
+            self._genJets = []
+            for i in range(self._genTree.Generator.nJet):
+                self._genJets.append(GenJet(self._genTree.Generator, i))
+            self._makeGenSums(self._genTree.Generator)
 
     def _readUpgradeSums(self):
         self._readSums(self._upgrade, prefix='L1')
@@ -140,6 +146,38 @@ class Event(object):
                     sums[prefix + name] = obj(et)
         self._l1Sums.update(sums)
 
+    def _makeGenSums(self, tree):
+
+        self._genSums = {}
+        genMetBE_X = genMetBE_Y = genMetHF_X = genMetHF_Y = 0
+        for genPartIt in range(tree.nPart):
+            if abs(tree.partId[genPartIt]) in [12, 13, 14, 16]:
+                genPhi = tree.partPhi[genPartIt]
+                genPt = tree.partPt[genPartIt]
+                genMetHF_X += genPt * math.cos(genPhi)
+                genMetHF_Y += genPt * math.sin(genPhi)
+                if abs(tree.partEta[genPartIt]) < 3.0:
+                    genMetBE_X += genPt * math.cos(genPhi)
+                    genMetBE_Y += genPt * math.sin(genPhi)
+        genMetBE = math.sqrt(genMetBE_X * genMetBE_X + genMetBE_Y * genMetBE_Y)
+        genMetHF = math.sqrt(genMetHF_X * genMetHF_X + genMetHF_Y * genMetHF_Y)
+        if genMetBE_Y and genMetBE_X:
+            genMetPhiBE = math.atan(genMetBE_Y / genMetBE_X)
+        else:
+            genMetPhiBE = 0
+        if genMetHF_Y and genMetHF_X:
+            genMetPhiHF = math.atan(genMetHF_Y / genMetHF_X)
+        else:
+            genMetPhiHF = 0
+
+        genHT = 0
+        for jetIt in range(tree.nJet):
+            genHT += tree.jetPt[jetIt]
+
+        self._genSums["genMetBE"] = Met(genMetBE, genMetPhiBE)
+        self._genSums["genMetHF"] = Met(genMetHF, genMetPhiHF)
+        self._genSums["genHT"] = EnergySum(genHT)
+
     def test(self):
         # for tree in self._trees:
         #     print(tree)
@@ -157,8 +195,8 @@ class Event(object):
         print('>>>> L1 energy sums:')
         for name, value in six.iteritems(self.l1Sums):
             print('>>>>>>>> {0} = {1}'.format(name, value))
-        print(self._jets[0].eta)
-        leadingJet = self.getLeadingRecoJet()
+        print(self._pfJets[0].eta)
+        leadingJet = self.getLeadingRefJet()
         if leadingJet:
             print('>>>> Leading reco jet ET', leadingJet.etCorr)
         goodJets = self.goodJets()
@@ -171,26 +209,32 @@ class Event(object):
         # for m in members:
         #     print('>' * 6, m[0], ':', m[1])
 
-    def goodJets(self, jetFilter=pfJetFilter, doCalo=False):
+    def goodJets(self, jetFilter=pfJetFilter, jetType="pf"):
         '''
             filters and ET orders the jet collection
         '''
         goodJets = None
-        if doCalo:
+        if jetType is "calo":
             goodJets = filter(jetFilter, self._caloJets)
-        else:
-            goodJets = filter(jetFilter, self._jets)
-        sorted_jets = sorted(
-            goodJets, key=lambda jet: jet.etCorr, reverse=True)
+            sorted_jets = sorted(
+                goodJets, key=lambda jet: jet.etCorr, reverse=True)
+        if jetType is "pf":
+            goodJets = filter(jetFilter, self._pfJets)
+            sorted_jets = sorted(
+                goodJets, key=lambda jet: jet.etCorr, reverse=True)
+        if jetType is "gen":
+            goodJets = filter(jetFilter, self._genJets)
+            sorted_jets = sorted(
+                goodJets, key=lambda jet: jet.etCorr, reverse=True)
         return sorted_jets
 
-    def getLeadingRecoJet(self, jetFilter=pfJetFilter, doCalo=False):
-        goodJets = self.goodJets(jetFilter, doCalo)
+    def getLeadingRefJet(self, jetFilter=pfJetFilter, jetType="pf"):
+        goodJets = self.goodJets(jetFilter, jetType)
         if not goodJets:
             return None
-        leadingRecoJet = goodJets[0]
-        if leadingRecoJet.etCorr > 20.0:
-            return leadingRecoJet
+        leadingRefJet = goodJets[0]
+        if leadingRefJet.etCorr > 20.0:
+            return leadingRefJet
         return None
 
     def getMatchedL1Jet(self, recoJet, l1Type='HW'):
@@ -214,8 +258,12 @@ class Event(object):
         return closestJet
 
     @property
-    def nVertex(self):
+    def nRecoVertex(self):
         return self._recoTree.Vertex.nVtx
+
+    @property
+    def nGenVertex(self):
+        return self._genTree.Generator.nVtx
 
     @property
     def caloTowers(self):
@@ -230,11 +278,15 @@ class Event(object):
         return self._jetReco.Sums
 
     @property
+    def genSums(self):
+        return self._genSums
+
+    @property
     def l1Sums(self):
         return self._l1Sums
 
 
-class Jet(object):
+class PFJet(object):
     '''
         Create a simple python wrapper for
         L1Analysis::L1AnalysisRecoJetDataFormat
@@ -263,6 +315,23 @@ class CaloJet(object):
             etCorr='caloEtCorr',
             eta='caloEta',
             phi='caloPhi',
+        )
+        for outattr, attr in read_attributes.items():
+            setattr(self, outattr, getattr(jets, attr)[index])
+
+
+class GenJet(object):
+    '''
+        Create a simple python wrapper for
+        L1Analysis::L1AnalysisGeneratorDataFormat
+    '''
+
+    def __init__(self, jets, index):
+        # this could be simplified with a list of attributes
+        read_attributes = dict(
+            etCorr='jetPt',
+            eta='jetEta',
+            phi='jetPhi',
         )
         for outattr, attr in read_attributes.items():
             setattr(self, outattr, getattr(jets, attr)[index])

@@ -15,12 +15,20 @@ from collections import namedtuple
 import numpy as np
 
 
-def types(doEmu):
-    sum_types = ["caloHT", "pfHT", "caloMETHF", "caloMETBE", "pfMET_NoMu"]
-    jet_types = ["caloJetET_BE", "caloJetET_HF", "pfJetET_BE", "pfJetET_HF"]
+def types(doEmu, doReco, doGen):
+
+    sum_types = []
+    jet_types = []
+    if doReco:
+        sum_types.extend(["caloHT", "pfHT", "caloMETHF", "caloMETBE", "pfMET_NoMu"])
+        jet_types.extend(["caloJetET_BE", "caloJetET_HF", "pfJetET_BE", "pfJetET_HF"])
+    if doGen:
+        sum_types.extend(["genHT", "genMETHF", "genMETBE"])
+        jet_types.extend(["genJetET_BE", "genJetET_HF"])
     if doEmu:
         sum_types += [t + '_Emu' for t in sum_types]
         jet_types += [t + '_Emu' for t in jet_types]
+
     return sum_types, jet_types
 
 
@@ -66,29 +74,31 @@ HIGH_RANGE_BINS_HT = np.asarray(HIGH_RANGE_BINS_HT, 'd')
 HIGH_RANGE_BINS_FWD = np.asarray(HIGH_RANGE_BINS_FWD, 'd')
 
 
-def extractSums(event, doEmu):
-    offline = dict(
-        caloHT=EnergySum(event.sums.caloHt),
-        pfHT=EnergySum(event.sums.Ht),
-        caloMETBE=Met(event.sums.caloMetBE, event.sums.caloMetPhiBE),
-        caloMETHF=Met(event.sums.caloMet, event.sums.caloMetPhi),
-        pfMET_NoMu=Met(event.sums.pfMetNoMu, event.sums.pfMetNoMuPhi),
-    )
-    online = dict(
-        caloHT=event.l1Sums["L1Htt"],
-        pfHT=event.l1Sums["L1Htt"],
-        caloMETBE=event.l1Sums["L1Met"],
-        caloMETHF=event.l1Sums["L1MetHF"],
-        pfMET_NoMu=event.l1Sums["L1MetHF"],
-    )
-
-    if doEmu:
+def extractSums(event, doEmu, doReco, doGen):
+    offline = dict()
+    online = dict()
+    if doReco:
         offline.update(dict(
-            caloHT_Emu=EnergySum(event.sums.caloHt),
-            pfHT_Emu=EnergySum(event.sums.Ht),
-            caloMETBE_Emu=Met(event.sums.caloMetBE, event.sums.caloMetPhiBE),
-            caloMETHF_Emu=Met(event.sums.caloMet, event.sums.caloMetPhi),
-            pfMET_NoMu_Emu=Met(event.sums.pfMetNoMu, event.sums.pfMetNoMuPhi),
+            caloHT=EnergySum(event.sums.caloHt),
+            pfHT=EnergySum(event.sums.Ht),
+            caloMETBE=Met(event.sums.caloMetBE, event.sums.caloMetPhiBE),
+            caloMETHF=Met(event.sums.caloMet, event.sums.caloMetPhi),
+            pfMET_NoMu=Met(event.sums.pfMetNoMu, event.sums.pfMetNoMuPhi),
+        ))
+        if doEmu:
+            offline.update(dict(
+                caloHT_Emu=EnergySum(event.sums.caloHt),
+                pfHT_Emu=EnergySum(event.sums.Ht),
+                caloMETBE_Emu=Met(event.sums.caloMetBE, event.sums.caloMetPhiBE),
+                caloMETHF_Emu=Met(event.sums.caloMet, event.sums.caloMetPhi),
+                pfMET_NoMu_Emu=Met(event.sums.pfMetNoMu, event.sums.pfMetNoMuPhi),
+            ))
+        online.update(dict(
+            caloHT=event.l1Sums["L1Htt"],
+            pfHT=event.l1Sums["L1Htt"],
+            caloMETBE=event.l1Sums["L1Met"],
+            caloMETHF=event.l1Sums["L1MetHF"],
+            pfMET_NoMu=event.l1Sums["L1MetHF"],
         ))
         online.update(dict(
             caloHT_Emu=event.l1Sums["L1EmuHtt"],
@@ -97,6 +107,29 @@ def extractSums(event, doEmu):
             caloMETHF_Emu=event.l1Sums["L1EmuMetHF"],
             pfMET_NoMu_Emu=event.l1Sums["L1EmuMetHF"],
         ))
+
+    if doGen:
+        offline.update(dict(
+            genHT=event.genSums["genHT"],
+            genMETHF=event.genSums["genMetHF"],
+            genMETBE=event.genSums["genMetBE"]
+        ))
+        online.update(dict(
+            genHT=event.l1Sums["L1Htt"],
+            genMETHF=event.l1Sums["L1MetHF"],
+            genMETBE=event.l1Sums["L1Met"]
+        ))
+        if doEmu:
+            offline.update(dict(
+                genHT_Emu=event.genSums["genHT"],
+                genMETHF_Emu=event.genSums["genMetHF"],
+                genMETBE_Emu=event.genSums["genMetBE"]
+            ))
+            online.update(dict(
+                genHT_Emu=event.l1Sums["L1EmuHtt"],
+                genMETHF_Emu=event.l1Sums["L1EmuMetHF"],
+                genMETBE_Emu=event.l1Sums["L1EmuMet"]
+            ))
 
     return offline, online
 
@@ -114,8 +147,12 @@ class Analyzer(BaseAnalyzer):
         self._lastRunAndLumi = (-1, -1)
         self._processLumi = True
 
+        self._doVertex = config.try_get('analysis', 'do_vertex', False)
         self._doEmu = config.try_get('analysis', 'do_emu', False)
-        self._sumTypes, self._jetTypes = types(self._doEmu)
+        self._doReco = config.try_get('analysis', 'do_reco', True)
+        self._doGen = config.try_get('analysis', 'do_gen', False)
+
+        self._sumTypes, self._jetTypes = types(self._doEmu, self._doReco, self._doGen)
 
         for name in self._sumTypes:
             eff_plot = EfficiencyPlot("L1", "offline_" + name)
@@ -167,8 +204,11 @@ class Analyzer(BaseAnalyzer):
             setattr(self, name + "_2D_HR", twoD_plot_HR)
 
         self.res_vs_eta_CentralJets = ResolutionVsXPlot(
-            "energy", "onlineJet", "offlineJet", "offlineJet_eta")
+            "energy", "", "", "pfJet_eta")
         self.register_plotter(self.res_vs_eta_CentralJets)
+        self.res_vs_eta_CentralGenJets = ResolutionVsXPlot(
+            "energy", "", "", "genJet_eta")
+        self.register_plotter(self.res_vs_eta_CentralGenJets)
 
     def prepare_for_events(self, reader):
         puBins = self.puBins
@@ -178,21 +218,34 @@ class Analyzer(BaseAnalyzer):
             "Config",
             "name off_title on_title min max",
         )
-        cfgs = [
-            Config("caloHT", "Offline Calo HT", "L1 HT", 30, 800),
-            Config("pfHT", "Offline PF HT", "L1 HT", 30, 800),
-            Config("caloMETHF", "Offline Calo MET HF", "L1 MET HF", 0, 400),
-            Config("caloMETBE", "Offline Calo MET BE", "L1 MET BE", 0, 400),
-            Config("pfMET_NoMu", "Offline PF MET NoMu", "L1 MET HF", 0, 400),
-            Config("caloJetET_BE", "Offline Central Calo Jet ET",
-                   "L1 Jet ET", 20, 400),
-            Config("caloJetET_HF", "Offline Forward Calo Jet ET",
-                   "L1 Jet ET", 20, 400),
-            Config("pfJetET_BE", "Offline Central PF Jet ET",
-                   "L1 Jet ET", 20, 400),
-            Config("pfJetET_HF", "Offline Forward PF Jet ET",
-                   "L1 Jet ET", 20, 400),
-        ]
+        cfgs = []
+        if self._doReco:
+            cfgs.extend([
+                Config("caloHT", "Offline Calo HT", "L1 HT", 30, 800),
+                Config("pfHT", "Offline PF HT", "L1 HT", 30, 800),
+                Config("caloMETHF", "Offline Calo MET HF", "L1 MET HF", 0, 400),
+                Config("caloMETBE", "Offline Calo MET BE", "L1 MET BE", 0, 400),
+                Config("pfMET_NoMu", "Offline PF MET NoMu", "L1 MET HF", 0, 400),
+                Config("caloJetET_BE", "Offline Central Calo Jet ET",
+                       "L1 Jet ET", 20, 400),
+                Config("caloJetET_HF", "Offline Forward Calo Jet ET",
+                       "L1 Jet ET", 20, 400),
+                Config("pfJetET_BE", "Offline Central PF Jet ET",
+                       "L1 Jet ET", 20, 400),
+                Config("pfJetET_HF", "Offline Forward PF Jet ET",
+                       "L1 Jet ET", 20, 400),
+            ])
+        if self._doGen:
+            cfgs.extend([
+                Config("genHT", "Gen HT", "L1 HT", 30, 800),
+                Config("genMETHF", "Gen MET HF", "L1 MET HF", 0, 400),
+                Config("genMETBE", "Gen MET BE", "L1 MET BE", 0, 400),
+                Config("genJetET_BE", "Central Gen Jet ET",
+                       "L1 Jet ET", 20, 400),
+                Config("genJetET_HF", "Forward Gen Jet ET",
+                       "L1 Jet ET", 20, 400),
+            ])
+
         self._plots_from_cfgs(cfgs, puBins)
         if self._doEmu:
             self._plots_from_cfgs(cfgs, puBins, emulator=True)
@@ -202,6 +255,13 @@ class Analyzer(BaseAnalyzer):
                 cfgs, puBins_HR, emulator=True, high_range=True)
 
         self.res_vs_eta_CentralJets.build(
+            "Online Jet energy (GeV)",
+            "Offline Jet energy (GeV)",
+            "Offline Jet Eta (rad)",
+            puBins,
+            50, -0.5, 3.5, 50, -5.0, 5.0,
+        )
+        self.res_vs_eta_CentralGenJets.build(
             "Online Jet energy (GeV)",
             "Offline Jet energy (GeV)",
             "Offline Jet Eta (rad)",
@@ -313,8 +373,15 @@ class Analyzer(BaseAnalyzer):
         if not self._passesLumiFilter(event._run, event._lumi):
             return True
 
-        offline, online = extractSums(event, self._doEmu)
-        pileup = event.nVertex
+        offline, online = extractSums(event, self._doEmu, self._doReco, self._doGen)
+
+        recoNVtx = 1
+        genNVtx = 1
+
+        if self._doReco or self._doVertex:
+            recoNVtx = event.nRecoVertex
+        if self._doGen:
+            genNVtx = event.nGenVertex
 
         for name in self._sumTypes:
             if 'pfMET' in name and not pfMetFilter(event):
@@ -324,106 +391,161 @@ class Analyzer(BaseAnalyzer):
             for suffix in ['_eff', '_res', '_2D', '_eff_HR', '_2D_HR']:
                 if '_res' in suffix and on.et < 0.01:
                     continue
+                pileup = recoNVtx
+                if 'gen' in name:
+                    pileup = genNVtx
                 getattr(self, name + suffix).fill(pileup, off.et, on.et)
             if hasattr(self, name + "_phi_res"):
                 getattr(self, name + "_phi_res").fill(pileup, off.phi, on.phi)
                 getattr(self, name + "_phi_2D").fill(pileup, off.phi, on.phi)
 
-        goodPFJets = event.goodJets(jetFilter=pfJetFilter, doCalo=False)
-        # goodCaloJets = event.goodJets(jetFilter=None, doCalo=True)
+        if self._doReco and self._doEmu:
+            goodRefJets = event.goodJets(jetFilter=pfJetFilter, jetType="pf")
 
-        if self._doEmu:
-            for pfJet in goodPFJets:
-                l1Jet = event.getMatchedL1Jet(pfJet, l1Type='EMU')
+            for refJet in goodRefJets:
+                l1Jet = event.getMatchedL1Jet(refJet, l1Type='EMU')
                 if not l1Jet:
                     continue
-                if pfJet.etCorr > 30.:
+                if refJet.etCorr > 30.:
                     self.res_vs_eta_CentralJets.fill(
-                        pileup, pfJet.eta, pfJet.etCorr, l1Jet.et)
+                        recoNVtx, refJet.eta, refJet.etCorr, l1Jet.et)
 
-        leadingPFJet = event.getLeadingRecoJet(
-            jetFilter=pfJetFilter, doCalo=False)
-        leadingCaloJet = event.getLeadingRecoJet(jetFilter=None, doCalo=True)
+        if self._doGen and self._doEmu:
+            goodRefJets = event.goodJets(jetFilter=None, jetType="gen")
 
-        if leadingPFJet:
+            for refJet in goodRefJets:
+                l1Jet = event.getMatchedL1Jet(refJet, l1Type='EMU')
+                if not l1Jet:
+                    continue
+                if refJet.etCorr > 30.:
+                    self.res_vs_eta_CentralGenJets.fill(
+                        genNVtx, refJet.eta, refJet.etCorr, l1Jet.et)
 
-            pfFillRegions = []
-            if abs(leadingPFJet.eta) < 3.0:
-                pfFillRegions = ['BE']
-            else:
-                pfFillRegions = ['HF']
+        if self._doGen:
+            leadingGenJet = event.getLeadingRefJet(jetFilter=None, jetType="gen")
 
-            if self._doEmu:
-                pfL1EmuJet = event.getMatchedL1Jet(leadingPFJet, l1Type='EMU')
-                if pfL1EmuJet:
-                    pfL1EmuJetEt = pfL1EmuJet.et
+            if leadingGenJet:
+
+                genFillRegions = []
+                if abs(leadingGenJet.eta) < 3.0:
+                    genFillRegions = ['BE']
                 else:
-                    pfL1EmuJetEt = 0.
+                    genFillRegions = ['HF']
+
+                if self._doEmu:
+                    genL1EmuJet = event.getMatchedL1Jet(leadingGenJet, l1Type='EMU')
+                    if genL1EmuJet:
+                        genL1EmuJetEt = genL1EmuJet.et
+                    else:
+                        genL1EmuJetEt = 0.
+
+                    for region in genFillRegions:
+                        for suffix in ['_eff', '_res', '_2D', '_eff_HR', '_2D_HR']:
+                            if '_res' in suffix and genL1EmuJetEt == 0:
+                                continue
+                            name = 'genJetET_{0}_Emu{1}'.format(region, suffix)
+                            getattr(self, name).fill(
+                                genNVtx, leadingGenJet.etCorr, genL1EmuJetEt,
+                            )
+
+                genL1Jet = event.getMatchedL1Jet(leadingGenJet, l1Type='HW')
+                if genL1Jet:
+                    genL1JetEt = genL1Jet.et
+                else:
+                    genL1JetEt = 0.
+
+                for region in genFillRegions:
+                    for suffix in ['_eff', '_res', '_2D', '_eff_HR', '_2D_HR']:
+                        if '_res' in suffix and genL1JetEt == 0:
+                            continue
+                        name = 'genJetET_{0}{1}'.format(region, suffix)
+                        getattr(self, name).fill(
+                            genNVtx, leadingGenJet.etCorr, genL1JetEt,
+                        )
+
+        if self._doReco:
+            leadingPFJet = event.getLeadingRefJet(jetFilter=pfJetFilter, jetType="pf")
+            leadingCaloJet = event.getLeadingRefJet(jetFilter=None, jetType="calo")
+
+            if leadingPFJet:
+
+                pfFillRegions = []
+                if abs(leadingPFJet.eta) < 3.0:
+                    pfFillRegions = ['BE']
+                else:
+                    pfFillRegions = ['HF']
+
+                if self._doEmu:
+                    pfL1EmuJet = event.getMatchedL1Jet(leadingPFJet, l1Type='EMU')
+                    if pfL1EmuJet:
+                        pfL1EmuJetEt = pfL1EmuJet.et
+                    else:
+                        pfL1EmuJetEt = 0.
+
+                    for region in pfFillRegions:
+                        for suffix in ['_eff', '_res', '_2D', '_eff_HR', '_2D_HR']:
+                            if '_res' in suffix and pfL1EmuJetEt == 0:
+                                continue
+                            name = 'pfJetET_{0}_Emu{1}'.format(region, suffix)
+                            getattr(self, name).fill(
+                                recoNVtx, leadingPFJet.etCorr, pfL1EmuJetEt,
+                            )
+
+                pfL1Jet = event.getMatchedL1Jet(leadingPFJet, l1Type='HW')
+                if pfL1Jet:
+                    pfL1JetEt = pfL1Jet.et
+                else:
+                    pfL1JetEt = 0.
 
                 for region in pfFillRegions:
                     for suffix in ['_eff', '_res', '_2D', '_eff_HR', '_2D_HR']:
-                        if '_res' in suffix and pfL1EmuJetEt == 0:
+                        if '_res' in suffix and pfL1JetEt == 0:
                             continue
-                        name = 'pfJetET_{0}_Emu{1}'.format(region, suffix)
+                        name = 'pfJetET_{0}{1}'.format(region, suffix)
                         getattr(self, name).fill(
-                            pileup, leadingPFJet.etCorr, pfL1EmuJetEt,
+                            recoNVtx, leadingPFJet.etCorr, pfL1JetEt,
                         )
 
-            pfL1Jet = event.getMatchedL1Jet(leadingPFJet, l1Type='HW')
-            if pfL1Jet:
-                pfL1JetEt = pfL1Jet.et
-            else:
-                pfL1JetEt = 0.
+            if leadingCaloJet:
 
-            for region in pfFillRegions:
-                for suffix in ['_eff', '_res', '_2D', '_eff_HR', '_2D_HR']:
-                    if '_res' in suffix and pfL1JetEt == 0:
-                        continue
-                    name = 'pfJetET_{0}{1}'.format(region, suffix)
-                    getattr(self, name).fill(
-                        pileup, leadingPFJet.etCorr, pfL1JetEt,
-                    )
-
-        if leadingCaloJet:
-
-            caloFillRegions = []
-            if abs(leadingCaloJet.eta) < 3.0:
-                caloFillRegions = ['BE']
-            else:
-                caloFillRegions = ['HF']
-
-            if self._doEmu:
-                caloL1EmuJet = event.getMatchedL1Jet(
-                    leadingCaloJet, l1Type='EMU')
-                if caloL1EmuJet:
-                    caloL1EmuJetEt = caloL1EmuJet.et
+                caloFillRegions = []
+                if abs(leadingCaloJet.eta) < 3.0:
+                    caloFillRegions = ['BE']
                 else:
-                    caloL1EmuJetEt = 0.
+                    caloFillRegions = ['HF']
+
+                if self._doEmu:
+                    caloL1EmuJet = event.getMatchedL1Jet(
+                        leadingCaloJet, l1Type='EMU')
+                    if caloL1EmuJet:
+                        caloL1EmuJetEt = caloL1EmuJet.et
+                    else:
+                        caloL1EmuJetEt = 0.
+
+                    for region in caloFillRegions:
+                        for suffix in ['_eff', '_res', '_2D', '_eff_HR', '_2D_HR']:
+                            if '_res' in suffix and caloL1EmuJetEt == 0:
+                                continue
+                            name = 'caloJetET_{0}_Emu{1}'.format(
+                                region, suffix)
+                            getattr(self, name).fill(
+                                recoNVtx, leadingCaloJet.etCorr, caloL1EmuJetEt,
+                            )
+
+                caloL1Jet = event.getMatchedL1Jet(leadingCaloJet, l1Type='HW')
+                if caloL1Jet:
+                    caloL1JetEt = caloL1Jet.et
+                else:
+                    caloL1JetEt = 0.
 
                 for region in caloFillRegions:
                     for suffix in ['_eff', '_res', '_2D', '_eff_HR', '_2D_HR']:
-                        if '_res' in suffix and caloL1EmuJetEt == 0:
+                        if '_res' in suffix and caloL1JetEt == 0:
                             continue
-                        name = 'caloJetET_{0}_Emu{1}'.format(
-                            region, suffix)
+                        name = 'caloJetET_{0}{1}'.format(region, suffix)
                         getattr(self, name).fill(
-                            pileup, leadingCaloJet.etCorr, caloL1EmuJetEt,
+                            recoNVtx, leadingCaloJet.etCorr, caloL1JetEt,
                         )
-
-            caloL1Jet = event.getMatchedL1Jet(leadingCaloJet, l1Type='HW')
-            if caloL1Jet:
-                caloL1JetEt = caloL1Jet.et
-            else:
-                caloL1JetEt = 0.
-
-            for region in caloFillRegions:
-                for suffix in ['_eff', '_res', '_2D', '_eff_HR', '_2D_HR']:
-                    if '_res' in suffix and caloL1JetEt == 0:
-                        continue
-                    name = 'caloJetET_{0}{1}'.format(region, suffix)
-                    getattr(self, name).fill(
-                        pileup, leadingCaloJet.etCorr, caloL1JetEt,
-                    )
 
         return True
 
@@ -445,73 +567,116 @@ class Analyzer(BaseAnalyzer):
         # for plot in self.all_plots:
         #    plot.draw()
 
-        getattr(self, 'caloHT_eff').draw()
-        getattr(self, 'pfHT_eff').draw()
-        getattr(self, 'caloMETBE_eff').draw()
-        getattr(self, 'caloMETHF_eff').draw()
-        getattr(self, 'pfMET_NoMu_eff').draw()
-        getattr(self, 'caloJetET_BE_eff').draw()
-        getattr(self, 'caloJetET_HF_eff').draw()
-        getattr(self, 'pfJetET_BE_eff').draw()
-        getattr(self, 'pfJetET_HF_eff').draw()
+        if self._doReco:
+            getattr(self, 'caloHT_eff').draw()
+            getattr(self, 'pfHT_eff').draw()
+            getattr(self, 'caloMETBE_eff').draw()
+            getattr(self, 'caloMETHF_eff').draw()
+            getattr(self, 'pfMET_NoMu_eff').draw()
+            getattr(self, 'caloJetET_BE_eff').draw()
+            getattr(self, 'caloJetET_HF_eff').draw()
+            getattr(self, 'pfJetET_BE_eff').draw()
+            getattr(self, 'pfJetET_HF_eff').draw()
 
-        getattr(self, 'caloHT_eff_HR').draw()
-        getattr(self, 'pfHT_eff_HR').draw()
-        getattr(self, 'caloMETBE_eff_HR').draw()
-        getattr(self, 'caloMETHF_eff_HR').draw()
-        getattr(self, 'pfMET_NoMu_eff_HR').draw()
-        getattr(self, 'caloJetET_BE_eff_HR').draw()
-        getattr(self, 'caloJetET_HF_eff_HR').draw()
-        getattr(self, 'pfJetET_BE_eff_HR').draw()
-        getattr(self, 'pfJetET_HF_eff_HR').draw()
+            getattr(self, 'caloHT_eff_HR').draw()
+            getattr(self, 'pfHT_eff_HR').draw()
+            getattr(self, 'caloMETBE_eff_HR').draw()
+            getattr(self, 'caloMETHF_eff_HR').draw()
+            getattr(self, 'pfMET_NoMu_eff_HR').draw()
+            getattr(self, 'caloJetET_BE_eff_HR').draw()
+            getattr(self, 'caloJetET_HF_eff_HR').draw()
+            getattr(self, 'pfJetET_BE_eff_HR').draw()
+            getattr(self, 'pfJetET_HF_eff_HR').draw()
 
-        getattr(self, 'caloHT_res').draw()
-        getattr(self, 'pfHT_res').draw()
-        getattr(self, 'caloMETBE_res').draw()
-        getattr(self, 'caloMETHF_res').draw()
-        getattr(self, 'pfMET_NoMu_res').draw()
-        getattr(self, 'caloJetET_BE_res').draw()
-        getattr(self, 'caloJetET_HF_res').draw()
-        getattr(self, 'pfJetET_BE_res').draw()
-        getattr(self, 'pfJetET_HF_res').draw()
+            getattr(self, 'caloHT_res').draw()
+            getattr(self, 'pfHT_res').draw()
+            getattr(self, 'caloMETBE_res').draw()
+            getattr(self, 'caloMETHF_res').draw()
+            getattr(self, 'pfMET_NoMu_res').draw()
+            getattr(self, 'caloJetET_BE_res').draw()
+            getattr(self, 'caloJetET_HF_res').draw()
+            getattr(self, 'pfJetET_BE_res').draw()
+            getattr(self, 'pfJetET_HF_res').draw()
 
-        if self._doEmu:
-            getattr(self, 'caloHT_eff').overlay_with_emu(
-                getattr(self, 'caloHT_Emu_eff'))
-            getattr(self, 'pfHT_eff').overlay_with_emu(
-                getattr(self, 'pfHT_Emu_eff'))
-            getattr(self, 'caloMETBE_eff').overlay_with_emu(
-                getattr(self, 'caloMETBE_Emu_eff'))
-            getattr(self, 'caloMETHF_eff').overlay_with_emu(
-                getattr(self, 'caloMETHF_Emu_eff'))
-            getattr(self, 'pfMET_NoMu_eff').overlay_with_emu(
-                getattr(self, 'pfMET_NoMu_Emu_eff'))
-            getattr(self, 'caloJetET_BE_eff').overlay_with_emu(
-                getattr(self, 'caloJetET_BE_Emu_eff'))
-            getattr(self, 'caloJetET_HF_eff').overlay_with_emu(
-                getattr(self, 'caloJetET_HF_Emu_eff'))
-            getattr(self, 'pfJetET_BE_eff').overlay_with_emu(
-                getattr(self, 'pfJetET_BE_Emu_eff'))
-            getattr(self, 'pfJetET_HF_eff').overlay_with_emu(
-                getattr(self, 'pfJetET_HF_Emu_eff'))
+            if self._doEmu:
+                getattr(self, 'caloHT_eff').overlay_with_emu(
+                    getattr(self, 'caloHT_Emu_eff'))
+                getattr(self, 'pfHT_eff').overlay_with_emu(
+                    getattr(self, 'pfHT_Emu_eff'))
+                getattr(self, 'caloMETBE_eff').overlay_with_emu(
+                    getattr(self, 'caloMETBE_Emu_eff'))
+                getattr(self, 'caloMETHF_eff').overlay_with_emu(
+                    getattr(self, 'caloMETHF_Emu_eff'))
+                getattr(self, 'pfMET_NoMu_eff').overlay_with_emu(
+                    getattr(self, 'pfMET_NoMu_Emu_eff'))
+                getattr(self, 'caloJetET_BE_eff').overlay_with_emu(
+                    getattr(self, 'caloJetET_BE_Emu_eff'))
+                getattr(self, 'caloJetET_HF_eff').overlay_with_emu(
+                    getattr(self, 'caloJetET_HF_Emu_eff'))
+                getattr(self, 'pfJetET_BE_eff').overlay_with_emu(
+                    getattr(self, 'pfJetET_BE_Emu_eff'))
+                getattr(self, 'pfJetET_HF_eff').overlay_with_emu(
+                    getattr(self, 'pfJetET_HF_Emu_eff'))
 
-            getattr(self, 'caloHT_res').overlay_with_emu(
-                getattr(self, 'caloHT_Emu_res'))
-            getattr(self, 'pfHT_res').overlay_with_emu(
-                getattr(self, 'pfHT_Emu_res'))
-            getattr(self, 'caloMETBE_res').overlay_with_emu(
-                getattr(self, 'caloMETBE_Emu_res'))
-            getattr(self, 'caloMETHF_res').overlay_with_emu(
-                getattr(self, 'caloMETHF_Emu_res'))
-            getattr(self, 'pfMET_NoMu_res').overlay_with_emu(
-                getattr(self, 'pfMET_NoMu_Emu_res'))
-            getattr(self, 'caloJetET_BE_res').overlay_with_emu(
-                getattr(self, 'caloJetET_BE_Emu_res'))
-            getattr(self, 'caloJetET_HF_res').overlay_with_emu(
-                getattr(self, 'caloJetET_HF_Emu_res'))
-            getattr(self, 'pfJetET_BE_res').overlay_with_emu(
-                getattr(self, 'pfJetET_BE_Emu_res'))
-            getattr(self, 'pfJetET_HF_res').overlay_with_emu(
-                getattr(self, 'pfJetET_HF_Emu_res'))
+                getattr(self, 'caloHT_res').overlay_with_emu(
+                    getattr(self, 'caloHT_Emu_res'))
+                getattr(self, 'pfHT_res').overlay_with_emu(
+                    getattr(self, 'pfHT_Emu_res'))
+                getattr(self, 'caloMETBE_res').overlay_with_emu(
+                    getattr(self, 'caloMETBE_Emu_res'))
+                getattr(self, 'caloMETHF_res').overlay_with_emu(
+                    getattr(self, 'caloMETHF_Emu_res'))
+                getattr(self, 'pfMET_NoMu_res').overlay_with_emu(
+                    getattr(self, 'pfMET_NoMu_Emu_res'))
+                getattr(self, 'caloJetET_BE_res').overlay_with_emu(
+                    getattr(self, 'caloJetET_BE_Emu_res'))
+                getattr(self, 'caloJetET_HF_res').overlay_with_emu(
+                    getattr(self, 'caloJetET_HF_Emu_res'))
+                getattr(self, 'pfJetET_BE_res').overlay_with_emu(
+                    getattr(self, 'pfJetET_BE_Emu_res'))
+                getattr(self, 'pfJetET_HF_res').overlay_with_emu(
+                    getattr(self, 'pfJetET_HF_Emu_res'))
+
+        if self._doGen:
+            getattr(self, 'genHT_eff').draw()
+            getattr(self, 'genMETBE_eff').draw()
+            getattr(self, 'genMETHF_eff').draw()
+            getattr(self, 'genJetET_BE_eff').draw()
+            getattr(self, 'genJetET_HF_eff').draw()
+
+            getattr(self, 'genHT_eff_HR').draw()
+            getattr(self, 'genMETBE_eff_HR').draw()
+            getattr(self, 'genMETHF_eff_HR').draw()
+            getattr(self, 'genJetET_BE_eff_HR').draw()
+            getattr(self, 'genJetET_HF_eff_HR').draw()
+
+            getattr(self, 'genHT_res').draw()
+            getattr(self, 'genMETBE_res').draw()
+            getattr(self, 'genMETHF_res').draw()
+            getattr(self, 'genJetET_BE_res').draw()
+            getattr(self, 'genJetET_HF_res').draw()
+
+            if self._doEmu:
+                getattr(self, 'genHT_eff').overlay_with_emu(
+                    getattr(self, 'genHT_Emu_eff'))
+                getattr(self, 'genMETBE_eff').overlay_with_emu(
+                    getattr(self, 'genMETBE_Emu_eff'))
+                getattr(self, 'genMETHF_eff').overlay_with_emu(
+                    getattr(self, 'genMETHF_Emu_eff'))
+                getattr(self, 'genJetET_BE_eff').overlay_with_emu(
+                    getattr(self, 'genJetET_BE_Emu_eff'))
+                getattr(self, 'genJetET_HF_eff').overlay_with_emu(
+                    getattr(self, 'genJetET_HF_Emu_eff'))
+
+                getattr(self, 'genHT_res').overlay_with_emu(
+                    getattr(self, 'genHT_Emu_res'))
+                getattr(self, 'genMETBE_res').overlay_with_emu(
+                    getattr(self, 'genMETBE_Emu_res'))
+                getattr(self, 'genMETHF_res').overlay_with_emu(
+                    getattr(self, 'genMETHF_Emu_res'))
+                getattr(self, 'genJetET_BE_Emu_res').overlay_with_emu(
+                    getattr(self, 'genJetET_BE_Emu_res'))
+                getattr(self, 'genJetET_HF_Emu_res').overlay_with_emu(
+                    getattr(self, 'genJetET_HF_Emu_res'))
 
         return True
