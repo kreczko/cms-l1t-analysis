@@ -1,0 +1,43 @@
+version: 0.0.1
+name: 'Jet Met MC Studies'
+
+input:
+  files:
+      # QCD MC
+       -   root://eoscms.cern.ch//eos/cms/store/group/dpg_trigger/comm_trigger/L1Trigger/bundocka/cmsl1t/100X_jec.root
+  sample:
+    name: MC
+    title: 100X MC
+  trigger:
+    name: genJEC
+    title: QCD
+  pileup_file: ""
+  run_number: 
+
+analysis:
+  do_emu: True
+  do_reco: False
+  do_vertex: False
+  do_gen: True
+  do_fit: True
+  pu_type: 0PU24,25PU49,50PU
+  pu_bins: [0,25,50,999]
+  thresholds:
+    HT: [120, 200, 320]
+    HT_Emu: [120, 200, 320]
+    METBE: [80, 100, 120]
+    METBE_Emu: [80, 100, 120]
+    METHF: [80, 100, 120]
+    METHF_Emu: [80, 100, 120] 
+    JetET: [35, 90, 120]
+    JetET_Emu: [35, 90, 120] 
+  analyzers:
+     - cmsl1t.analyzers.jetMet_analyzer
+  modifiers: []
+  progress_bar:
+    report_every: 1000
+
+output:
+  template:
+     - output/constant_rate_turnons
+     - "{date}_{run_number}_{sample_name}_{trigger_name}"
