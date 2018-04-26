@@ -43,10 +43,10 @@ ETA_RANGES = dict(
 )
 
 ALL_THRESHOLDS = dict(
-    HT=[120, 200, 320, 450],
-    METBE=[80, 100, 120, 150],
-    METHF=[80, 100, 120, 150],
-    JetET=[35, 90, 120, 180]
+    HT=[120, 200, 320],
+    METBE=[80, 100, 120],
+    METHF=[80, 100, 120],
+    JetET=[35, 90, 120]
 )
 
 HIGH_RANGE_BINS = list(range(0, 100, 5)) + list(range(100, 300, 10))
@@ -85,6 +85,13 @@ def extractSums(event, doEmu, doReco, doGen):
             caloMETHF=Met(event.sums.caloMet, event.sums.caloMetPhi),
             pfMET_NoMu=Met(event.sums.pfMetNoMu, event.sums.pfMetNoMuPhi),
         ))
+        online.update(dict(
+            caloHT=event.l1Sums["L1Htt"],
+            pfHT=event.l1Sums["L1Htt"],
+            caloMETBE=event.l1Sums["L1Met"],
+            caloMETHF=event.l1Sums["L1MetHF"],
+            pfMET_NoMu=event.l1Sums["L1MetHF"],
+        ))
         if doEmu:
             offline.update(dict(
                 caloHT_Emu=EnergySum(event.sums.caloHt),
@@ -93,20 +100,13 @@ def extractSums(event, doEmu, doReco, doGen):
                 caloMETHF_Emu=Met(event.sums.caloMet, event.sums.caloMetPhi),
                 pfMET_NoMu_Emu=Met(event.sums.pfMetNoMu, event.sums.pfMetNoMuPhi),
             ))
-        online.update(dict(
-            caloHT=event.l1Sums["L1Htt"],
-            pfHT=event.l1Sums["L1Htt"],
-            caloMETBE=event.l1Sums["L1Met"],
-            caloMETHF=event.l1Sums["L1MetHF"],
-            pfMET_NoMu=event.l1Sums["L1MetHF"],
-        ))
-        online.update(dict(
-            caloHT_Emu=event.l1Sums["L1EmuHtt"],
-            pfHT_Emu=event.l1Sums["L1EmuHtt"],
-            caloMETBE_Emu=event.l1Sums["L1EmuMet"],
-            caloMETHF_Emu=event.l1Sums["L1EmuMetHF"],
-            pfMET_NoMu_Emu=event.l1Sums["L1EmuMetHF"],
-        ))
+            online.update(dict(
+                caloHT_Emu=event.l1Sums["L1EmuHtt"],
+                pfHT_Emu=event.l1Sums["L1EmuHtt"],
+                caloMETBE_Emu=event.l1Sums["L1EmuMet"],
+                caloMETHF_Emu=event.l1Sums["L1EmuMetHF"],
+                pfMET_NoMu_Emu=event.l1Sums["L1EmuMetHF"],
+            ))
 
     if doGen:
         offline.update(dict(

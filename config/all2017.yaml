@@ -1,5 +1,5 @@
 version: 0.0.1
-name: 'Offline Met Studies'
+name: '2017 Performance'
 
 input:
   files:
@@ -25,16 +25,19 @@ input:
 
 analysis:
   do_emu: False
-  do_fit: False
+  do_reco: True
+  do_vertex: False
+  do_gen: False
+  do_fit: True
   pu_type: 0PU24,25PU49,50PU
   pu_bins: [25,50,999]
   analyzers:
-     - cmsl1t.analyzers.offline_met_analyzer
+     - cmsl1t.analyzers.jetMet_analyzer
   modifiers: []
   progress_bar:
     report_every: 1000
 
 output:
   template:
-     - output/offline_met_studies
+     - output/jetMet_analyzer
      - "{date}_{run_number}_{sample_name}_{trigger_name}"
