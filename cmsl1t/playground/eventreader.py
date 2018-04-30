@@ -248,6 +248,13 @@ class Event(object):
                 closestJet = l1Jet
         return closestJet
 
+    def passesMETFilter(self):
+        return pfMetFilter(self)
+
+    @property
+    def nVertex(self):
+        return self.nRecoVertex
+
     @property
     def nRecoVertex(self):
         return self._recoTree.Vertex.nVtx
