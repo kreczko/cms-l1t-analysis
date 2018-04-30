@@ -4,16 +4,14 @@ MAINTAINER kreczko@cern.ch
 
 COPY conda_requirements.txt /tmp/conda_requirements.txt
 
-RUN conda create -n cms python=2.7 -yq &&\
-   echo "Created conda environment, installing basic dependencies" && \
-   /bin/bash -c "source activate cms && \
-   conda install -yq --file /tmp/conda_requirements.txt" && \
+RUN /bin/bash -c "source activate cms && \
+   conda update -yq --file /tmp/conda_requirements.txt" && \
    conda clean -t -y
 
  COPY requirements.txt /tmp/requirements.txt
 
  RUN /bin/bash -c "source activate cms && \
-     pip install --no-cache-dir -r /tmp/requirements.txt"
+     pip install -U --no-cache-dir -r /tmp/requirements.txt"
 
 ENV CODE_PATH /code
 ENV USERNAME cmsl1t
