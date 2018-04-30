@@ -105,3 +105,6 @@ data
 benchmark
 legacy
 output
+build
+.git
+*.root

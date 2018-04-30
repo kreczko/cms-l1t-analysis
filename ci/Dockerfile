@@ -5,7 +5,7 @@ MAINTAINER kreczko@cern.ch
 COPY conda_requirements.txt /tmp/conda_requirements.txt
 
 RUN /bin/bash -c "source activate cms && \
-   conda update -yq --file /tmp/conda_requirements.txt" && \
+   conda install -yq --file /tmp/conda_requirements.txt" && \
    conda clean -t -y
 
  COPY requirements.txt /tmp/requirements.txt
