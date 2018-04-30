@@ -19,7 +19,7 @@ services:
   ci-base:
     build:
       context: .
-      dockerfile: ci/Dockerfile.base
+      dockerfile: ci/base/Dockerfile
     image: kreczko/cms-l1t-analysis-ci-base
 
   ci:
