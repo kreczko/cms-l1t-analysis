@@ -1,4 +1,3 @@
-from nose.tools import assert_equal, assert_false, assert_almost_equal, assert_true, assert_greater
 import cmsl1t.utils.fit_efficiency as fit
 from rootpy.plotting import F1, Hist, Canvas
 from rootpy import asrootpy, ROOT
@@ -6,7 +5,7 @@ from rootpy import asrootpy, ROOT
 
 def test_get_asymmetric_formula():
     formula = fit.get_asymmetric_formula()
-    assert_false("{" in formula)
+    assert "{" not in formula
 
 
 def test__create_output_dict_sym():
@@ -19,12 +18,12 @@ def test__create_output_dict_sym():
 
     params = fit._create_output_dict(success, [test_func], "")
 
-    assert_equal(params["success"], False)
-    assert_equal(params["mu"], (1, 3))
-    assert_equal(params["sigma_inv"], (2, 4))
-    assert_equal(params["sigma"][0], 1. / 2)
-    assert_equal(params["symmetric"].name, "sym")
-    assert_false("asymmetric" in params)
+    assert not params["success"]
+    assert params["mu"] == (1, 3)
+    assert params["sigma_inv"] == (2, 4)
+    assert params["sigma"][0] == 1. / 2
+    assert params["symmetric"].name == "sym"
+    assert "asymmetric" not in params
 
 
 def FakeEff(in_mean, in_sigma):
@@ -48,9 +47,9 @@ def test_fit_efficiency_symmetric():
     sigma = params["sigma"][0]
     mu_ratio = mu / in_mean if mu > in_mean else in_mean / mu
     sigma_ratio = sigma / in_sigma if sigma > in_sigma else in_sigma / sigma
-    assert_greater(1.1, mu_ratio)
-    assert_greater(1.5, sigma_ratio)
-    assert_true(params["success"])
+    assert 1.1 > mu_ratio
+    assert 1.5 > sigma_ratio
+    assert params["success"]
 
 
 def test_fit_efficiency_asymmetric():
@@ -65,7 +64,7 @@ def test_fit_efficiency_asymmetric():
     lamda = params["lambda"][0]
     mu_ratio = mu / in_mean if mu > in_mean else in_mean / mu
     sigma_ratio = sigma / in_sigma if sigma > in_sigma else in_sigma / sigma
-    assert_greater(1.1, mu_ratio)
-    assert_greater(1.5, sigma_ratio)
-    assert_greater(0.5, abs(lamda))
-    assert_true(params["success"])
+    assert 1.1 > mu_ratio
+    assert 1.5 > sigma_ratio
+    assert 0.5 > abs(lamda)
+    assert params["success"]

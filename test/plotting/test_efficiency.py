@@ -1,5 +1,4 @@
 from __future__ import print_function
-from nose.tools import assert_equal, assert_false
 from cmsl1t.plotting.efficiency import EfficiencyPlot
 import cmsl1t.hist.binning as bn
 from rootpy.io import root_open
@@ -53,10 +52,10 @@ def test_EffiencyPlot_noPU_oneThreshold():
             setattr(plotter, "n_non_integral_" + str(pu_bin), len(non_integral))
 
     # There should only be 1 non-integer bin: that which contains the actual threshold
-    assert_equal(1, plotters["on_v_on"].n_non_integral_0)
-    assert_equal(1, plotters["off_v_off"].n_non_integral_0)
-    assert_equal(1, plotters["on_v_on"].n_non_integral_everything)
-    assert_equal(1, plotters["off_v_off"].n_non_integral_everything)
+    assert 1 == plotters["on_v_on"].n_non_integral_0
+    assert 1 == plotters["off_v_off"].n_non_integral_0
+    assert 1 == plotters["on_v_on"].n_non_integral_everything
+    assert 1 == plotters["off_v_off"].n_non_integral_everything
 
 
 def test_EffiencyPlot_merge():
@@ -69,14 +68,6 @@ def test_EffiencyPlot_merge():
         merged.merge_in(plotters_1[plot_name])
         merged.merge_in(plotters_2[plot_name])
 
-    # with root_open("test/outputs/plotting-test_efficiency-merge.root", "w") as out_file:
-    #     for name, plotter in plotters_1.items():
-    #         plotter.to_root(out_file.mkdir(plotter.directory_name + "_pre_merge_1"))
-    #     for name, plotter in plotters_2.items():
-    #         plotter.to_root(out_file.mkdir(plotter.directory_name + "_pre_merge_2"))
-    #     for name, plotter in plotters_merged.items():
-    #         plotter.to_root(out_file.mkdir(plotter.directory_name + "_merged"))
-
     for name, plotter in plotters_merged.items():
         if not isinstance(plotter, EfficiencyPlot):
             continue
@@ -87,6 +78,6 @@ def test_EffiencyPlot_merge():
         zeroes = [zero_eff and over and yerr for zero_eff, over, yerr in zeroes]
         plotter.zeroes_over_thresh = zeroes
 
-    assert_false(any(plotters_merged["on_v_on"].zeroes_over_thresh))
-    assert_false(any(plotters_merged["off_v_off"].zeroes_over_thresh))
-    assert_false(any(plotters_merged["on_v_off"].zeroes_over_thresh))
+    assert not any(plotters_merged["on_v_on"].zeroes_over_thresh)
+    assert not any(plotters_merged["off_v_off"].zeroes_over_thresh)
+    assert not any(plotters_merged["on_v_off"].zeroes_over_thresh)

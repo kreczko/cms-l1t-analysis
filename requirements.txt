@@ -1,7 +1,6 @@
 memory_profiler
 flake8
 pep8
-nose
 click==6.7
 click-log==0.2.0
 sphinx
@@ -13,3 +12,4 @@ dill
 mock
 boltons
 tabulate
+pytest>=3.5.0

@@ -1,9 +1,6 @@
 from cmsl1t.config import (ConfigParser, resolve_file_paths)
 import yaml
 
-from nose.tools import (raises, assert_equal, assert_almost_equal,
-                        assert_raises, assert_true, assert_false)
-from nose import with_setup
 import pyfakefs.fake_filesystem as fake_fs
 import pyfakefs.fake_filesystem_glob as fake_glob
 
@@ -11,6 +8,7 @@ try:
     from unittest.mock import patch  # In Python 3, mock is built-in
 except ImportError:
     from mock import patch
+import pytest
 
 TEST_CONFIG = """
 version: 0.0.1
@@ -82,8 +80,8 @@ def test_general_section():
     with patch('glob.glob', glob.glob):
         parser = ConfigParser()
         parser._read_config(yaml.load(TEST_CONFIG))
-        assert_equal(parser.get('general', 'version'), '0.0.1')
-        assert_equal(parser.get('general', 'name'), 'Benchmark')
+        assert parser.get('general', 'version') == '0.0.1'
+        assert parser.get('general', 'name') == 'Benchmark'
 
 
 def test_invalid_section():
@@ -91,7 +89,7 @@ def test_invalid_section():
         parser = ConfigParser()
         config_with_invalid_section = yaml.load(
             TEST_CONFIG.replace('analysis:', 'ryan:'))
-        assert_raises(IOError, parser._read_config,
+        pytest.raises(IOError, parser._read_config,
                       config_with_invalid_section)
 
 
@@ -100,7 +98,7 @@ def test_invalid_analyzer():
         parser = ConfigParser()
         config_with_invalid_analyzer = yaml.load(
             TEST_CONFIG.replace('cmsl1t.analyzers.demo_analyzer', 'ben'))
-        assert_raises(IOError, parser._read_config,
+        pytest.raises(IOError, parser._read_config,
                       config_with_invalid_analyzer)
 
 
@@ -109,30 +107,30 @@ def test_invalid_modifier():
         parser = ConfigParser()
         config_with_invalid_analyzer = yaml.load(
             TEST_CONFIG.replace('cmsl1t.recalc.met.l1MetNot28', 'olivier'))
-        assert_raises(IOError, parser._read_config,
+        pytest.raises(IOError, parser._read_config,
                       config_with_invalid_analyzer)
 
 
 def test_resolve_file_paths():
     with patch('glob.glob', glob.glob):
         input_files = resolve_file_paths(['/tmp/l1t/L1Ntuple_*.root'])
-        assert_equal(input_files, ALL_EXISTING_FILES)
+        assert input_files == ALL_EXISTING_FILES
 
 
 def test_resolve_file_paths_missing_file():
     with patch('glob.glob', glob.glob):
         input_files = resolve_file_paths(
             ['/tmp/l1t/L1Ntuple_*.root', '/tmp/missingFile'])
-        assert_equal(input_files, ALL_EXISTING_FILES)
+        assert input_files == ALL_EXISTING_FILES
 
 
 def test_input_section():
     with patch('glob.glob', glob.glob):
         parser = ConfigParser()
         parser._read_config(yaml.load(TEST_CONFIG))
-        assert_equal(parser.get('input', 'files'), ALL_EXISTING_FILES)
-        assert_equal(parser.get('input', 'sample'), {
-                     'name': 'Data', 'title': '2016 Data'})
+        assert parser.get('input', 'files') == ALL_EXISTING_FILES
+        assert parser.get('input', 'sample') == {
+            'name': 'Data', 'title': '2016 Data'}
 
 
 def test_input_section_missing_files():
@@ -142,4 +140,4 @@ def test_input_section_missing_files():
             '/tmp/l1t/L1Ntuple_*.root', '/tmp/missingFile')
         config_with_missing_files = yaml.load(bad_input_files)
 
-        assert_raises(IOError, parser._read_config, config_with_missing_files)
+        pytest.raises(IOError, parser._read_config, config_with_missing_files)

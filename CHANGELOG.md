@@ -1,8 +1,8 @@
 # Change Log
 
-## [Unreleased](https://github.com/cms-l1t-offline/cms-l1t-analysis/tree/HEAD)
+## [v0.2.0](https://github.com/cms-l1t-offline/cms-l1t-analysis/tree/v0.2.0)
 
-[Full Changelog](https://github.com/cms-l1t-offline/cms-l1t-analysis/compare/v0.1.2...HEAD)
+[Full Changelog](https://github.com/cms-l1t-offline/cms-l1t-analysis/compare/v0.1.2...v0.2.0)
 
 **Implemented enhancements:**
 

@@ -1,7 +1,6 @@
 # simple makefile to simplify repetitive build env management tasks under posix
 
 PYTHON := $(shell which python)
-NOSETESTS := $(shell which nosetests)
 
 all: clean setup
 
@@ -51,7 +50,7 @@ data/L1Ntuple_test_3.root:
 pep8:
 	@pep8 --exclude=.git,external examples cmsl1t
 
-flake8: 
+flake8:
 	@flake8 $(shell file -p bin/* |awk -F: '/python.*text/{print $$1}') cmsl1t test --ignore=F401 --max-line-length=120
 
 # benchmarks
@@ -75,10 +74,10 @@ test: test-code flake8
 test-all: test-code-full flake8
 
 test-code:
-	@$(NOSETESTS) -v -A "not slow and not grid_access" -s test
+	@pytest -v -m "not xrootdtest" test
 
 test-code-full:
-	@$(NOSETESTS) -v -s test
+	@pytest -v test
 
 changelog:
 	@github_changelog_generator -u cms-l1t-offline -p cms-l1t-analysis --base docs/initial_changelog.md
