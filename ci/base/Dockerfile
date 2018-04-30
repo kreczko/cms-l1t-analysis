@@ -33,3 +33,16 @@ RUN echo "Finished conda installation, updating conda and pip" \
  && conda config --add channels http://conda.anaconda.org/NLeSC \
  && conda config --set show_channel_urls yes \
  && conda clean -t -y
+
+ COPY conda_requirements.txt /tmp/conda_requirements.txt
+
+ RUN conda create -n cms python=2.7 -yq &&\
+    echo "Created conda environment, installing basic dependencies" && \
+    /bin/bash -c "source activate cms && \
+    conda install -yq --file /tmp/conda_requirements.txt" && \
+    conda clean -t -y
+
+  COPY requirements.txt /tmp/requirements.txt
+
+  RUN /bin/bash -c "source activate cms && \
+      pip install --no-cache-dir -r /tmp/requirements.txt"

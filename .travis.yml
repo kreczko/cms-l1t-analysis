@@ -8,6 +8,7 @@ services:
 
 before_install:
   - docker pull hepsw/cvmfs-cms
+  - docker pull kreczko/cms-l1t-analysis-ci-base
   - docker pull kreczko/cms-l1t-analysis:ci
 
 install:
