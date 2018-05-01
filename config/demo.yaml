@@ -42,6 +42,10 @@ analysis:
     - event
     - upgrade
     - recoTree
+    - metFilterReco
+    - caloTowers
+    - emuCaloTowers
+    - jetReco
   do_fit: False
   pu_type: 0PU12,13PU19,20PU
   pu_bins: 0,13,20,999
