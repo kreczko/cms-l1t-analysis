@@ -5,6 +5,8 @@ import os
 from datetime import datetime
 from cmsl1t.utils.timers import timerfunc_log_to
 from cmsl1t.config import ConfigParser
+from cmsl1t.utils.module import load_L1TNTupleLibrary
+from cmsl1t.io.eventreader import EventReader
 import click
 import click_log
 from importlib import import_module
@@ -40,11 +42,11 @@ def process_tuples(config, nevents, analyzers, producers):
     else:
         logger.info(input_files)
 
-    from cmsl1t.playground.eventreader import EventReader
-    load_trees = config.try_get('analysis', 'load_trees', ['event', 'upgrade'])
-    reader = EventReader(
-        input_files, events=nevents, load_trees=load_trees,
-    )
+    ntuple_map_file = 'config/ntuple_content.yaml'
+    with open(ntuple_map_file) as f:
+       ntuple_map = yaml.load(f)
+    load_L1TNTupleLibrary()
+    reader = EventReader(input_files, ntuple_map, nevents=nevents)
 
     results = [analyzer.prepare_for_events(reader) for analyzer in analyzers]
     check(results, analyzers, 'prepare_for_events')
