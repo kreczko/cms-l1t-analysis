@@ -1,0 +1,185 @@
+#!/usr/bin/env python
+from __future__ import print_function
+import ROOT
+import os
+from datetime import datetime
+from cmsl1t.utils.timers import timerfunc_log_to
+from cmsl1t.config import ConfigParser
+import click
+import click_log
+from importlib import import_module
+import logging
+logger = logging.getLogger(__name__)
+logging.getLogger("rootpy.tree.chain").setLevel(logging.WARNING)
+click_log.basic_config(logger)
+
+TODAY = datetime.now().timetuple()
+ROOT.PyConfig.IgnoreCommandLineOptions = True
+ROOT.gROOT.SetBatch(1)
+ROOT.TH1.SetDefaultSumw2(True)
+separator = '=' * 80
+section = [separator, '{0}', separator]
+section = '\n'.join(section)
+
+
+@timerfunc_log_to(logger.info)
+def process_tuples(config, nevents, analyzers):
+    # Open the data files
+    logger.info(section.format("Loading data"))
+
+    input_files = config.get('input', 'files')
+    logger.info("Input files:")
+
+    if len(input_files) > 10:
+        file_msg = [input_files[:10], "... and",
+                    len(input_files) - 10, "more files"]
+        file_msg = map(str, file_msg)
+        file_msg = " ".join(file_msg)
+        logger.info(file_msg)
+    else:
+        logger.info(input_files)
+
+    from cmsl1t.playground.eventreader import EventReader
+    load_trees = config.try_get('analysis', 'load_trees', ['event', 'upgrade'])
+    reader = EventReader(
+        input_files, events=nevents, load_trees=load_trees,
+    )
+
+    results = [analyzer.prepare_for_events(reader) for analyzer in analyzers]
+    check(results, analyzers, 'prepare_for_events')
+
+    logger.info(section.format("Processing events"))
+    # Fill the histograms from the tuples
+    counter_rate = 1000
+    if nevents <= 10000 and not nevents < 0:
+        counter_rate = nevents / 10
+    for entry, event in enumerate(reader):
+        if entry % counter_rate == 0:
+            if nevents > 0:
+                logger.info("{} of {}".format(entry, nevents))
+            else:
+                logger.info("{} of <all>".format(entry))
+        results = [analyzer.process_event(entry, event)
+                   for analyzer in analyzers]
+        check(results, analyzers, 'process_event')
+        if all(results) is not True:
+            break
+
+
+@timerfunc_log_to(logger.info)
+def process_histogram_files(config, analyzers):
+    # Open the histogram files
+    logger.info(section.format("Reading back histograms"))
+
+    inputs = config.get('input', 'hist_files')
+    logger.info("Inputs:")
+    if len(inputs) > 10:
+        msg = inputs[:10], "... and " + str(len(inputs) - 10) + " more"
+        logger.info(msg)
+    else:
+        logger.info(inputs)
+
+    # Open the histogram file
+    results = {}
+    for filename in inputs:
+        for analyzer in analyzers:
+            if analyzer not in results:
+                results[analyzer] = True
+            if analyzer.might_contain_histograms(filename):
+                results[analyzer] &= bool(analyzer.reload_histograms(filename))
+
+    # Check for errors
+    return check(results.values(), results.keys(), 'process_histogram_files')
+
+
+@timerfunc_log_to(logger.info)
+def process_legacy(config, nevents, analyzers):
+    logger.info(section.format("Running in legacy mode"))
+    results = [analyzer.prepare_for_events(None) for analyzer in analyzers]
+    check(results, analyzers, 'prepare_for_events')
+
+    # setting entry = nevents  is ugly
+    results = [analyzer.process_event(nevents, None) for analyzer in analyzers]
+    check(results, analyzers, 'process_event')
+
+    return all(results)
+
+
+def run(config, nevents, reload_histograms):
+    results = [False]
+    # Fetch the analyzer
+    analyzers = config.get('analysis', 'analyzers')
+    analyzers = [load_analyzer(analyzer, config) for analyzer in analyzers]
+
+    if not reload_histograms:
+        analysis_mode = config.try_get('analysis', 'mode', default='new')
+        if analysis_mode == 'legacy':
+            process_legacy(config, nevents, analyzers)
+        else:
+            process_tuples(config, nevents, analyzers)
+    else:
+        process_histogram_files(config, analyzers)
+
+    # Write out the histograms
+    for analyzer in analyzers:
+        analyzer.write_histograms()
+
+    # Turn the histograms to plots
+    logger.info(section.format("Making plots"))
+    results = [analyzer.make_plots() for analyzer in analyzers]
+    check(results, analyzers, 'make_plots')
+
+    # Finalize
+    print(section.format("Finalizing things"))
+    results = [analyzer.finalize() for analyzer in analyzers]
+    check(results, analyzers, 'finalize')
+
+    return all(results)
+
+
+def check(results, analyzers, method):
+    msg = 'Problem during {method}() with analyzer "{analyzer}"'
+    is_ok = all(results)
+    if not is_ok:
+        for i, r in enumerate(results):
+            if r is not True:
+                logger.error(msg.format(method=method, analyzer=analyzers[i]))
+    return is_ok
+
+
+@click.command()
+@click.option('-c', '--config_file', help='YAML style config file', type=click.File(), required=True)
+@click.option('-n', '--nevents', default=-1, help='Number of events to process.')
+@click.option('-r', '--reload-histograms', is_flag=True,
+              help="Reload histograms from a file and skip the input tuples")
+@click.option('--hist-files', default=None,
+              help="Provide a list of files to reload histograms from")
+@click_log.simple_verbosity_option(logger)
+def analyze(config_file, nevents, reload_histograms, hist_files):
+    logger.info(section.format("Starting CMS L1T Analysis"))
+    config = ConfigParser()
+    config.read(config_file, reload_histograms, hist_files)
+
+    isok = run(config, nevents, reload_histograms)
+
+    print('\n' + separator + '\n')
+    if isok is not True:
+        logger.info("There were errors during running:")
+        logger.info(isok)
+        logger.info('\n' + separator + '\n')
+
+
+def load_analyzer(analyzer, config):
+    name = analyzer
+    params = {}
+    if isinstance(analyzer, dict):
+        name = analyzer.keys()[0]
+        params = analyzer[name]
+    logger.info("Try loading analyzer:" + name)
+    module = import_module(name)
+    logger.info("Successfully loaded analyzer:" + name)
+    return module.Analyzer(config, **params)
+
+
+if __name__ == '__main__':
+    analyze()
