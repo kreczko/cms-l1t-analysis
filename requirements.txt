@@ -13,3 +13,4 @@ mock
 boltons
 tabulate
 pytest>=3.5.0
+uproot
