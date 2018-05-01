@@ -33,7 +33,7 @@ analysis:
     JetET_Emu: [35, 90, 120] 
   analyzers:
      - cmsl1t.analyzers.jetMet_analyzer
-  modifiers: []
+  producers: []
   progress_bar:
     report_every: 1000
 

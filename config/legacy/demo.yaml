@@ -49,7 +49,7 @@ analysis:
     - cmsl1t.analyzers.legacy_analyzer:
         macro: 'legacy/MakePlots/studyTower28MET.cxx'
         name: legacy_study_tower28MET
-  modifiers: []
+  producers: []
 
 
   progress_bar:
