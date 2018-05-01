@@ -1,7 +1,8 @@
 """
 Study the MET distibutions and various PUS schemes
 """
-
+from functools import partial
+import numpy as np
 from BaseAnalyzer import BaseAnalyzer
 from cmsl1t.collections import EfficiencyCollection
 from functools import partial
@@ -16,10 +17,10 @@ class Analyzer(BaseAnalyzer):
         self.met_calcs = dict(
             RecalcL1EmuMETNot28=dict(
                 title="Emulated MET, |ieta|<28",
-                calculate=recalc.l1MetNot28),
+                attr='l1MetNot28'),
             RecalcL1EmuMETNot28HF=dict(
                 title="Emulated MET, |ieta|!=28",
-                calculate=recalc.l1MetNot28HF),
+                attr='l1MetNot28HF'),
         )
 
     def prepare_for_events(self, reader):
@@ -40,14 +41,14 @@ class Analyzer(BaseAnalyzer):
         return True
 
     def fill_histograms(self, entry, event):
-        pileup = event.nVertex
-        if pileup < 5 or not event.passesMETFilter():
+        pileup = event['Vertex_nVtx']
+        if pileup < 5 or not event.MetFilters_hbheNoiseFilter:
             return True
         self.efficiencies.set_pileup(pileup)
 
-        offlineMetBE = event.sums.caloMetBE
+        offlineMetBE = event.Sums_caloMetBE
         for name, config in self.met_calcs.items():
-            onlineMet = config['calculate'](event.caloTowers)
+            onlineMet = event[config['attr']]
             onlineMet = onlineMet.mag
             self.efficiencies.fill(name, offlineMetBE, onlineMet)
         return True
