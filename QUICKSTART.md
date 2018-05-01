@@ -37,7 +37,7 @@ This should fail if make setup threw Error 54.
 "Analyzers" are the parts of the code that receive events from the input tuples, extracts the relevant data and puts this into the histograms.
 
 You can see an example of an analyzer at: `cmsl1t/analyzers/demo_analyzer.py`.
-  
+
 To implement your own analyzer, all you need to do is make a new class in a file under `cmsl1t/analyzers/` which inherits from `cmsl1t.analyzers.BaseAnalyzer.BaseAnalyzer`.  You then need to implement two or three methods: `prepare_for_event`, ` fill_histograms`, `write_histograms`, and `make_plots`.  See the BaseAnalyzer class and the demo_analyzer for examples and documentation of these methods.
 
 Once you have implemented an analyzer and written a simple configuration for it, you can run it with `cmsl1t` command:
@@ -54,7 +54,7 @@ cmsl1t --help
 
 For the weekly checks of jets & sums efficiencies, 2D plots etc, we have an analyzer:
 
-Currently this is 'cmsl1t/analyzers/offline_met_analyzer.py' but in the future it will likely get rolled into weekly_analyzer.py.
+Currently this is 'cmsl1t/analyzers/jetMet_analyzer.py' but in the future it will likely get rolled into weekly_analyzer.py.
 
 To run this, we want the config file 'configs/offline_met_studies.yaml'.
 
@@ -70,11 +70,11 @@ cmsl1t -c config/offline_met_studies.yaml -n <no_of_entries>
 
 Or, for large running you can run on lxbatch with the NTuple list broken up into many jobs. Files per job specifiable with -f <number>. Try to keep max ~1000 jobs else combining later is a nightmare.
 
-Also more than about 8 files per job will lead to some going over the walltime, since the bsub queue is 8nm... Edit bin/cmsl1t_dirty_batch to change 
-queue to 1nh or something 
+Also more than about 8 files per job will lead to some going over the walltime, since the bsub queue is 8nm... Edit bin/cmsl1t_dirty_batch to change
+queue to 1nh or something
 else if this happens a lot.
 
-For small runs I reccommend changing queue to 8nm and running ~4-6 files per job.
+For small runs I recommend changing queue to 8nm and running ~4-6 files per job.
 
 Once this submits the jobs it will tell you how to combine them together later :-)
 

@@ -147,10 +147,11 @@ class Analyzer(BaseAnalyzer):
         self._lastRunAndLumi = (-1, -1)
         self._processLumi = True
 
-        self._doVertex = config.try_get('analysis', 'do_vertex', False)
-        self._doEmu = config.try_get('analysis', 'do_emu', False)
-        self._doReco = config.try_get('analysis', 'do_reco', True)
-        self._doGen = config.try_get('analysis', 'do_gen', False)
+        loaded_trees = config.try_get('analysis', 'load_trees')
+        self._doVertex = 'recoTree' in loaded_trees
+        self._doEmu = 'emuUpgrade' in loaded_trees
+        self._doReco = 'recoTree' in loaded_trees
+        self._doGen = 'genTree' in loaded_trees
 
         self._sumTypes, self._jetTypes = types(self._doEmu, self._doReco, self._doGen)
 

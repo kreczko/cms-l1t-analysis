@@ -40,14 +40,9 @@ def process_tuples(config, nevents, analyzers):
         logger.info(input_files)
 
     from cmsl1t.playground.eventreader import EventReader
-    load_emu = config.try_get('analysis', 'do_emu', False)
-    load_reco = config.try_get('analysis', 'do_reco', True)
-    load_vertex = config.try_get('analysis', 'do_vertex', False)
-    load_gen = config.try_get('analysis', 'do_gen', False)
+    load_trees = config.try_get('analysis', 'load_trees', ['event', 'upgrade'])
     reader = EventReader(
-        input_files, events=nevents, load_emu_trees=load_emu,
-        load_reco_trees=load_reco, load_vertex_trees=load_vertex,
-        load_gen_trees=load_gen
+        input_files, events=nevents, load_trees=load_trees,
     )
 
     results = [analyzer.prepare_for_events(reader) for analyzer in analyzers]
