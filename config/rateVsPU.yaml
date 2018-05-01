@@ -12,14 +12,16 @@ input:
     name: zbMed
     title: Zero Bias
   pileup_file: ""
-  run_number: 
-  lumi_json: "https://cms-service-dqm.web.cern.ch/cms-service-dqm/CAF/certification/Collisions17/13TeV/PromptReco/Cert_294927-306462_13TeV_PromptReco_Collisions17_JSON.txt"  
+  run_number:
+  lumi_json: "https://cms-service-dqm.web.cern.ch/cms-service-dqm/CAF/certification/Collisions17/13TeV/PromptReco/Cert_294927-306462_13TeV_PromptReco_Collisions17_JSON.txt"
 
 analysis:
-  do_emu: True
-  do_reco: False
-  do_vertex: True
-  do_gen: False
+  load_trees:
+    - event
+    - emuCaloTowers
+    - emuUpgrade
+    - upgrade
+    - recoTree
   do_fit: True
   pu_type: 0PU24,25PU49,50PU
   pu_bins: [0,25,50,999]
@@ -29,7 +31,7 @@ analysis:
     METBE: [80, 100, 120]
     METBE_Emu: [80, 100, 120]
     METHF: [80, 100, 120]
-    METHF_Emu: [80, 100, 120] 
+    METHF_Emu: [80, 100, 120]
     JetET: [35, 90, 120]
     JetET_Emu: [35, 90, 120]
 
@@ -43,4 +45,3 @@ output:
   template:
      - output/zb_rates
      - "{date}_{run_number}_{sample_name}_{trigger_name}"
-

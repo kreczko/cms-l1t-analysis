@@ -11,7 +11,7 @@ input:
 #      -   root://eoscms.cern.ch//eos/cms/store/group/dpg_trigger/comm_trigger/L1Trigger/treis/l1t-integration-v97p7-CMSSW-940pre3/SingleMuon/crab_l1t-integration-v97p7-CMSSW-940pre3__SingleMuon_Run2017E-17Nov2017-v1/180125_121715/0000/L1Ntuple_*.root
       -   root://eoscms.cern.ch//eos/cms/store/group/dpg_trigger/comm_trigger/L1Trigger/treis/l1t-integration-v97p7-CMSSW-940pre3/SingleMuon/crab_l1t-integration-v97p7-CMSSW-940pre3__SingleMuon_Run2017E-17Nov2017-v1/180125_121715/0001/L1Ntuple_*.root
 #      -   root://eoscms.cern.ch//eos/cms/store/group/dpg_trigger/comm_trigger/L1Trigger/treis/l1t-integration-v97p7-CMSSW-940pre3/SingleMuon/crab_l1t-integration-v97p7-CMSSW-940pre3__SingleMuon_Run2017F-17Nov2017-v1/180125_122032/0000/L1Ntuple_*.root
-#      -   root://eoscms.cern.ch//eos/cms/store/group/dpg_trigger/comm_trigger/L1Trigger/treis/l1t-integration-v97p7-CMSSW-940pre3/SingleMuon/crab_l1t-integration-v97p7-CMSSW-940pre3__SingleMuon_Run2017F-17Nov2017-v1/180125_122032/0001/L1Ntuple_*.root      
+#      -   root://eoscms.cern.ch//eos/cms/store/group/dpg_trigger/comm_trigger/L1Trigger/treis/l1t-integration-v97p7-CMSSW-940pre3/SingleMuon/crab_l1t-integration-v97p7-CMSSW-940pre3__SingleMuon_Run2017F-17Nov2017-v1/180125_122032/0001/L1Ntuple_*.root
 
   sample:
     name: Data
@@ -24,10 +24,10 @@ input:
   lumi_json: "https://cms-service-dqm.web.cern.ch/cms-service-dqm/CAF/certification/Collisions17/13TeV/PromptReco/Cert_294927-306462_13TeV_PromptReco_Collisions17_JSON.txt"
 
 analysis:
-  do_emu: False
-  do_reco: True
-  do_vertex: False
-  do_gen: False
+  load_trees:
+    - event
+    - upgrade
+    - recoTree
   do_fit: True
   pu_type: 0PU24,25PU49,50PU
   pu_bins: [25,50,999]
