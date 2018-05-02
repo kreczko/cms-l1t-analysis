@@ -1,4 +1,4 @@
-version: 0.0.1
+version: 1
 name: '2017 Performance'
 
 input:
@@ -9,9 +9,11 @@ input:
 #      -   root://eoscms.cern.ch//eos/cms/store/group/dpg_trigger/comm_trigger/L1Trigger/treis/l1t-integration-v97p7-CMSSW-940pre3/SingleMuon/crab_l1t-integration-v97p7-CMSSW-940pre3__SingleMuon_Run2017C-17Nov2017-v1/180125_121925/0001/L1Ntuple_*.root
 #      -   root://eoscms.cern.ch//eos/cms/store/group/dpg_trigger/comm_trigger/L1Trigger/treis/l1t-integration-v97p7-CMSSW-940pre3/SingleMuon/crab_l1t-integration-v97p7-CMSSW-940pre3__SingleMuon_Run2017D-17Nov2017-v1/180125_122141/0000/L1Ntuple_*.root
 #      -   root://eoscms.cern.ch//eos/cms/store/group/dpg_trigger/comm_trigger/L1Trigger/treis/l1t-integration-v97p7-CMSSW-940pre3/SingleMuon/crab_l1t-integration-v97p7-CMSSW-940pre3__SingleMuon_Run2017E-17Nov2017-v1/180125_121715/0000/L1Ntuple_*.root
-      -   root://eoscms.cern.ch//eos/cms/store/group/dpg_trigger/comm_trigger/L1Trigger/treis/l1t-integration-v97p7-CMSSW-940pre3/SingleMuon/crab_l1t-integration-v97p7-CMSSW-940pre3__SingleMuon_Run2017E-17Nov2017-v1/180125_121715/0001/L1Ntuple_*.root
+      # -   root://eoscms.cern.ch//eos/cms/store/group/dpg_trigger/comm_trigger/L1Trigger/treis/l1t-integration-v97p7-CMSSW-940pre3/SingleMuon/crab_l1t-integration-v97p7-CMSSW-940pre3__SingleMuon_Run2017E-17Nov2017-v1/180125_121715/0001/L1Ntuple_*.root
 #      -   root://eoscms.cern.ch//eos/cms/store/group/dpg_trigger/comm_trigger/L1Trigger/treis/l1t-integration-v97p7-CMSSW-940pre3/SingleMuon/crab_l1t-integration-v97p7-CMSSW-940pre3__SingleMuon_Run2017F-17Nov2017-v1/180125_122032/0000/L1Ntuple_*.root
 #      -   root://eoscms.cern.ch//eos/cms/store/group/dpg_trigger/comm_trigger/L1Trigger/treis/l1t-integration-v97p7-CMSSW-940pre3/SingleMuon/crab_l1t-integration-v97p7-CMSSW-940pre3__SingleMuon_Run2017F-17Nov2017-v1/180125_122032/0001/L1Ntuple_*.root
+      # local tests
+      - data/L1Ntuple_*.root
 
   sample:
     name: Data
@@ -28,6 +30,8 @@ analysis:
     - event
     - upgrade
     - recoTree
+    - jetReco
+    - metFilterReco
   do_fit: True
   pu_type: 0PU24,25PU49,50PU
   pu_bins: [25,50,999]
