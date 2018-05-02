@@ -1,10 +1,12 @@
-version: 0.0.1
+version: 1
 name: 'Jet Met Efficiencies'
 
 input:
   files:
       # Single Muons
        -   root://eoscms.cern.ch//eos/cms/store/group/dpg_trigger/comm_trigger/L1Trigger/bundocka/cmsl1t/sm_noLowEtSF_101.root
+      # Local tests
+       # - data/L1Ntuple_*.root
   sample:
     name: Data
     title: 2017 Data
@@ -40,8 +42,6 @@ analysis:
   analyzers:
      - cmsl1t.analyzers.jetMet_analyzer
   producers: []
-  progress_bar:
-    report_every: 1000
 
 output:
   template:
