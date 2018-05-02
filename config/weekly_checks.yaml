@@ -1,4 +1,4 @@
-version: 0.0.1
+version: 1
 name: 'Weekly Checks'
 
 input:
@@ -36,8 +36,6 @@ analysis:
       - cmsl1t.analyzers.weekly_analyzer
       - cmsl1t.analyzers.jetMet_analyzer
   modifiers: []
-  progress_bar:
-    report_every: 1000
 
 output:
   template:
