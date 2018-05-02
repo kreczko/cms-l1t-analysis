@@ -1,4 +1,4 @@
-version: 0.0.1
+version: 1
 name: 'Jet Met MC Studies'
 
 input:
@@ -37,8 +37,6 @@ analysis:
   analyzers:
      - cmsl1t.analyzers.jetMet_analyzer
   producers: []
-  progress_bar:
-    report_every: 1000
 
 output:
   template:
