@@ -1,67 +1,4 @@
-# replicating
-# ntuple_cfg benchmark_cfg()
-# {
-#   ntuple_cfg config;
-#   config.sampleName   = "Data";
-#   config.sampleTitle  = "2016 Data";
-#   config.triggerName  = "SingleMu";
-#   config.triggerTitle = "Single Muon";
-#   config.puFilename   = "";
-#   config.run          = "276243";
-#   config.outDirBase   = "{{BENCHMARK_OUTPUT_FOLDER}}";
-#   config.doFit        = false;
-#   config.puType       = {"0PU12","13PU19","20PU"};
-#   config.puBins       = {0,13,20,999};
-#   config.inFiles      = {"{{BENCHMARK_DATA}}}/*.root"};
-#   config.baseOWdir    = config.outDirBase +
-#       "/20161101_"+config.sampleName+"_run-"+config.run+"_"+\
-#       config.triggerName+"_hadd/";
-#   config.outDir       = config.outDirBase+"/"+TL1DateTime::GetDate()+"_"+\
-#   config.sampleName+"_run-"+config.run+"_"+config.triggerName;
-#   return config;
-# }
-
-
-version: 0.0.1
-name: Benchmark
-
-input:
-  files:
-    - data/L1Ntuple_*.root
-  sample:
-    name: Data
-    title: 2016 Data
-  trigger:
-    name: SingleMu
-    title: Single Muon
-  pileup_file: ""
-  run_number: 276243
-
-analysis:
-  load_trees:
-    - event
-    - upgrade
-    - jetReco
-    - recoTree
-  do_fit: False
-  pu_type: 0PU12,13PU19,20PU
-  pu_bins: 0,13,20,999
-  analyzers:
-    - cmsl1t.analyzers.jet_rates
-  progress_bar:
-    report_every: 1000
-  # or to switch it off
-  # progress_bar:
-  #   enable: False
-
-output:
-  # template is a list here that is joined (os.path.join) in the config parser
-  template:
-     - benchmark/new
-     - "{date}_{sample_name}_run-{run_number}_{trigger_name}"
-
-
-version: 0.0.1
+version: 1
 name: 'Jet Rates'
 
 input:
@@ -74,6 +11,8 @@ input:
       # Zero Bias
       # -  root://eoscms.cern.ch//eos/cms/store/group/dpg_trigger/comm_trigger/L1Trigger/safarzad/2017/ZeroBias/Fill6*/Collision2017-noRECO-l1t-integration-96p27_NoPUS/ZeroBias/crab_Collision2017-noRECO-l1t-integration-96p27_NoPUS__ZeroBias_Run2017C/*/0000/L1Ntuple_*root
       # -  root://eoscms.cern.ch//eos/cms/store/group/dpg_trigger/comm_trigger/L1Trigger/safarzad/2017/ZeroBias/Collision2017-noRECO-l1t-integration-96p20/ZeroBias/crab_Collision2017-noRECO-l1t-integration-96p20__ZeroBias_Run2017C/170726_094745/0000/*root
+      # local tests
+      # - data/L1Ntuple_*.root
   sample:
     name: Data
     title: 2017 Data
@@ -86,6 +25,11 @@ input:
   run_number: 6XXX
 
 analysis:
+  load_trees:
+    - event
+    - upgrade
+    - jetReco
+    - recoTree
   do_fit: True
   pu_type: 0PU12,13PU19,20PU
   pu_bins: [0,13,20,999]
