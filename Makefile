@@ -97,3 +97,4 @@ update_release:
 	@echo "git commit -m 'tagged version ${RELEASE}'"
 	@echo "git push upstream master"
 	@echo "git tag v${RELEASE}"
+	@echo "git push upstream v${RELEASE}"
