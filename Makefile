@@ -87,3 +87,13 @@ docs-html:
 
 docs-latex:
 	cd docs; make latexpdf; cd -
+
+release: changelog update_release
+
+update_release:
+	@python update_release.py
+	@echo "Check everything and if OK, execute"
+	@echo "git add -u"
+	@echo "git commit -m 'tagged version ${RELEASE}'"
+	@echo "git push upstream master"
+	@echo "git tag v${RELEASE}"
