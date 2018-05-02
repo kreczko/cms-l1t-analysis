@@ -1,6 +1,8 @@
 # cms-l1t-analysis
 Software package to analyse L1TNtuples
 
+Latest stable version: https://github.com/cms-l1t-offline/cms-l1t-analysis/releases/tag/v0.3.0
+
 [![Build Status](https://travis-ci.org/cms-l1t-offline/cms-l1t-analysis.svg?branch=master)](https://travis-ci.org/cms-l1t-offline/cms-l1t-analysis) [![DOI](https://zenodo.org/badge/80877637.svg)](https://zenodo.org/badge/latestdoi/80877637) [![Code Health](https://landscape.io/github/cms-l1t-offline/cms-l1t-analysis/master/landscape.svg?style=flat)](https://landscape.io/github/cms-l1t-offline/cms-l1t-analysis/master) [![docs](https://readthedocs.org/projects/cms-l1t-analysis/badge/?version=latest)](http://cms-l1t-analysis.readthedocs.io/en/latest/)
 
 
@@ -55,15 +57,6 @@ make test-all
 # install python requirements
 pip install -r requirements.txt --user
 make benchmark
-```
-
-### Generating changelog
-Since the changelog generator queries the repository you will need to give it
-a github authentication token to bypass the limits for unauthenticated access.
-You can create such tokens under https://github.com/settings/tokens .
-```bash
-export CHANGELOG_GITHUB_TOKEN=<from https://github.com/settings/tokens>
-make changelog
 ```
 
 ### Generating documentation (locally)
@@ -126,3 +119,16 @@ to update you have to `sudo rm -f /usr/local/bin/docker-compose` first.
 
 
 To build the docker container: `docker-compose build` or `docker build -t kreczko/cms-l1t-analysis -f docker/Dockerfile .`.
+
+# Releases
+
+# Make a new release
+Since the changelog generator queries the repository you will need to give it
+a github authentication token to bypass the limits for unauthenticated access.
+You can create such tokens under https://github.com/settings/tokens .
+```bash
+export CHANGELOG_GITHUB_TOKEN=<from https://github.com/settings/tokens>
+export RELEASE=<release version> #e.g. 0.3.0
+git pull --rebase upstream master
+make release
+```
