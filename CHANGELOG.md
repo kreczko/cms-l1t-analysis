@@ -1,7 +1,36 @@
 # Change Log
 
-## [v0.2.0](https://github.com/cms-l1t-offline/cms-l1t-analysis/tree/v0.2.0)
+## [v0.3.0](https://github.com/cms-l1t-offline/cms-l1t-analysis/tree/v0.3.0)
 
+[Full Changelog](https://github.com/cms-l1t-offline/cms-l1t-analysis/compare/v0.2.0...v0.3.0)
+
+**Fixed bugs:**
+
+- Root files no longer exist [\#64](https://github.com/cms-l1t-offline/cms-l1t-analysis/issues/64)
+
+**Closed issues:**
+
+- Validation of old vs new [\#6](https://github.com/cms-l1t-offline/cms-l1t-analysis/issues/6)
+
+**Merged pull requests:**
+
+- Replacing `do\_X` with `load\_trees` in configs, analysers and eventReader [\#128](https://github.com/cms-l1t-offline/cms-l1t-analysis/pull/128) ([kreczko](https://github.com/kreczko))
+- Remaining new files from PR \#85 [\#127](https://github.com/cms-l1t-offline/cms-l1t-analysis/pull/127) ([kreczko](https://github.com/kreczko))
+- Speeding up docker build for travis [\#126](https://github.com/cms-l1t-offline/cms-l1t-analysis/pull/126) ([kreczko](https://github.com/kreczko))
+- Bug fix to efficiencies [\#125](https://github.com/cms-l1t-offline/cms-l1t-analysis/pull/125) ([bundocka](https://github.com/bundocka))
+- Few bug fixes, corrections, remove deprecated cfgs/analyzers [\#124](https://github.com/cms-l1t-offline/cms-l1t-analysis/pull/124) ([bundocka](https://github.com/bundocka))
+- Add config yamls for 4 main modes [\#123](https://github.com/cms-l1t-offline/cms-l1t-analysis/pull/123) ([bundocka](https://github.com/bundocka))
+- Add ability to run performance studies using generator quantities from MC [\#122](https://github.com/cms-l1t-offline/cms-l1t-analysis/pull/122) ([bundocka](https://github.com/bundocka))
+- Add rate vs pileup plotting [\#121](https://github.com/cms-l1t-offline/cms-l1t-analysis/pull/121) ([bundocka](https://github.com/bundocka))
+- Fix calo jets efficiencies and logic for emulator thresholds [\#120](https://github.com/cms-l1t-offline/cms-l1t-analysis/pull/120) ([bundocka](https://github.com/bundocka))
+- Fix lumi filter in jetMet\_analyzer [\#119](https://github.com/cms-l1t-offline/cms-l1t-analysis/pull/119) ([bundocka](https://github.com/bundocka))
+- Convert output of cum sum back to array to build cum hist [\#118](https://github.com/cms-l1t-offline/cms-l1t-analysis/pull/118) ([bundocka](https://github.com/bundocka))
+- Remove @cached and corresponding import [\#117](https://github.com/cms-l1t-offline/cms-l1t-analysis/pull/117) ([bundocka](https://github.com/bundocka))
+- Add rebase command to README [\#116](https://github.com/cms-l1t-offline/cms-l1t-analysis/pull/116) ([bundocka](https://github.com/bundocka))
+- \[IO\] Moving code from create-map-file to cmsl1t.io.mapfile for easier testing [\#113](https://github.com/cms-l1t-offline/cms-l1t-analysis/pull/113) ([kreczko](https://github.com/kreczko))
+- Replacing nose with pytest [\#112](https://github.com/cms-l1t-offline/cms-l1t-analysis/pull/112) ([kreczko](https://github.com/kreczko))
+
+## [v0.2.0](https://github.com/cms-l1t-offline/cms-l1t-analysis/tree/v0.2.0) (2018-03-27)
 [Full Changelog](https://github.com/cms-l1t-offline/cms-l1t-analysis/compare/v0.1.2...v0.2.0)
 
 **Implemented enhancements:**
