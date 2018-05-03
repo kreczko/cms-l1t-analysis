@@ -35,7 +35,7 @@ analysis:
   analyzers:
       - cmsl1t.analyzers.weekly_analyzer
       - cmsl1t.analyzers.jetMet_analyzer
-  modifiers: []
+  producers: []
 
 output:
   template:
