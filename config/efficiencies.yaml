@@ -39,7 +39,7 @@ analysis:
 
   analyzers:
      - cmsl1t.analyzers.jetMet_analyzer
-  modifiers: []
+  producers: []
   progress_bar:
     report_every: 1000
 
