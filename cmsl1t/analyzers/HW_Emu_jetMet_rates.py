@@ -15,7 +15,7 @@ from cmsl1t.utils.hist import cumulative_hist, normalise_to_collision_rate
 
 def types():
     sum_types = ["HT", "METBE", "METHF"]
-    jet_types = ["JetET"]
+    jet_types = ["JetET_BE", "JetET_HF"]
     sum_types += [t + '_Emu' for t in sum_types]
     jet_types += [t + '_Emu' for t in jet_types]
 
@@ -41,11 +41,13 @@ ETA_RANGES = dict(
     HT="|\\eta| < 2.4",
     METBE="|\\eta| < 3.0",
     METHF="|\\eta| < 5.0",
-    JetET="|\\eta| < 5.0",
+    JetET_BE="|\\eta| < 3.0",
+    JetET_HF="3.0 < |\\eta| < 5.0",
     HT_Emu="|\\eta| < 2.4",
     METBE_Emu="|\\eta| < 3.0",
     METHF_Emu="|\\eta| < 5.0",
-    JetET_Emu="|\\eta| < 5.0",
+    JetET_BE_Emu="|\\eta| < 3.0",
+    JetET_HF_Emu="3.0 < |\\eta| < 5.0",
 )
 
 
@@ -126,7 +128,7 @@ class Analyzer(BaseAnalyzer):
             getattr(self, name + "_rates").fill(pileup, on.et)
             getattr(self, name + "_rate_vs_pileup").fill(pileup, on.et)
 
-        # Jets:
+        # All jets:
         l1JetEts = [jet.et for jet in event._l1Jets]
         nJets = len(l1JetEts)
         if nJets > 0:
@@ -141,13 +143,61 @@ class Analyzer(BaseAnalyzer):
         else:
             maxL1EmuJetEt = 0.
 
+        # Central Jets:
+        l1BEJets = [jet for jet in event._l1Jets if abs(jet.eta) < 3.0]
+        l1BEJetEts = [beJet.et for beJet in l1BEJets]
+        nBEJets = len(l1BEJets)
+        if nBEJets > 0:
+            maxL1BEJetEt = max(l1BEJetEts)
+        else:
+            maxL1BEJetEt = 0.
+
+        l1EmuBEJets = [jet for jet in event._l1EmuJets if abs(jet.eta) < 3.0]
+        l1EmuBEJetEts = [beJet.et for beJet in l1EmuBEJets]
+        nEmuBEJets = len(l1EmuBEJetEts)
+        if nEmuBEJets > 0:
+            maxL1EmuBEJetEt = max(l1EmuBEJetEts)
+        else:
+            maxL1EmuBEJetEt = 0.
+
+        # Forward Jets
+        l1HFJets = [jet for jet in event._l1Jets if abs(jet.eta) > 3.0]
+        l1HFJetEts = [hfJet.et for hfJet in l1HFJets]
+        nHFJets = len(l1HFJetEts)
+        if nHFJets > 0:
+            maxL1HFJetEt = max(l1HFJetEts)
+        else:
+            maxL1HFJetEt = 0.
+
+        l1EmuHFJets = [jet for jet in event._l1EmuJets if abs(jet.eta) > 3.0]
+        l1EmuHFJetEts = [hfJet.et for hfJet in l1EmuHFJets]
+        nEmuHFJets = len(l1EmuHFJetEts)
+        if nEmuHFJets > 0:
+            maxL1EmuHFJetEt = max(l1EmuHFJetEts)
+        else:
+            maxL1EmuHFJetEt = 0.
+
         for name in self._jetTypes:
             if 'Emu' in name:
-                getattr(self, name + '_rates').fill(pileup, maxL1EmuJetEt)
-                getattr(self, name + '_rate_vs_pileup').fill(pileup, maxL1EmuJetEt)
+                if 'BE' in name:
+                    getattr(self, name + '_rates').fill(pileup, maxL1EmuBEJetEt)
+                    getattr(self, name + '_rate_vs_pileup').fill(pileup, maxL1EmuBEJetEt)
+                elif 'HF' in name:
+                    getattr(self, name + '_rates').fill(pileup, maxL1EmuHFJetEt)
+                    getattr(self, name + '_rate_vs_pileup').fill(pileup, maxL1EmuHFJetEt)
+                else:
+                    getattr(self, name + '_rates').fill(pileup, maxL1EmuJetEt)
+                    getattr(self, name + '_rate_vs_pileup').fill(pileup, maxL1EmuJetEt)                    
             else:
-                getattr(self, name + '_rates').fill(pileup, maxL1JetEt)
-                getattr(self, name + '_rate_vs_pileup').fill(pileup, maxL1JetEt)
+                if 'BE' in name:
+                    getattr(self, name + '_rates').fill(pileup, maxL1BEJetEt)
+                    getattr(self, name + '_rate_vs_pileup').fill(pileup, maxL1BEJetEt)
+                elif 'HF' in name:
+                    getattr(self, name + '_rates').fill(pileup, maxL1HFJetEt)
+                    getattr(self, name + '_rate_vs_pileup').fill(pileup, maxL1HFJetEt)
+                else:
+                    getattr(self, name + '_rates').fill(pileup, maxL1JetEt)
+                    getattr(self, name + '_rate_vs_pileup').fill(pileup, maxL1JetEt)
 
         return True
 
