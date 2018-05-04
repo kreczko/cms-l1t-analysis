@@ -6,31 +6,30 @@ from uproot.interp.auto import interpret
 def main(input_files):
     example_file = input_files[0]
     f = uproot.open(example_file)
-    # print(f.allkeys())
-    events = f['l1EventTree/L1EventTree']
-    # for d in dir(events['Event']):
-    #     print(d)
-    print(events['Event']['time'].fBranches)
-    events['Event']['hlt'].show()
-    print()
-    # print_structure(events)
+    content = f.allkeys()
+    content = [c for c in content if '/' in c]
 
-
-    # for events in uproot.iterate(input_files, 'l1CaloTowerEmuTree/L1CaloTowerTree', branches=branches):
-    #     print(events)
+    for c in content:
+        data = f[c]
+        print_structure(data)
 
 
 def print_structure(events, offset=2):
     spacing = '-' * offset
     for k in sorted(events.keys()):
-        print('|{0} {1} ({2}, {3})'.format(
-            spacing, k.decode('utf-8'), events[k].fClassName, interpret(events[k])))
+        name = k.decode('utf-8')
+        className = events[k].fClassName
+        readAs = interpret(events[k])
+        msg = '|{0} {1} ({2})'
+        if readAs is None:
+            print(msg.format(spacing, name, className))
+        else:
+            print(msg.format(spacing, name, readAs))
         if hasattr(events[k], 'keys'):
             print_structure(events[k], offset=offset + 2)
 
 if __name__ == '__main__':
     input_files = glob.glob('data/L1Ntuple_*.root')
-    # print(input_files)
     branches = [
         'L1CaloCluster.et',
         'L1CaloCluster.eta',
