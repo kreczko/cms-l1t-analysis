@@ -74,7 +74,7 @@ Running the weekly checks:
 
 For the weekly checks of jets & sums efficiencies, 2D plots etc, we have an analyzer:
 
-Currently this is `cmsl1t/analyzers/offline_met_analyzer.py` but in the future it will likely get rolled into weekly_analyzer.py.
+Currently this is `cmsl1t/analyzers/jetMet_analyzer.py` but in the future it will likely get rolled into weekly_analyzer.py.
 
 To run this, we want the config file `configs/offline_met_studies.yaml`.
 

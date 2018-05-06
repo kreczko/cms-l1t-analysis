@@ -12,13 +12,16 @@ input:
     name: genJEC
     title: QCD
   pileup_file: ""
-  run_number: 
+  run_number:
 
 analysis:
-  do_emu: True
-  do_reco: False
-  do_vertex: False
-  do_gen: True
+  load_trees:
+    - event
+    - upgrade
+    - caloTowers
+    - emuCaloTowers
+    - emuUpgrade
+    - genTree
   do_fit: True
   pu_type: 0PU24,25PU49,50PU
   pu_bins: [0,25,50,999]
@@ -36,7 +39,7 @@ analysis:
 
   analyzers:
      - cmsl1t.analyzers.jetMet_analyzer
-  modifiers: []
+  producers: []
   progress_bar:
     report_every: 1000
 

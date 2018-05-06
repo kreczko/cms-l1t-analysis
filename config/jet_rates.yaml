@@ -38,6 +38,11 @@ input:
   run_number: 276243
 
 analysis:
+  load_trees:
+    - event
+    - upgrade
+    - jetReco
+    - recoTree
   do_fit: False
   pu_type: 0PU12,13PU19,20PU
   pu_bins: 0,13,20,999
@@ -86,7 +91,7 @@ analysis:
   pu_bins: [0,13,20,999]
   analyzers:
      - cmsl1t.analyzers.jet_rates
-  modifiers: []
+  producers: []
   progress_bar:
     report_every: 1000
 
