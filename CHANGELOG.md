@@ -1,7 +1,28 @@
 # Change Log
 
-## [v0.3.0](https://github.com/cms-l1t-offline/cms-l1t-analysis/tree/v0.3.0)
+## [v0.4.0](https://github.com/cms-l1t-offline/cms-l1t-analysis/tree/v0.4.0)
 
+[Full Changelog](https://github.com/cms-l1t-offline/cms-l1t-analysis/compare/v0.3.0...v0.4.0)
+
+**Implemented enhancements:**
+
+- Generalisation of analyzers/producers [\#53](https://github.com/cms-l1t-offline/cms-l1t-analysis/issues/53)
+- Tighter integration of config and processing [\#40](https://github.com/cms-l1t-offline/cms-l1t-analysis/issues/40)
+- Enabling new event reader in cmsl1t\_future [\#129](https://github.com/cms-l1t-offline/cms-l1t-analysis/pull/129) ([kreczko](https://github.com/kreczko))
+
+**Closed issues:**
+
+- Provide option to produce emulator plots  [\#102](https://github.com/cms-l1t-offline/cms-l1t-analysis/issues/102)
+- Offline MET Analyser tries to access Phi attribute of HTT \(no such thing\) [\#95](https://github.com/cms-l1t-offline/cms-l1t-analysis/issues/95)
+- New EventReader [\#80](https://github.com/cms-l1t-offline/cms-l1t-analysis/issues/80)
+- Configuration files for mapping L1TNtuple content [\#79](https://github.com/cms-l1t-offline/cms-l1t-analysis/issues/79)
+
+**Merged pull requests:**
+
+- Separate central and forward jets for fixed rate comparisons [\#131](https://github.com/cms-l1t-offline/cms-l1t-analysis/pull/131) ([bundocka](https://github.com/bundocka))
+- Tidying up configuration files and removing obsolete analysers [\#130](https://github.com/cms-l1t-offline/cms-l1t-analysis/pull/130) ([kreczko](https://github.com/kreczko))
+
+## [v0.3.0](https://github.com/cms-l1t-offline/cms-l1t-analysis/tree/v0.3.0) (2018-05-02)
 [Full Changelog](https://github.com/cms-l1t-offline/cms-l1t-analysis/compare/v0.2.0...v0.3.0)
 
 **Fixed bugs:**
