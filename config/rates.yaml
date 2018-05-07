@@ -33,9 +33,7 @@ analysis:
 
   analyzers:
      - cmsl1t.analyzers.HW_Emu_jetMet_rates
-  modifiers: []
-  progress_bar:
-    report_every: 1000
+  producers: []
 
 output:
   template:
