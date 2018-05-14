@@ -1,7 +1,14 @@
 # Change Log
 
-## [v0.4.0](https://github.com/cms-l1t-offline/cms-l1t-analysis/tree/v0.4.0)
+## [v0.4.1](https://github.com/cms-l1t-offline/cms-l1t-analysis/tree/v0.4.1)
 
+[Full Changelog](https://github.com/cms-l1t-offline/cms-l1t-analysis/compare/v0.4.0...v0.4.1)
+
+**Merged pull requests:**
+
+- Implement offline cuts for resolution plots [\#132](https://github.com/cms-l1t-offline/cms-l1t-analysis/pull/132) ([bundocka](https://github.com/bundocka))
+
+## [v0.4.0](https://github.com/cms-l1t-offline/cms-l1t-analysis/tree/v0.4.0) (2018-05-07)
 [Full Changelog](https://github.com/cms-l1t-offline/cms-l1t-analysis/compare/v0.3.0...v0.4.0)
 
 **Implemented enhancements:**
