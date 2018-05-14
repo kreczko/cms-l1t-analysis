@@ -1,5 +1,6 @@
 
 from .luminosity import LuminosityFilter
+from .pfMetFilter import pfMetFilter
 
 
 def muonfilter(muons):
