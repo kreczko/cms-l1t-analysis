@@ -390,7 +390,7 @@ class Analyzer(BaseAnalyzer):
             on = online[name]
             off = offline[name]
             for suffix in ['_eff', '_res', '_2D', '_eff_HR', '_2D_HR']:
-                if '_res' in suffix and on.et < 0.01:
+                if '_res' in suffix and (on.et < 0.01 or off.et < 30):
                     continue
                 pileup = recoNVtx
                 if 'gen' in name:
@@ -442,7 +442,7 @@ class Analyzer(BaseAnalyzer):
 
                     for region in genFillRegions:
                         for suffix in ['_eff', '_res', '_2D', '_eff_HR', '_2D_HR']:
-                            if '_res' in suffix and genL1EmuJetEt == 0:
+                            if '_res' in suffix and (genL1EmuJetEt == 0 or leadingGenJet.etCorr < 30):
                                 continue
                             name = 'genJetET_{0}_Emu{1}'.format(region, suffix)
                             getattr(self, name).fill(
@@ -457,7 +457,7 @@ class Analyzer(BaseAnalyzer):
 
                 for region in genFillRegions:
                     for suffix in ['_eff', '_res', '_2D', '_eff_HR', '_2D_HR']:
-                        if '_res' in suffix and genL1JetEt == 0:
+                        if '_res' in suffix and (genL1JetEt == 0 or leadingGenJet.etCorr < 30):
                             continue
                         name = 'genJetET_{0}{1}'.format(region, suffix)
                         getattr(self, name).fill(
@@ -485,7 +485,7 @@ class Analyzer(BaseAnalyzer):
 
                     for region in pfFillRegions:
                         for suffix in ['_eff', '_res', '_2D', '_eff_HR', '_2D_HR']:
-                            if '_res' in suffix and pfL1EmuJetEt == 0:
+                            if '_res' in suffix and (pfL1EmuJetEt == 0 or leadingPFJet.etCorr < 30):
                                 continue
                             name = 'pfJetET_{0}_Emu{1}'.format(region, suffix)
                             getattr(self, name).fill(
@@ -500,7 +500,7 @@ class Analyzer(BaseAnalyzer):
 
                 for region in pfFillRegions:
                     for suffix in ['_eff', '_res', '_2D', '_eff_HR', '_2D_HR']:
-                        if '_res' in suffix and pfL1JetEt == 0:
+                        if '_res' in suffix and (pfL1JetEt == 0 or leadingPFJet.etCorr < 30):
                             continue
                         name = 'pfJetET_{0}{1}'.format(region, suffix)
                         getattr(self, name).fill(
@@ -525,7 +525,7 @@ class Analyzer(BaseAnalyzer):
 
                     for region in caloFillRegions:
                         for suffix in ['_eff', '_res', '_2D', '_eff_HR', '_2D_HR']:
-                            if '_res' in suffix and caloL1EmuJetEt == 0:
+                            if '_res' in suffix and (caloL1EmuJetEt == 0 or leadingCaloJet.etCorr < 30):
                                 continue
                             name = 'caloJetET_{0}_Emu{1}'.format(
                                 region, suffix)
@@ -541,7 +541,7 @@ class Analyzer(BaseAnalyzer):
 
                 for region in caloFillRegions:
                     for suffix in ['_eff', '_res', '_2D', '_eff_HR', '_2D_HR']:
-                        if '_res' in suffix and caloL1JetEt == 0:
+                        if '_res' in suffix and (caloL1JetEt == 0 or leadingCaloJet.etCorr < 30):
                             continue
                         name = 'caloJetET_{0}{1}'.format(region, suffix)
                         getattr(self, name).fill(
