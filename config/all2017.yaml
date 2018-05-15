@@ -40,10 +40,9 @@ analysis:
   producers:
     - cmsl1t.producers.l1sums:
         inputs:
-          nSums: L1Upgrade_nSums
-          type: L1Upgrade_sumType
-          et: L1Upgrade_sumEt
-          phi: L1Upgrade_sumPhi
+          - L1Upgrade_sumType
+          - L1Upgrade_sumEt
+          - L1Upgrade_sumPhi
         outputs:
           - l1Sums
 

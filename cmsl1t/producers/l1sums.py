@@ -1,10 +1,10 @@
 import ROOT
 
 from cmsl1t.energySums import EnergySum, Mex, Mey, Met
-from . import _init_values
+from .base import BaseProducer
 
 
-class Producer(object):
+class Producer(BaseProducer):
     sumTypes = ROOT.l1t.EtSum
     energySumTypes = {
         sumTypes.kTotalEt: {'name': 'Ett', 'type': EnergySum},
@@ -19,19 +19,16 @@ class Producer(object):
     }
 
     def __init__(self, inputs, outputs, params):
-        self.inputs = inputs
-        self.outputs = outputs
-        self.params = params
-        self.values = {}
-        self.outputCollection = self.outputs[0]
+        self._expected_input_order = ['type', 'et', 'phi']
+        super(Producer, self).__init__(inputs, outputs, params)
 
     def produce(self, event):
-        values = _init_values(self.inputs, event)
+        variables = [event[i] for i in self._inputs]
         sums = {}
         energySumTypes = Producer.energySumTypes
-        prefix = self.outputCollection + '_'
+        prefix = self._outputs[0] + '_'
 
-        for sumType, et, phi in zip(values['type'], values['et'], values['phi']):
+        for sumType, et, phi in zip(*variables):
             if sumType in energySumTypes:
                 name = energySumTypes[sumType]['name']
                 obj = energySumTypes[sumType]['type']
