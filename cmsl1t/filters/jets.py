@@ -1,12 +1,5 @@
-import cmsl1t.geometry as geo
-from cmsl1t.utils.decorators import deprecated
 
-
-@deprecated(replacement='cmsl1t.filters.jets.pfJetFilter')
-def pfJetFilter(jet):
-    '''
-        also a lot of potential for simplification
-    '''
+def _pfJetID(jet):
     abs_eta = abs(jet.eta)
     isInnerJet = abs_eta <= 2.4
     isCentralJet = abs_eta <= 2.7
@@ -30,3 +23,7 @@ def pfJetFilter(jet):
     if any(reject_if):
         return False
     return True
+
+
+def pfJetFilter(jets):
+    return [jet for jet in jets if _pfJetID(jet)]
