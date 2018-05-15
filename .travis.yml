@@ -16,6 +16,6 @@ install:
   - docker-compose build ci
 
 script:
-  - docker-compose up ci
+  - docker-compose up --exit-code-from ci ci
 
 cache: apt
