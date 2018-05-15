@@ -191,7 +191,7 @@ class Analyzer(BaseAnalyzer):
                                                                  maxL1EmuHFJetEt)
                 else:
                     getattr(self, name + '_rates').fill(pileup, maxL1EmuJetEt)
-                    getattr(self, name + 
+                    getattr(self, name +
                             '_rate_vs_pileup').fill(pileup, maxL1EmuJetEt)
             else:
                 if 'BE' in name:
