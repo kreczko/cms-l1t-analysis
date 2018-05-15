@@ -5,7 +5,6 @@ from cmsl1t.hist.hist_collection import HistogramCollection
 from cmsl1t.hist.factory import HistFactory
 import cmsl1t.hist.binning as bn
 from cmsl1t.utils.draw import draw, label_canvas
-from cmsl1t.recalc.resolution import get_resolution_function
 from cmsl1t.utils.hist import cumulative_hist, normalise_to_collision_rate
 from cmsl1t.utils.hist import normalise_to_unit_area
 
@@ -23,14 +22,15 @@ class RatesPlot(BasePlotter):
 
     def create_histograms(self,
                           online_title,
-                          pileup_bins, n_bins, low, high):
+                          pileup_bins, n_bins, low, high, legend_title=""):
         """ This is not in an init function so that we can by-pass this in the
         case where we reload things from disk """
         self.online_title = online_title
         self.pileup_bins = bn.Sorted(pileup_bins, "pileup",
                                      use_everything_bin=True)
+        self.legend_title = legend_title
 
-        name = ["resolution", self.online_name, "pu_{pileup}"]
+        name = ["rate_vs_threshold", self.online_name, "pu_{pileup}"]
         name = "__".join(name)
         title = " ".join([self.online_name, "vs.", "in PU bin: {pileup}"])
         title = ";".join([title, self.online_title])
@@ -69,12 +69,44 @@ class RatesPlot(BasePlotter):
         self.__make_overlay(normed_hists, fits, labels,
                             "Fraction of events", "__shapes")
 
-    def __make_overlay(self, hists, fits, labels, ytitle, suffix=""):
+    def overlay_with_emu(self, emu_plotter, with_fits=False):
+
+        hists = []
+        labels = []
+        fits = []
+
+        hist = self.plots.get_bin_contents([bn.Base.everything])
+        hist = cumulative_hist(hist)
+
+        hist.drawstyle = "EP"
+        hist.SetMarkerSize(0.5)
+        hist.SetMarkerColor(1)
+        # if with_fits:
+        #    fit = self.fits.get_bin_contents([threshold])
+        #    fits.append(fit)
+        hists.append(hist)
+        labels.append("HW")
+
+        emu_hist = emu_plotter.plots.get_bin_contents([bn.Base.everything])
+        emu_hist = cumulative_hist(emu_hist)
+
+        emu_hist.drawstyle = "EP"
+        emu_hist.SetMarkerSize(0.5)
+        emu_hist.SetMarkerColor(2)
+        # if with_fits:
+        #    emu_fit = self.fits.get_bin_contents([threshold])
+        #    fits.append(emu_fit)
+        hists.append(emu_hist)
+        labels.append("Emu")
+
+        self.__make_overlay(hists, fits, labels, "# Events", setlogy=True)
+
+    def __make_overlay(self, hists, fits, labels, ytitle, suffix="", setlogy=False):
         with preserve_current_style():
             # Draw each resolution (with fit)
             xtitle = self.online_title
             canvas = draw(hists, draw_args={
-                          "xtitle": xtitle, "ytitle": ytitle})
+                          "xtitle": xtitle, "ytitle": ytitle, "logy": setlogy})
             if fits:
                 for fit, hist in zip(fits, hists):
                     fit["asymmetric"].linecolor = hist.GetLineColor()
@@ -84,8 +116,14 @@ class RatesPlot(BasePlotter):
             label_canvas()
 
             # Add a legend
-            legend = Legend(len(hists), header="Pile-up bin",
-                            topmargin=0.35, entryheight=0.035)
+            legend = Legend(
+                len(hists),
+                header=self.legend_title,
+                topmargin=0.35,
+                rightmargin=0.2,
+                leftmargin=0.8,
+                entryheight=0.028
+            )
             for hist, label in zip(hists, labels):
                 legend.AddEntry(hist, label)
             legend.SetBorderSize(0)
