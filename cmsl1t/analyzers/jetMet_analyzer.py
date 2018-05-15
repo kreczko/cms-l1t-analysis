@@ -5,7 +5,8 @@ from cmsl1t.plotting.onlineVsOffline import OnlineVsOffline
 from cmsl1t.plotting.resolution import ResolutionPlot
 from cmsl1t.plotting.resolution_vs_X import ResolutionVsXPlot
 from cmsl1t.playground.jetfilters import pfJetFilter
-from cmsl1t.playground.metfilters import pfMetFilter
+# from cmsl1t.playground.metfilters import pfMetFilter
+from cmsl1t.filters import pfMetFilter
 from cmsl1t.filters import LuminosityFilter
 import cmsl1t.recalc.met as recalc
 from cmsl1t.energySums import EnergySum, Met
@@ -79,18 +80,18 @@ def extractSums(event, doEmu, doReco, doGen):
     online = dict()
     if doReco:
         offline.update(dict(
-            caloHT=EnergySum(event.sums.caloHt),
-            pfHT=EnergySum(event.sums.Ht),
-            caloMETBE=Met(event.sums.caloMetBE, event.sums.caloMetPhiBE),
-            caloMETHF=Met(event.sums.caloMet, event.sums.caloMetPhi),
-            pfMET_NoMu=Met(event.sums.pfMetNoMu, event.sums.pfMetNoMuPhi),
+            caloHT=EnergySum(event.Sums_caloSumEt),
+            pfHT=EnergySum(event.Sums_sumEt),
+            caloMETBE=Met(event.Sums_caloMetBE, event.Sums_caloMetPhiBE),
+            caloMETHF=Met(event.Sums_caloMet, event.Sums_caloMetPhi),
+            pfMET_NoMu=Met(event.Sums_pfMetNoMu, event.Sums_pfMetNoMuPhi),
         ))
         online.update(dict(
-            caloHT=event.l1Sums["L1Htt"],
-            pfHT=event.l1Sums["L1Htt"],
-            caloMETBE=event.l1Sums["L1Met"],
-            caloMETHF=event.l1Sums["L1MetHF"],
-            pfMET_NoMu=event.l1Sums["L1MetHF"],
+            caloHT=event.l1Sums_Htt,
+            pfHT=event.l1Sums_Htt,
+            caloMETBE=event.l1Sums_Met,
+            caloMETHF=event.l1Sums_MetHF,
+            pfMET_NoMu=event.l1Sums_MetHF,
         ))
         if doEmu:
             offline.update(dict(
@@ -371,7 +372,7 @@ class Analyzer(BaseAnalyzer):
 
     def fill_histograms(self, entry, event):
 
-        if not self._passesLumiFilter(event._run, event._lumi):
+        if not self._passesLumiFilter(event.run, event.lumi):
             return True
 
         offline, online = extractSums(event, self._doEmu, self._doReco, self._doGen)
@@ -380,7 +381,7 @@ class Analyzer(BaseAnalyzer):
         genNVtx = 1
 
         if self._doReco or self._doVertex:
-            recoNVtx = event.nRecoVertex
+            recoNVtx = event.Vertex_nVtx
         if self._doGen:
             genNVtx = event.nGenVertex
 
