@@ -18,10 +18,10 @@ class BaseProducer(object):
         self._checked_content = False
 
         if not _check_inputs(self._inputs, self._expected_input_order):
-            logger.error('Unexpected input order.')
-            logger.error('Expected order' +
-                         ','.join(self._expected_input_order))
-            logger.error('Got' + ','.join(self._inputs))
+            msg = 'Unexpected input order.' + \
+            '\n\tExpected order: ' +', '.join(self._expected_input_order) + \
+            '\n\tGot: ' + ', '.join(self._inputs)
+            logger.error(msg)
             raise ValueError('Unexpected input order in {}'.format(
                 self.__class__.__name__))
 
