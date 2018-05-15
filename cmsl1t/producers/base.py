@@ -4,7 +4,7 @@ logger = logging.getLogger(__name__)
 
 def _check_inputs(inputs, expected_input_order):
     for i, o in zip(inputs, expected_input_order):
-        if not i.endswith(o):
+        if not i.lower().endswith(o.lower()):
             return False
     return True
 
