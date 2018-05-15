@@ -14,6 +14,7 @@ from math import pi
 import pprint
 from collections import namedtuple
 import numpy as np
+from cmsl1t.jet import match
 
 
 def types(doEmu, doReco, doGen):
@@ -21,8 +22,10 @@ def types(doEmu, doReco, doGen):
     sum_types = []
     jet_types = []
     if doReco:
-        sum_types.extend(["caloHT", "pfHT", "caloMETHF", "caloMETBE", "pfMET_NoMu"])
-        jet_types.extend(["caloJetET_BE", "caloJetET_HF", "pfJetET_BE", "pfJetET_HF"])
+        sum_types.extend(["caloHT", "pfHT", "caloMETHF",
+                          "caloMETBE", "pfMET_NoMu"])
+        jet_types.extend(["caloJetET_BE", "caloJetET_HF",
+                          "pfJetET_BE", "pfJetET_HF"])
     if doGen:
         sum_types.extend(["genHT", "genMETHF", "genMETBE"])
         jet_types.extend(["genJetET_BE", "genJetET_HF"])
@@ -95,18 +98,20 @@ def extractSums(event, doEmu, doReco, doGen):
         ))
         if doEmu:
             offline.update(dict(
-                caloHT_Emu=EnergySum(event.sums.caloHt),
-                pfHT_Emu=EnergySum(event.sums.Ht),
-                caloMETBE_Emu=Met(event.sums.caloMetBE, event.sums.caloMetPhiBE),
-                caloMETHF_Emu=Met(event.sums.caloMet, event.sums.caloMetPhi),
-                pfMET_NoMu_Emu=Met(event.sums.pfMetNoMu, event.sums.pfMetNoMuPhi),
+                caloHT_Emu=EnergySum(event.Sums_caloSumEt),
+                pfHT_Emu=EnergySum(event.Sums_sumEt),
+                caloMETBE_Emu=Met(event.Sums_caloMetBE,
+                                  event.Sums_caloMetPhiBE),
+                caloMETHF_Emu=Met(event.Sums_caloMet, event.Sums_caloMetPhi),
+                pfMET_NoMu_Emu=Met(event.Sums_pfMetNoMu,
+                                   event.Sums_pfMetNoMuPhi),
             ))
             online.update(dict(
-                caloHT_Emu=event.l1Sums["L1EmuHtt"],
-                pfHT_Emu=event.l1Sums["L1EmuHtt"],
-                caloMETBE_Emu=event.l1Sums["L1EmuMet"],
-                caloMETHF_Emu=event.l1Sums["L1EmuMetHF"],
-                pfMET_NoMu_Emu=event.l1Sums["L1EmuMetHF"],
+                caloHT_Emu=event.l1Sums_EmuHtt,
+                pfHT_Emu=event.l1Sums_EmuHtt,
+                caloMETBE_Emu=event.l1Sums_EmuMet,
+                caloMETHF_Emu=event.l1Sums_EmuMetHF,
+                pfMET_NoMu_Emu=event.l1Sums_EmuMetHF,
             ))
 
     if doGen:
@@ -154,7 +159,8 @@ class Analyzer(BaseAnalyzer):
         self._doReco = 'recoTree' in loaded_trees
         self._doGen = 'genTree' in loaded_trees
 
-        self._sumTypes, self._jetTypes = types(self._doEmu, self._doReco, self._doGen)
+        self._sumTypes, self._jetTypes = types(
+            self._doEmu, self._doReco, self._doGen)
 
         for name in self._sumTypes:
             eff_plot = EfficiencyPlot("L1", "offline_" + name)
@@ -227,7 +233,8 @@ class Analyzer(BaseAnalyzer):
                 Config("pfHT", "Offline PF HT", "L1 HT", 30, 800),
                 Config("caloMETHF", "Offline Calo MET HF", "L1 MET HF", 0, 400),
                 Config("caloMETBE", "Offline Calo MET BE", "L1 MET BE", 0, 400),
-                Config("pfMET_NoMu", "Offline PF MET NoMu", "L1 MET HF", 0, 400),
+                Config("pfMET_NoMu", "Offline PF MET NoMu",
+                       "L1 MET HF", 0, 400),
                 Config("caloJetET_BE", "Offline Central Calo Jet ET",
                        "L1 Jet ET", 20, 400),
                 Config("caloJetET_HF", "Offline Forward Calo Jet ET",
@@ -375,7 +382,8 @@ class Analyzer(BaseAnalyzer):
         if not self._passesLumiFilter(event.run, event.lumi):
             return True
 
-        offline, online = extractSums(event, self._doEmu, self._doReco, self._doGen)
+        offline, online = extractSums(
+            event, self._doEmu, self._doReco, self._doGen)
 
         recoNVtx = 1
         genNVtx = 1
@@ -402,10 +410,10 @@ class Analyzer(BaseAnalyzer):
                 getattr(self, name + "_phi_2D").fill(pileup, off.phi, on.phi)
 
         if self._doReco and self._doEmu:
-            goodRefJets = event.goodJets(jetFilter=pfJetFilter, jetType="pf")
+            goodRefJets = event.goodPFJets
 
             for refJet in goodRefJets:
-                l1Jet = event.getMatchedL1Jet(refJet, l1Type='EMU')
+                l1Jet = match(refJet, event.l1EmuJets)
                 if not l1Jet:
                     continue
                 if refJet.etCorr > 30.:
@@ -413,10 +421,10 @@ class Analyzer(BaseAnalyzer):
                         recoNVtx, refJet.eta, refJet.etCorr, l1Jet.et)
 
         if self._doGen and self._doEmu:
-            goodRefJets = event.goodJets(jetFilter=None, jetType="gen")
+            goodRefJets = event.goodGenJets
 
             for refJet in goodRefJets:
-                l1Jet = event.getMatchedL1Jet(refJet, l1Type='EMU')
+                l1Jet = match(refJet, event.l1EmuJets)
                 if not l1Jet:
                     continue
                 if refJet.etCorr > 30.:
@@ -424,7 +432,9 @@ class Analyzer(BaseAnalyzer):
                         genNVtx, refJet.eta, refJet.etCorr, l1Jet.et)
 
         if self._doGen:
-            leadingGenJet = event.getLeadingRefJet(jetFilter=None, jetType="gen")
+            leadingGenJet = None
+            if event.goodGenJets:
+                leadingGenJet = event.goodGenJets[0]
 
             if leadingGenJet:
 
@@ -435,7 +445,7 @@ class Analyzer(BaseAnalyzer):
                     genFillRegions = ['HF']
 
                 if self._doEmu:
-                    genL1EmuJet = event.getMatchedL1Jet(leadingGenJet, l1Type='EMU')
+                    genL1EmuJet = match(leadingGenJet, event.l1EmuJets)
                     if genL1EmuJet:
                         genL1EmuJetEt = genL1EmuJet.et
                     else:
@@ -450,7 +460,7 @@ class Analyzer(BaseAnalyzer):
                                 genNVtx, leadingGenJet.etCorr, genL1EmuJetEt,
                             )
 
-                genL1Jet = event.getMatchedL1Jet(leadingGenJet, l1Type='HW')
+                genL1Jet = match(leadingGenJet, event.l1Jets)
                 if genL1Jet:
                     genL1JetEt = genL1Jet.et
                 else:
@@ -466,11 +476,13 @@ class Analyzer(BaseAnalyzer):
                         )
 
         if self._doReco:
-            leadingPFJet = event.getLeadingRefJet(jetFilter=pfJetFilter, jetType="pf")
-            leadingCaloJet = event.getLeadingRefJet(jetFilter=None, jetType="calo")
+            leadingPFJet, leadingCaloJet = None, None
+            if event.goodPFJets:
+                leadingPFJet = event.goodPFJets[0]
+            if event.caloJets:
+                leadingCaloJet = event.caloJets[0]
 
-            if leadingPFJet:
-
+            if leadingPFJet and leadingPFJet.etCorr > 20:
                 pfFillRegions = []
                 if abs(leadingPFJet.eta) < 3.0:
                     pfFillRegions = ['BE']
@@ -478,7 +490,7 @@ class Analyzer(BaseAnalyzer):
                     pfFillRegions = ['HF']
 
                 if self._doEmu:
-                    pfL1EmuJet = event.getMatchedL1Jet(leadingPFJet, l1Type='EMU')
+                    pfL1EmuJet = match(leadingPFJet, event.l1EmuJets)
                     if pfL1EmuJet:
                         pfL1EmuJetEt = pfL1EmuJet.et
                     else:
@@ -493,7 +505,7 @@ class Analyzer(BaseAnalyzer):
                                 recoNVtx, leadingPFJet.etCorr, pfL1EmuJetEt,
                             )
 
-                pfL1Jet = event.getMatchedL1Jet(leadingPFJet, l1Type='HW')
+                pfL1Jet = match(leadingPFJet, event.l1Jets)
                 if pfL1Jet:
                     pfL1JetEt = pfL1Jet.et
                 else:
@@ -508,7 +520,7 @@ class Analyzer(BaseAnalyzer):
                             recoNVtx, leadingPFJet.etCorr, pfL1JetEt,
                         )
 
-            if leadingCaloJet:
+            if leadingCaloJet and leadingCaloJet.etCorr > 20:
 
                 caloFillRegions = []
                 if abs(leadingCaloJet.eta) < 3.0:
@@ -517,8 +529,7 @@ class Analyzer(BaseAnalyzer):
                     caloFillRegions = ['HF']
 
                 if self._doEmu:
-                    caloL1EmuJet = event.getMatchedL1Jet(
-                        leadingCaloJet, l1Type='EMU')
+                    caloL1EmuJet = match(leadingCaloJet, event.l1EmuJets)
                     if caloL1EmuJet:
                         caloL1EmuJetEt = caloL1EmuJet.et
                     else:
@@ -534,7 +545,7 @@ class Analyzer(BaseAnalyzer):
                                 recoNVtx, leadingCaloJet.etCorr, caloL1EmuJetEt,
                             )
 
-                caloL1Jet = event.getMatchedL1Jet(leadingCaloJet, l1Type='HW')
+                caloL1Jet = match(leadingCaloJet, event.l1Jets)
                 if caloL1Jet:
                     caloL1JetEt = caloL1Jet.et
                 else:
