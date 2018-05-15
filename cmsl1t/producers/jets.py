@@ -29,7 +29,6 @@ class Jet(object):
         for attr in read_attributes:
             setattr(self, attr, getattr(event, prefix + attr)[index])
 
-
     def __getitem__(self, name):
         return object.__getattribute__(self, name)
 

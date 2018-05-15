@@ -86,13 +86,15 @@ class Analyzer(BaseAnalyzer):
                 if "Emu" in name:
                     trig_thresholds = thresholds.get(name.replace('_Emu', ''))
                 else:
-                    print('Error: Please specify thresholds in the config .yaml in dictionary format')
+                    print(
+                        'Error: Please specify thresholds in the config .yaml in dictionary format')
 
             rates_plot = getattr(self, name + "_rates")
             rates_plot.build(name, puBins, 200, 0, 200, ETA_RANGES.get(name))
 
             rate_vs_pileup_plot = getattr(self, name + "_rate_vs_pileup")
-            rate_vs_pileup_plot.build("L1 " + name, trig_thresholds, 16, 0, 80, ETA_RANGES.get(name))
+            rate_vs_pileup_plot.build(
+                "L1 " + name, trig_thresholds, 16, 0, 80, ETA_RANGES.get(name))
 
         '''
         self.rates = HistogramsByPileUpCollection(
@@ -181,23 +183,29 @@ class Analyzer(BaseAnalyzer):
             if 'Emu' in name:
                 if 'BE' in name:
                     getattr(self, name + '_rates').fill(pileup, maxL1EmuBEJetEt)
-                    getattr(self, name + '_rate_vs_pileup').fill(pileup, maxL1EmuBEJetEt)
+                    getattr(self, name + '_rate_vs_pileup').fill(pileup,
+                                                                 maxL1EmuBEJetEt)
                 elif 'HF' in name:
                     getattr(self, name + '_rates').fill(pileup, maxL1EmuHFJetEt)
-                    getattr(self, name + '_rate_vs_pileup').fill(pileup, maxL1EmuHFJetEt)
+                    getattr(self, name + '_rate_vs_pileup').fill(pileup,
+                                                                 maxL1EmuHFJetEt)
                 else:
                     getattr(self, name + '_rates').fill(pileup, maxL1EmuJetEt)
-                    getattr(self, name + '_rate_vs_pileup').fill(pileup, maxL1EmuJetEt)
+                    getattr(self, name + 
+                            '_rate_vs_pileup').fill(pileup, maxL1EmuJetEt)
             else:
                 if 'BE' in name:
                     getattr(self, name + '_rates').fill(pileup, maxL1BEJetEt)
-                    getattr(self, name + '_rate_vs_pileup').fill(pileup, maxL1BEJetEt)
+                    getattr(self, name +
+                            '_rate_vs_pileup').fill(pileup, maxL1BEJetEt)
                 elif 'HF' in name:
                     getattr(self, name + '_rates').fill(pileup, maxL1HFJetEt)
-                    getattr(self, name + '_rate_vs_pileup').fill(pileup, maxL1HFJetEt)
+                    getattr(self, name +
+                            '_rate_vs_pileup').fill(pileup, maxL1HFJetEt)
                 else:
                     getattr(self, name + '_rates').fill(pileup, maxL1JetEt)
-                    getattr(self, name + '_rate_vs_pileup').fill(pileup, maxL1JetEt)
+                    getattr(self, name +
+                            '_rate_vs_pileup').fill(pileup, maxL1JetEt)
 
         return True
 

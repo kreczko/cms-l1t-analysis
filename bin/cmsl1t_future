@@ -44,7 +44,7 @@ def process_tuples(config, nevents, analyzers, producers):
 
     ntuple_map_file = 'config/ntuple_content.yaml'
     with open(ntuple_map_file) as f:
-       ntuple_map = yaml.load(f)
+        ntuple_map = yaml.load(f)
     load_L1TNTupleLibrary()
     reader = EventReader(input_files, ntuple_map, nevents=nevents)
 
@@ -118,6 +118,7 @@ def run(config, nevents, reload_histograms):
 
     producers = config.get('analysis', 'producers')
     producers = [load_producer(producer, config) for producer in producers]
+    _check_producer_outputs(producers)
 
     if not reload_histograms:
         analysis_mode = config.try_get('analysis', 'mode', default='new')
@@ -143,6 +144,18 @@ def run(config, nevents, reload_histograms):
     check(results, analyzers, 'finalize')
 
     return all(results)
+
+
+def _check_producer_outputs(producers):
+    outputs = []
+    for p in producers:
+        for o in p._outputs:
+            if o in outputs:
+                msg = 'Producer output {} already defined by other producers'.format(
+                    o)
+                logger.error(msg)
+                raise AttributeError(msg)
+        outputs += p._outputs
 
 
 def check(results, analyzers, method):
@@ -201,6 +214,7 @@ def load_producer(producer, config):
     module = import_module(name)
     logger.info("Successfully loaded producer:" + name)
     return module.Producer(**params)
+
 
 if __name__ == '__main__':
     analyze()

@@ -9,7 +9,9 @@ logger = logging.getLogger(__name__)
 def exists(module_name):
     try:
         import_module(module_name)
-    except ImportError:
+    except ImportError as e1:
+        logger.debug(
+            'Error importing a module "{}": {}'.format(module_name, e1))
         if '.' not in module_name:
             return False
         # check if it is a member of a module instead
@@ -17,7 +19,9 @@ def exists(module_name):
         module_name = '.'.join(tokens[:-1])
         try:
             m = import_module(module_name)
-        except ImportError:
+        except ImportError as e2:
+            logger.debug(
+                'Error importing a module "{}": {}'.format(module_name, e2))
             return False
         return hasattr(m, tokens[-1])
     else:
