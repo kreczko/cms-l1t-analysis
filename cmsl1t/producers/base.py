@@ -19,8 +19,8 @@ class BaseProducer(object):
 
         if not _check_inputs(self._inputs, self._expected_input_order):
             msg = 'Unexpected input order.' + \
-            '\n\tExpected order: ' +', '.join(self._expected_input_order) + \
-            '\n\tGot: ' + ', '.join(self._inputs)
+                '\n\tExpected order: ' + ', '.join(self._expected_input_order) + \
+                '\n\tGot: ' + ', '.join(self._inputs)
             logger.error(msg)
             raise ValueError('Unexpected input order in {}'.format(
                 self.__class__.__name__))
