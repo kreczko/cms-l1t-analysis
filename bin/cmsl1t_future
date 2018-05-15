@@ -151,7 +151,8 @@ def _check_producer_outputs(producers):
     for p in producers:
         for o in p._outputs:
             if o in outputs:
-                msg = 'Producer output {} already defined by other producers'.format(o)
+                msg = 'Producer output {} already defined by other producers'.format(
+                    o)
                 logger.error(msg)
                 raise AttributeError(msg)
         outputs += p._outputs
@@ -213,6 +214,7 @@ def load_producer(producer, config):
     module = import_module(name)
     logger.info("Successfully loaded producer:" + name)
     return module.Producer(**params)
+
 
 if __name__ == '__main__':
     analyze()

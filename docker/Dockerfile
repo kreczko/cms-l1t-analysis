@@ -5,6 +5,8 @@ ENV CMSL1T_CONDA_PATH /software/cmsl1t/miniconda
 # ROOT requirements
 RUN sudo apt install -y \
     libjpeg \
+    libnss3-dev \
+    libreadline-dev \
     libxpm-dev \
     libxft-dev
 
@@ -18,6 +20,7 @@ RUN wget -nv https://repo.continuum.io/miniconda/Miniconda2-latest-Linux-x86_64.
   bash /tmp/miniconda.sh -b -p ${CMSL1T_CONDA_PATH} && \
   rm -f miniconda.sh
 ENV PATH="${CMSL1T_CONDA_PATH}/bin:$PATH"
+ENV LD_LIBRARY_PATH ${CMSL1T_CONDA_PATH}/lib:/usr/lib/x86_64-linux-gnu/:/usr/lib/x86_64-linux-gnu/nss/
 
 RUN echo "Finished conda installation, updating conda and pip" && \
   conda update conda -yq && \

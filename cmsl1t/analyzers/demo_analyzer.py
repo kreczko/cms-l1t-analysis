@@ -1,8 +1,6 @@
 """
 Study the MET distibutions and various PUS schemes
 """
-from functools import partial
-import numpy as np
 from BaseAnalyzer import BaseAnalyzer
 from cmsl1t.collections import EfficiencyCollection
 from functools import partial
@@ -11,6 +9,7 @@ import numpy as np
 
 
 class Analyzer(BaseAnalyzer):
+
     def __init__(self, config, **kwargs):
         super(Analyzer, self).__init__("demo_analyzer", config)
 
