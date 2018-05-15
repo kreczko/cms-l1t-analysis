@@ -1,7 +1,20 @@
 # Change Log
 
-## [v0.4.1](https://github.com/cms-l1t-offline/cms-l1t-analysis/tree/v0.4.1)
+## [v0.4.2](https://github.com/cms-l1t-offline/cms-l1t-analysis/tree/v0.4.2)
 
+[Full Changelog](https://github.com/cms-l1t-offline/cms-l1t-analysis/compare/v0.4.1...v0.4.2)
+
+**Closed issues:**
+
+- Producers need better configuration language [\#134](https://github.com/cms-l1t-offline/cms-l1t-analysis/issues/134)
+- Error reporting when importing a broken analyzer is lousy. [\#88](https://github.com/cms-l1t-offline/cms-l1t-analysis/issues/88)
+
+**Merged pull requests:**
+
+- BaseProducer, input & output checks [\#135](https://github.com/cms-l1t-offline/cms-l1t-analysis/pull/135) ([kreczko](https://github.com/kreczko))
+- Added error reporting to utils.module.exists \(issue \#88\) [\#133](https://github.com/cms-l1t-offline/cms-l1t-analysis/pull/133) ([kreczko](https://github.com/kreczko))
+
+## [v0.4.1](https://github.com/cms-l1t-offline/cms-l1t-analysis/tree/v0.4.1) (2018-05-14)
 [Full Changelog](https://github.com/cms-l1t-offline/cms-l1t-analysis/compare/v0.4.0...v0.4.1)
 
 **Merged pull requests:**
