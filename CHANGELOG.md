@@ -1,7 +1,19 @@
 # Change Log
 
-## [v0.4.2](https://github.com/cms-l1t-offline/cms-l1t-analysis/tree/v0.4.2)
+## [v0.4.3](https://github.com/cms-l1t-offline/cms-l1t-analysis/tree/v0.4.3)
 
+[Full Changelog](https://github.com/cms-l1t-offline/cms-l1t-analysis/compare/v0.4.2...v0.4.3)
+
+**Fixed bugs:**
+
+- Bug: travis is returning false positives! [\#137](https://github.com/cms-l1t-offline/cms-l1t-analysis/issues/137)
+
+**Merged pull requests:**
+
+- Fixing travis false positives [\#138](https://github.com/cms-l1t-offline/cms-l1t-analysis/pull/138) ([kreczko](https://github.com/kreczko))
+- Add hardware vs emu rate comparisons [\#136](https://github.com/cms-l1t-offline/cms-l1t-analysis/pull/136) ([bundocka](https://github.com/bundocka))
+
+## [v0.4.2](https://github.com/cms-l1t-offline/cms-l1t-analysis/tree/v0.4.2) (2018-05-15)
 [Full Changelog](https://github.com/cms-l1t-offline/cms-l1t-analysis/compare/v0.4.1...v0.4.2)
 
 **Closed issues:**
