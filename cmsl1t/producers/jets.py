@@ -1,5 +1,5 @@
 from importlib import import_module
-from ..jet import Jet, CaloJet, PFJet
+from ..jet import Jet, L1Jet, CaloJet, PFJet
 from .base import BaseProducer
 
 # TODO:
@@ -36,16 +36,19 @@ class Producer(BaseProducer):
     def _init_jet_class(self):
         if self._jetType == 'PF':
             self._expected_input_order = [
-                'et', 'etCorr', 'eta', 'phi', 'cemef', 'chef',
+                'et', 'eta', 'phi', 'etCorr',  'cemef', 'chef',
                 'cMult', 'mef', 'muMult', 'nemef', 'nhef', 'nMult',
             ]
             self._jetClass = PFJet
         elif self._jetType == 'Calo':
-            self._expected_input_order = ['et', 'etCorr', 'eta', 'phi']
+            self._expected_input_order = ['et', 'eta', 'phi', 'etCorr', ]
             self._jetClass = CaloJet
         elif self._jetType == 'Gen':
             self._expected_input_order = ['pt', 'eta', 'phi']
             self._jetClass = Jet
+        elif self._jetType == 'L1':
+            self._expected_input_order = ['et', 'eta', 'phi', 'bx']
+            self._jetClass = L1Jet
         else:
             self._expected_input_order = []
             self._jetClass = None
