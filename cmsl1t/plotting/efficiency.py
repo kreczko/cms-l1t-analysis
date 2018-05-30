@@ -326,7 +326,7 @@ class EfficiencyPlot(BasePlotter):
         Re-build efficiency plots so that there are no bins with < min_ entries
         """
 
-        min_ = 8
+        min_ = 10
         total = []
         passed = []
         bins = []
@@ -341,6 +341,9 @@ class EfficiencyPlot(BasePlotter):
             next_bin_total = eff.GetTotalHistogram().GetBinContent(bin+1)
             merge_total += eff.GetTotalHistogram().GetBinContent(bin)
             merge_passed += eff.GetPassedHistogram().GetBinContent(bin)
+            if bin == nbins:
+                merge_total += eff.GetTotalHistogram().GetBinContent(bin+1)
+                merge_passed += eff.GetPassedHistogram().GetBinContent(bin+1)
 
             if (next_bin_total > min_ and merge_total > min_) or bin == nbins:
                 bins.append(eff.GetTotalHistogram().GetBinLowEdge(bin+1))
