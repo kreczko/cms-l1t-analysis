@@ -320,7 +320,6 @@ class EfficiencyPlot(BasePlotter):
         self.efficiencies += other.efficiencies
         return self.efficiencies
 
-
     def _dynamic_bin(self, eff):
         """
         Re-build efficiency plots so that there are no bins with < min_ entries
@@ -336,17 +335,17 @@ class EfficiencyPlot(BasePlotter):
         merge_total = 0
         merge_passed = 0
 
-        for bin in range(1,nbins+1):
+        for bin in range(1, nbins + 1):
 
-            next_bin_total = eff.GetTotalHistogram().GetBinContent(bin+1)
+            next_bin_total = eff.GetTotalHistogram().GetBinContent(bin + 1)
             merge_total += eff.GetTotalHistogram().GetBinContent(bin)
             merge_passed += eff.GetPassedHistogram().GetBinContent(bin)
             if bin == nbins:
-                merge_total += eff.GetTotalHistogram().GetBinContent(bin+1)
-                merge_passed += eff.GetPassedHistogram().GetBinContent(bin+1)
+                merge_total += eff.GetTotalHistogram().GetBinContent(bin + 1)
+                merge_passed += eff.GetPassedHistogram().GetBinContent(bin + 1)
 
             if (next_bin_total > min_ and merge_total > min_) or bin == nbins:
-                bins.append(eff.GetTotalHistogram().GetBinLowEdge(bin+1))
+                bins.append(eff.GetTotalHistogram().GetBinLowEdge(bin + 1))
                 total.append(merge_total)
                 passed.append(merge_passed)
                 merge_total = 0
@@ -354,15 +353,15 @@ class EfficiencyPlot(BasePlotter):
 
         npbins = np.asarray(bins)
 
-        hist_total = asrootpy(ROOT.TH1I("total","total",len(bins)-1,npbins))
-        hist_passed = asrootpy(ROOT.TH1I("passed","passed",len(bins)-1,npbins))
+        hist_total = asrootpy(ROOT.TH1I("total", "total", len(bins) - 1, npbins))
+        hist_passed = asrootpy(ROOT.TH1I("passed", "passed", len(bins) - 1, npbins))
 
-        for bin in range(1,len(bins)):
-            hist_total.SetBinContent(bin,total[bin-1])
-            hist_passed.SetBinContent(bin,passed[bin-1])
+        for bin in range(1, len(bins)):
+            hist_total.SetBinContent(bin, total[bin - 1])
+            hist_passed.SetBinContent(bin, passed[bin - 1])
 
         hist_total.Sumw2(False)
         hist_passed.Sumw2(False)
 
-        eff.SetTotalHistogram(hist_total,"f")
-        eff.SetPassedHistogram(hist_passed,"f")
+        eff.SetTotalHistogram(hist_total, "f")
+        eff.SetPassedHistogram(hist_passed, "f")

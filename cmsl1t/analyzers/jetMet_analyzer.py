@@ -49,6 +49,7 @@ ALL_THRESHOLDS = dict(
     JetET=[35, 90, 120]
 )
 
+
 def extractSums(event, doEmu, doReco, doGen):
     offline = dict()
     online = dict()
