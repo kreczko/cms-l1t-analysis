@@ -105,6 +105,7 @@ class EfficiencyPlot(BasePlotter):
                 continue
             hist = all_pileup_effs.get_bin_contents(threshold)
             hist.drawstyle = EfficiencyPlot.drawstyle_data
+            self._dynamic_bin(hist)
             hists.append(hist)
 
             label = label_template.format(
@@ -129,6 +130,7 @@ class EfficiencyPlot(BasePlotter):
                     continue
                 hist = self.efficiencies.get_bin_contents([pileup, threshold])
                 hist.drawstyle = EfficiencyPlot.drawstyle_data
+                self._dynamic_bin(hist)
                 hists.append(hist)
                 if with_fits:
                     fits.append(self.fits.get_bin_contents(
@@ -161,6 +163,7 @@ class EfficiencyPlot(BasePlotter):
                 continue
             hist = all_pileup_effs.get_bin_contents(threshold)
             hist.drawstyle = EfficiencyPlot.drawstyle_data
+            self._dynamic_bin(hist)
             hists.append(hist)
 
             label = label_template.format(
@@ -178,6 +181,7 @@ class EfficiencyPlot(BasePlotter):
             hist = emu_pileup_effs.get_bin_contents(threshold)
             hist.drawstyle = EfficiencyPlot.drawstyle_data
             hist.markerstyle = EfficiencyPlot.markerstyle_overlay
+            self._dynamic_bin(hist)
             hists.append(hist)
 
             label = label_template.format(
@@ -268,14 +272,14 @@ class EfficiencyPlot(BasePlotter):
             xmax = self.x_max
             # TODO: also specialisation, needs removal
             if("HT" in name):
-                xmax = 800
+                xmax = 830
                 xmin = 30
             if("MET" in name):
                 xmin = 0
                 xmax = 400
             if("Jet" in name):
                 xmin = 20
-                xmax = 400
+                xmax = 420
             if("HiRange" in name):
                 xmax = 2000
 
@@ -315,3 +319,47 @@ class EfficiencyPlot(BasePlotter):
         """
         self.efficiencies += other.efficiencies
         return self.efficiencies
+
+
+    def _dynamic_bin(self, eff):
+        """
+        Re-build efficiency plots so that there are no bins with < min_ entries
+        """
+
+        min_ = 8
+        total = []
+        passed = []
+        bins = []
+        bins.append(eff.GetTotalHistogram().GetBinLowEdge(1))
+        nbins = eff.GetTotalHistogram().GetNbinsX()
+
+        merge_total = 0
+        merge_passed = 0
+
+        for bin in range(1,nbins+1):
+
+            next_bin_total = eff.GetTotalHistogram().GetBinContent(bin+1)
+            merge_total += eff.GetTotalHistogram().GetBinContent(bin)
+            merge_passed += eff.GetPassedHistogram().GetBinContent(bin)
+
+            if (next_bin_total > min_ and merge_total > min_) or bin == nbins:
+                bins.append(eff.GetTotalHistogram().GetBinLowEdge(bin+1))
+                total.append(merge_total)
+                passed.append(merge_passed)
+                merge_total = 0
+                merge_passed = 0
+
+        npbins = np.asarray(bins)
+
+        hist_total = asrootpy(ROOT.TH1I("total","total",len(bins)-1,npbins))
+        hist_passed = asrootpy(ROOT.TH1I("passed","passed",len(bins)-1,npbins))
+
+        for bin in range(1,len(bins)):
+            hist_total.SetBinContent(bin,total[bin-1])
+            hist_passed.SetBinContent(bin,passed[bin-1])
+
+        hist_total.Sumw2(False)
+        hist_passed.Sumw2(False)
+
+        eff.SetTotalHistogram(hist_total,"f")
+        eff.SetPassedHistogram(hist_passed,"f")

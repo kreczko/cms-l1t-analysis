@@ -222,29 +222,29 @@ class Analyzer(BaseAnalyzer):
         cfgs = []
         if self._doReco:
             cfgs.extend([
-                Config("caloHT", "Offline Calo HT", "L1 HT", 30, 800),
-                Config("pfHT", "Offline PF HT", "L1 HT", 30, 800),
+                Config("caloHT", "Offline Calo HT", "L1 HT", 30, 830),
+                Config("pfHT", "Offline PF HT", "L1 HT", 30, 830),
                 Config("caloMETHF", "Offline Calo MET HF", "L1 MET HF", 0, 400),
                 Config("caloMETBE", "Offline Calo MET BE", "L1 MET BE", 0, 400),
                 Config("pfMET_NoMu", "Offline PF MET NoMu", "L1 MET HF", 0, 400),
                 Config("caloJetET_BE", "Offline Central Calo Jet ET",
-                       "L1 Jet ET", 20, 400),
+                       "L1 Jet ET", 20, 420),
                 Config("caloJetET_HF", "Offline Forward Calo Jet ET",
-                       "L1 Jet ET", 20, 400),
+                       "L1 Jet ET", 20, 420),
                 Config("pfJetET_BE", "Offline Central PF Jet ET",
-                       "L1 Jet ET", 20, 400),
+                       "L1 Jet ET", 20, 420),
                 Config("pfJetET_HF", "Offline Forward PF Jet ET",
-                       "L1 Jet ET", 20, 400),
+                       "L1 Jet ET", 20, 420),
             ])
         if self._doGen:
             cfgs.extend([
-                Config("genHT", "Gen HT", "L1 HT", 30, 800),
-                Config("genMETHF", "Gen MET HF", "L1 MET HF", 0, 400),
-                Config("genMETBE", "Gen MET BE", "L1 MET BE", 0, 400),
+                Config("genHT", "Gen HT", "L1 HT", 30, 830),
+                Config("genMETHF", "Gen MET HF", "L1 MET HF", 0, 420),
+                Config("genMETBE", "Gen MET BE", "L1 MET BE", 0, 420),
                 Config("genJetET_BE", "Central Gen Jet ET",
-                       "L1 Jet ET", 20, 400),
+                       "L1 Jet ET", 20, 420),
                 Config("genJetET_HF", "Forward Gen Jet ET",
-                       "L1 Jet ET", 20, 400),
+                       "L1 Jet ET", 20, 420),
             ])
 
         self._plots_from_cfgs(cfgs, puBins)
