@@ -215,8 +215,8 @@ class Analyzer(BaseAnalyzer):
         if self._doGen:
             cfgs.extend([
                 Config("genHT", "Gen HT", "L1 HT", 30, 830),
-                Config("genMETHF", "Gen MET HF", "L1 MET HF", 0, 420),
-                Config("genMETBE", "Gen MET BE", "L1 MET BE", 0, 420),
+                Config("genMETHF", "Gen MET HF", "L1 MET HF", 0, 400),
+                Config("genMETBE", "Gen MET BE", "L1 MET BE", 0, 400),
                 Config("genJetET_BE", "Central Gen Jet ET",
                        "L1 Jet ET", 20, 420),
                 Config("genJetET_HF", "Forward Gen Jet ET",
