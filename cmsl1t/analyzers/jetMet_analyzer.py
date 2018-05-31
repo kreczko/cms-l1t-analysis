@@ -49,30 +49,6 @@ ALL_THRESHOLDS = dict(
     JetET=[35, 90, 120]
 )
 
-HIGH_RANGE_BINS = list(range(0, 100, 5)) + list(range(100, 300, 10))
-HIGH_RANGE_BINS += list(range(300, 400, 20)) + list(range(400, 600, 50))
-HIGH_RANGE_BINS += list(range(600, 800, 200)) + list(range(800, 1200, 200))
-HIGH_RANGE_BINS += list(range(1200, 2800, 800))
-HIGH_RANGE_BINS_MET = list(range(0, 100, 5)) + list(range(100, 300, 10))
-HIGH_RANGE_BINS_MET += list(range(300, 400, 20)) + list(range(400, 600, 50))
-HIGH_RANGE_BINS_MET += list(range(600, 800, 200)) + list(range(800, 1000, 200))
-HIGH_RANGE_BINS_MET += list(range(1000, 3000, 1000))
-HIGH_RANGE_BINS_FWD = list(range(20, 100, 5)) + list(range(100, 300, 10))
-HIGH_RANGE_BINS_FWD += list(range(300, 400, 20)) + list(range(400, 600, 50))
-HIGH_RANGE_BINS_FWD += list(range(600, 800, 100)) + \
-    list(range(800, 3200, 1200))
-HIGH_RANGE_BINS_HT = list(range(30, 100, 5)) + list(range(100, 300, 10))
-HIGH_RANGE_BINS_HT += list(range(300, 500, 20)) + list(range(500, 700, 50))
-HIGH_RANGE_BINS_HT += list(range(700, 1000, 100)) + \
-    list(range(1000, 1200, 200))
-HIGH_RANGE_BINS_HT += list(range(1200, 1500, 300)) + \
-    list(range(1500, 2500, 500))
-
-HIGH_RANGE_BINS = np.asarray(HIGH_RANGE_BINS, 'd')
-HIGH_RANGE_BINS_MET = np.asarray(HIGH_RANGE_BINS_MET, 'd')
-HIGH_RANGE_BINS_HT = np.asarray(HIGH_RANGE_BINS_HT, 'd')
-HIGH_RANGE_BINS_FWD = np.asarray(HIGH_RANGE_BINS_FWD, 'd')
-
 
 def extractSums(event, doEmu, doReco, doGen):
     offline = dict()
@@ -222,29 +198,29 @@ class Analyzer(BaseAnalyzer):
         cfgs = []
         if self._doReco:
             cfgs.extend([
-                Config("caloHT", "Offline Calo HT", "L1 HT", 30, 800),
-                Config("pfHT", "Offline PF HT", "L1 HT", 30, 800),
+                Config("caloHT", "Offline Calo HT", "L1 HT", 30, 830),
+                Config("pfHT", "Offline PF HT", "L1 HT", 30, 830),
                 Config("caloMETHF", "Offline Calo MET HF", "L1 MET HF", 0, 400),
                 Config("caloMETBE", "Offline Calo MET BE", "L1 MET BE", 0, 400),
                 Config("pfMET_NoMu", "Offline PF MET NoMu", "L1 MET HF", 0, 400),
                 Config("caloJetET_BE", "Offline Central Calo Jet ET",
-                       "L1 Jet ET", 20, 400),
+                       "L1 Jet ET", 20, 420),
                 Config("caloJetET_HF", "Offline Forward Calo Jet ET",
-                       "L1 Jet ET", 20, 400),
+                       "L1 Jet ET", 20, 420),
                 Config("pfJetET_BE", "Offline Central PF Jet ET",
-                       "L1 Jet ET", 20, 400),
+                       "L1 Jet ET", 20, 420),
                 Config("pfJetET_HF", "Offline Forward PF Jet ET",
-                       "L1 Jet ET", 20, 400),
+                       "L1 Jet ET", 20, 420),
             ])
         if self._doGen:
             cfgs.extend([
-                Config("genHT", "Gen HT", "L1 HT", 30, 800),
+                Config("genHT", "Gen HT", "L1 HT", 30, 830),
                 Config("genMETHF", "Gen MET HF", "L1 MET HF", 0, 400),
                 Config("genMETBE", "Gen MET BE", "L1 MET BE", 0, 400),
                 Config("genJetET_BE", "Central Gen Jet ET",
-                       "L1 Jet ET", 20, 400),
+                       "L1 Jet ET", 20, 420),
                 Config("genJetET_HF", "Forward Gen Jet ET",
-                       "L1 Jet ET", 20, 400),
+                       "L1 Jet ET", 20, 420),
             ])
 
         self._plots_from_cfgs(cfgs, puBins)
@@ -317,25 +293,25 @@ class Analyzer(BaseAnalyzer):
             if high_range:
                 params = [
                     cfg.on_title, cfg.off_title + " (GeV)", puBins, thresholds,
-                    HIGH_RANGE_BINS.size - 1, HIGH_RANGE_BINS
+                    105, 0, 2100,
                 ]
                 if "HT" in cfg.name:
                     params = [
                         cfg.on_title, cfg.off_title +
                         " (GeV)", puBins, thresholds,
-                        HIGH_RANGE_BINS_HT.size - 1, HIGH_RANGE_BINS_HT
+                        105, 30, 2130,
                     ]
-                if "JetET_HF" in cfg.name:
+                if "JetET" in cfg.name:
                     params = [
                         cfg.on_title, cfg.off_title +
                         " (GeV)", puBins, thresholds,
-                        HIGH_RANGE_BINS_FWD.size - 1, HIGH_RANGE_BINS_FWD
+                        105, 20, 2120,
                     ]
                 if "MET" in cfg.name:
                     params = [
                         cfg.on_title, cfg.off_title +
                         " (GeV)", puBins, thresholds,
-                        HIGH_RANGE_BINS_MET.size - 1, HIGH_RANGE_BINS_MET
+                        100, 0, 2000,
                     ]
 
             eff_plot.build(*params, legend_title=etaRange)
