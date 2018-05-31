@@ -325,7 +325,7 @@ class EfficiencyPlot(BasePlotter):
         Re-build efficiency plots so that there are no bins with < min_ entries
         """
 
-        min_ = 10
+        min_ = 20
         total = []
         passed = []
         bins = []
