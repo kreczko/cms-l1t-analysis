@@ -238,7 +238,7 @@ class EfficiencyPlot(BasePlotter):
                                                threshold=threshold)
 
             xmin = hists[0].GetTotalHistogram().GetBinLowEdge(1)
-            xmax = hists[0].GetTotalHistogram().GetBinLowEdge(hists[0].GetTotalHistogram().GetNbinsX()+1)
+            xmax = hists[0].GetTotalHistogram().GetBinLowEdge(hists[0].GetTotalHistogram().GetNbinsX() + 1)
 
             # Draw each efficiency (with fit)
             draw_args = {"xtitle": self.offline_title, "ytitle": "Efficiency", "xlimits": [xmin, xmax]}
