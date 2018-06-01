@@ -75,7 +75,7 @@ class ResolutionPlot(BasePlotter):
             labels.append(label)
             # if with_fits:
             #     fits.append(self.fits.get_bin_contents([pile_up]))
-        #self.__make_overlay(hists, fits, labels, "Number of events")
+        # self.__make_overlay(hists, fits, labels, "Number of events")
 
         normed_hists = list(normalise_to_unit_area(hists))
         for hist in normed_hists:
@@ -110,7 +110,7 @@ class ResolutionPlot(BasePlotter):
             hists.append(hist)
             labels.append(label)
 
-        #self.__make_overlay(hists, fits, labels,
+        # self.__make_overlay(hists, fits, labels,
         #                    "Number of events", "__Overlay_Emu")
 
         normed_hists = list(normalise_to_unit_area(hists))
