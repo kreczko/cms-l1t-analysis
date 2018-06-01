@@ -75,12 +75,12 @@ class ResolutionPlot(BasePlotter):
             labels.append(label)
             # if with_fits:
             #     fits.append(self.fits.get_bin_contents([pile_up]))
-        self.__make_overlay(hists, fits, labels, "Number of events")
+        #self.__make_overlay(hists, fits, labels, "Number of events")
 
         normed_hists = list(normalise_to_unit_area(hists))
         for hist in normed_hists:
             hist.GetYaxis().SetRangeUser(-0.1, 1.1)
-        self.__make_overlay(normed_hists, fits, labels, "a.u.", "__shapes")
+        self.__make_overlay(normed_hists, fits, labels, "a.u.")
 
     def overlay_with_emu(self, emu_plotter, with_fits=False):
         hists = []
@@ -110,14 +110,14 @@ class ResolutionPlot(BasePlotter):
             hists.append(hist)
             labels.append(label)
 
-        self.__make_overlay(hists, fits, labels,
-                            "Number of events", "__Overlay_Emu")
+        #self.__make_overlay(hists, fits, labels,
+        #                    "Number of events", "__Overlay_Emu")
 
         normed_hists = list(normalise_to_unit_area(hists))
         for hist in normed_hists:
             hist.GetYaxis().SetRangeUser(-0.1, 1.1)
         self.__make_overlay(normed_hists, fits, labels,
-                            "a.u.", "__shapes__Overlay_Emu")
+                            "a.u.", "__Overlay_Emu")
 
     def __make_overlay(self, hists, fits, labels, ytitle, suffix=""):
         with preserve_current_style():
