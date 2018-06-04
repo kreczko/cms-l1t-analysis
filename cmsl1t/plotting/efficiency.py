@@ -62,12 +62,10 @@ class EfficiencyPlot(BasePlotter):
                 eff = asrootpy(
                     ROOT.TEfficiency(this_name, this_title, n_bins, low)
                 )
-                self.x_max = 2000
             else:
                 eff = asrootpy(
                     ROOT.TEfficiency(this_name, this_title, n_bins, low, high)
                 )
-                self.x_max = high
             eff.drawstyle = EfficiencyPlot.drawstyle
             return eff
         self.efficiencies = HistogramCollection(
@@ -120,24 +118,25 @@ class EfficiencyPlot(BasePlotter):
             "all", "all", hists, fits, labels, self.online_title,
         )
 
-        # Overlay individual pile-up bins for each threshold
-        for threshold in self.thresholds:
-            hists = []
-            labels = []
-            fits = []
-            for pileup in self.pileup_bins:
-                if not isinstance(pileup, int):
-                    continue
-                hist = self.efficiencies.get_bin_contents([pileup, threshold])
-                hist.drawstyle = EfficiencyPlot.drawstyle_data
-                self._dynamic_bin(hist)
-                hists.append(hist)
-                if with_fits:
-                    fits.append(self.fits.get_bin_contents(
-                        [pileup, threshold]))
-                labels.append(str(self.pileup_bins.bins[pileup]))
-            self.__make_overlay(pileup, threshold, hists,
-                                fits, labels, "PU bin")
+        if 'HiRange' not in self.filename_format:
+            # Overlay individual pile-up bins for each threshold
+            for threshold in self.thresholds:
+                hists = []
+                labels = []
+                fits = []
+                for pileup in self.pileup_bins:
+                    if not isinstance(pileup, int):
+                        continue
+                    hist = self.efficiencies.get_bin_contents([pileup, threshold])
+                    hist.drawstyle = EfficiencyPlot.drawstyle_data
+                    self._dynamic_bin(hist)
+                    hists.append(hist)
+                    if with_fits:
+                        fits.append(self.fits.get_bin_contents(
+                            [pileup, threshold]))
+                    labels.append(str(self.pileup_bins.bins[pileup]))
+                self.__make_overlay(pileup, threshold, hists,
+                                    fits, labels, "PU bin")
 
         # Produce the fit summary plot
         if with_fits:
@@ -238,11 +237,12 @@ class EfficiencyPlot(BasePlotter):
         with preserve_current_style():
             name = self.filename_format.format(pileup=pileup,
                                                threshold=threshold)
+
+            xmin = hists[0].GetTotalHistogram().GetBinLowEdge(1)
+            xmax = hists[0].GetTotalHistogram().GetBinLowEdge(hists[0].GetTotalHistogram().GetNbinsX() + 1)
+
             # Draw each efficiency (with fit)
-            draw_args = {"xtitle": self.offline_title, "ytitle": "Efficiency"}
-            # TODO: special case should not be implemented here!
-            if 'Jet' in name and 'HiRange' in name:
-                draw_args['xlimits'] = [20, 2000]
+            draw_args = {"xtitle": self.offline_title, "ytitle": "Efficiency", "xlimits": [xmin, xmax]}
 
             canvas = draw(hists, draw_args=draw_args)
             if len(fits) > 0:
@@ -263,25 +263,12 @@ class EfficiencyPlot(BasePlotter):
                 textsize=0.025,
                 entryheight=0.028,
             )
+
             for hist, label in zip(hists, labels):
                 legend.AddEntry(hist, label)
+
             legend.SetBorderSize(0)
             legend.Draw()
-
-            xmin = 0
-            xmax = self.x_max
-            # TODO: also specialisation, needs removal
-            if("HT" in name):
-                xmax = 830
-                xmin = 30
-            if("MET" in name):
-                xmin = 0
-                xmax = 400
-            if("Jet" in name):
-                xmin = 20
-                xmax = 420
-            if("HiRange" in name):
-                xmax = 2000
 
             for val in [0.25, 0.5, 0.75, 0.95, 1.]:
                 line = ROOT.TLine(xmin, val, xmax, val)
@@ -289,8 +276,8 @@ class EfficiencyPlot(BasePlotter):
                 line.SetLineColor(15)
                 line.Draw()
 
-            for val in range(100, xmax, 100):
-                line = ROOT.TLine(val, 0., val, 1.)
+            for thresh in self.thresholds.bins:
+                line = ROOT.TLine(thresh, 0., thresh, 1.)
                 line.SetLineStyle("dashed")
                 line.SetLineColor(15)
                 line.Draw()
@@ -325,7 +312,7 @@ class EfficiencyPlot(BasePlotter):
         Re-build efficiency plots so that there are no bins with < min_ entries
         """
 
-        min_ = 20
+        min_ = 16
         total = []
         passed = []
         bins = []
