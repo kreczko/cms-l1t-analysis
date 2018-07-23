@@ -9,6 +9,7 @@ from metfilters import pfMetFilter
 from cmsl1t.playground.cache import CachedIndexedTree
 from cmsl1t.utils import load_ROOT_library
 from cmsl1t.energySums import EnergySum, Mex, Mey, Met
+from cmsl1t.playground.mapping import EventMap
 from rootpy import ROOT
 from exceptions import RuntimeError
 import logging
@@ -374,7 +375,7 @@ class EventReader(object):
 
     def __iter__(self):
         for trees in six.moves.zip(*self._trees):
-            yield Event(self._names, trees)
+            yield EventMap(Event(self._names, trees))
 
 
 if __name__ == '__main__':
