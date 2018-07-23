@@ -47,9 +47,9 @@ def match(jet, jets, minDeltaR=0.4):
     if not jet or not jets:
         return None
 
-    closestJet = None
     dEtas = np.array([jet.eta - j.eta for j in jets])
     dPhis = np.array([jet.phi - j.phi for j in jets])
     dRs = np.sqrt(dEtas**2 + dPhis**2)
+    # TODO: filter on minDeltaR
     index = dRs.argmin()
     return jets[index]

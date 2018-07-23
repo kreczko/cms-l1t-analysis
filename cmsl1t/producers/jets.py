@@ -36,7 +36,7 @@ class Producer(BaseProducer):
     def _init_jet_class(self):
         if self._jetType == 'PF':
             self._expected_input_order = [
-                'et', 'eta', 'phi', 'etCorr',  'cemef', 'chef',
+                'et', 'eta', 'phi', 'etCorr', 'cemef', 'chef',
                 'cMult', 'mef', 'muMult', 'nemef', 'nhef', 'nMult',
             ]
             self._jetClass = PFJet
