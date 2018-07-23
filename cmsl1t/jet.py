@@ -50,6 +50,7 @@ def match(jet, jets, minDeltaR=0.4):
     dEtas = np.array([jet.eta - j.eta for j in jets])
     dPhis = np.array([jet.phi - j.phi for j in jets])
     dRs = np.sqrt(dEtas**2 + dPhis**2)
-    # TODO: filter on minDeltaR
+    if min(dRs) > minDeltaR:
+        return None
     index = dRs.argmin()
     return jets[index]
