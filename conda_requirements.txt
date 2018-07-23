@@ -4,5 +4,5 @@ numpy
 matplotlib
 pytables
 rootpy
-pandas
+pandas==0.22.0
 psutil
