@@ -107,11 +107,11 @@ def extractSums(event, doEmu, doReco, doGen):
                                    event.Sums_pfMetNoMuPhi),
             ))
             online.update(dict(
-                caloHT_Emu=event.l1Sums_EmuHtt,
-                pfHT_Emu=event.l1Sums_EmuHtt,
-                caloMETBE_Emu=event.l1Sums_EmuMet,
-                caloMETHF_Emu=event.l1Sums_EmuMetHF,
-                pfMET_NoMu_Emu=event.l1Sums_EmuMetHF,
+                caloHT_Emu=event.l1EmuSums_Htt,
+                pfHT_Emu=event.l1EmuSums_Htt,
+                caloMETBE_Emu=event.l1EmuSums_Met,
+                caloMETHF_Emu=event.l1EmuSums_MetHF,
+                pfMET_NoMu_Emu=event.l1EmuSums_MetHF,
             ))
 
     if doGen:
@@ -136,7 +136,6 @@ def extractSums(event, doEmu, doReco, doGen):
                 genMETHF_Emu=event.l1Sums["L1EmuMetHF"],
                 genMETBE_Emu=event.l1Sums["L1EmuMet"]
             ))
-
     return offline, online
 
 
