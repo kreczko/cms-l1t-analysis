@@ -80,7 +80,7 @@ test-code-full:
 	@pytest -v test
 
 changelog:
-	@github_changelog_generator -u cms-l1t-offline -p cms-l1t-analysis --base docs/initial_changelog.md
+	@github_changelog_generator -u cms-l1t-offline -p cms-l1t-analysis
 
 docs-html:
 	cd docs; make html; cd -
