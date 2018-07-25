@@ -90,18 +90,6 @@ class EventReader(object):
 
 class Event(object):
 
-    energySumTypes = {
-        'Ett': sumTypes.kTotalEt,
-        'EttHF': sumTypes.kTotalEtHF,
-        'Htt': sumTypes.kTotalHt,
-        'HttHF': sumTypes.kTotalHtHF,
-        'Met': sumTypes.kMissingEt,
-        'MetHF': sumTypes.kMissingEtHF,
-        'Mht': sumTypes.kMissingHt,
-        'Mex': sumTypes.kTotalEtx,
-        'Mey': sumTypes.kTotalEty,
-    }
-
     def __init__(self, trees, mapping):
         self._map = mapping
         self._trees = trees
@@ -123,13 +111,3 @@ class Event(object):
 
     def __getitem__(self, name):
         return object.__getattribute__(self, '__getattr__')(name)
-
-    def _map_energy_sums(self):
-        # TODO: use Event.energySumTypes to map
-        '''
-            event.L1Upgrade_sumEt[event.energySumTypes['Htt']]
-            to
-            event.L1Upgrade_sumEt_Htt
-            + EMU + phi
-        '''
-        pass

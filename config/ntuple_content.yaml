@@ -149,30 +149,6 @@ content:
       CaloTP.nHCALTP:
         aliases:
         - event.CaloTP_nHCALTP
-      L1CaloCluster.et:
-        aliases:
-        - event.L1CaloCluster_et
-      L1CaloCluster.eta:
-        aliases:
-        - event.L1CaloCluster_eta
-      L1CaloCluster.iet:
-        aliases:
-        - event.L1CaloCluster_iet
-      L1CaloCluster.ieta:
-        aliases:
-        - event.L1CaloCluster_ieta
-      L1CaloCluster.iphi:
-        aliases:
-        - event.L1CaloCluster_iphi
-      L1CaloCluster.iqual:
-        aliases:
-        - event.L1CaloCluster_iqual
-      L1CaloCluster.nCluster:
-        aliases:
-        - event.L1CaloCluster_nCluster
-      L1CaloCluster.phi:
-        aliases:
-        - event.L1CaloCluster_phi
       L1CaloTower.et:
         aliases:
         - event.L1CaloTower_et
@@ -292,6 +268,34 @@ content:
       Event.time:
         aliases:
         - event.time
+  l1HOTree/L1HOTree:
+    name: L1HOTree
+    optional: false
+    branches:
+      L1HO.hcalDetIdIEta:
+        aliases:
+        - event.L1HO_hcalDetIdIEta
+      L1HO.hcalDetIdIPhi:
+        aliases:
+        - event.L1HO_hcalDetIdIPhi
+      L1HO.hcalQIESample:
+        aliases:
+        - event.L1HO_hcalQIESample
+      L1HO.hcalQIESampleAdc:
+        aliases:
+        - event.L1HO_hcalQIESampleAdc
+      L1HO.hcalQIESampleDv:
+        aliases:
+        - event.L1HO_hcalQIESampleDv
+      L1HO.hcalQIESampleEr:
+        aliases:
+        - event.L1HO_hcalQIESampleEr
+      L1HO.nHcalDetIds:
+        aliases:
+        - event.L1HO_nHcalDetIds
+      L1HO.nHcalQIESamples:
+        aliases:
+        - event.L1HO_nHcalQIESamples
   l1JetRecoTree/JetRecoTree:
     name: JetRecoTree
     optional: true
@@ -299,6 +303,24 @@ content:
       Jet.cMult:
         aliases:
         - event.Jet_cMult
+      Jet.caloCorrFactor:
+        aliases:
+        - event.Jet_caloCorrFactor
+      Jet.caloE:
+        aliases:
+        - event.Jet_caloE
+      Jet.caloEt:
+        aliases:
+        - event.Jet_caloEt
+      Jet.caloEtCorr:
+        aliases:
+        - event.Jet_caloEtCorr
+      Jet.caloEta:
+        aliases:
+        - event.Jet_caloEta
+      Jet.caloPhi:
+        aliases:
+        - event.Jet_caloPhi
       Jet.cemef:
         aliases:
         - event.Jet_cemef
@@ -380,9 +402,6 @@ content:
       Jet.hfhef:
         aliases:
         - event.Jet_hfhef
-      Jet.isPF:
-        aliases:
-        - event.Jet_isPF
       Jet.mef:
         aliases:
         - event.Jet_mef
@@ -398,6 +417,9 @@ content:
       Jet.n90hits:
         aliases:
         - event.Jet_n90hits
+      Jet.nCaloJets:
+        aliases:
+        - event.Jet_nCaloJets
       Jet.nJets:
         aliases:
         - event.Jet_nJets
@@ -431,6 +453,9 @@ content:
       Sums.Ht:
         aliases:
         - event.Sums_Ht
+      Sums.caloHt:
+        aliases:
+        - event.Sums_caloHt
       Sums.caloMet:
         aliases:
         - event.Sums_caloMet
@@ -473,6 +498,18 @@ content:
       Sums.metPy:
         aliases:
         - event.Sums_metPy
+      Sums.pfMetNoMu:
+        aliases:
+        - event.Sums_pfMetNoMu
+      Sums.pfMetNoMuPhi:
+        aliases:
+        - event.Sums_pfMetNoMuPhi
+      Sums.pfMetNoMuPx:
+        aliases:
+        - event.Sums_pfMetNoMuPx
+      Sums.pfMetNoMuPy:
+        aliases:
+        - event.Sums_pfMetNoMuPy
       Sums.sumEt:
         aliases:
         - event.Sums_sumEt
@@ -480,6 +517,12 @@ content:
     name: MetFilterRecoTree
     optional: true
     branches:
+      MetFilters.badChCandFilter:
+        aliases:
+        - event.MetFilters_badChCandFilter
+      MetFilters.badPFMuonFilter:
+        aliases:
+        - event.MetFilters_badPFMuonFilter
       MetFilters.chHadTrackResFilter:
         aliases:
         - event.MetFilters_chHadTrackResFilter
@@ -492,6 +535,9 @@ content:
       MetFilters.eeBadScFilter:
         aliases:
         - event.MetFilters_eeBadScFilter
+      MetFilters.globalSuperTightHalo2016Filter:
+        aliases:
+        - event.MetFilters_globalSuperTightHalo2016Filter
       MetFilters.goodVerticesFilter:
         aliases:
         - event.MetFilters_goodVerticesFilter
@@ -520,6 +566,12 @@ content:
       Muon.eta:
         aliases:
         - event.Muon_eta
+      Muon.etaSt1:
+        aliases:
+        - event.Muon_etaSt1
+      Muon.etaSt2:
+        aliases:
+        - event.Muon_etaSt2
       Muon.hlt_deltaR:
         aliases:
         - event.Muon_hlt_deltaR
@@ -534,7 +586,7 @@ content:
         - event.Muon_hlt_mu
       Muon.isLooseMuon:
         aliases:
-        - event.emu_Muon_isLooseMuon
+        - event.Muon_isLooseMuon
       Muon.isMediumMuon:
         aliases:
         - event.Muon_isMediumMuon
@@ -555,10 +607,16 @@ content:
         - event.Muon_nMuons
       Muon.passesSingleMuon:
         aliases:
-        - event.emu_Muon_passesSingleMuon
+        - event.Muon_passesSingleMuon
       Muon.phi:
         aliases:
         - event.Muon_phi
+      Muon.phiSt1:
+        aliases:
+        - event.Muon_phiSt1
+      Muon.phiSt2:
+        aliases:
+        - event.Muon_phiSt2
       Muon.pt:
         aliases:
         - event.Muon_pt
@@ -676,6 +734,9 @@ content:
       L1Upgrade.egShape:
         aliases:
         - event.emu_L1Upgrade_egShape
+      L1Upgrade.egTowerHoE:
+        aliases:
+        - event.emu_L1Upgrade_egTowerHoE
       L1Upgrade.egTowerIEta:
         aliases:
         - event.emu_L1Upgrade_egTowerIEta
@@ -742,21 +803,39 @@ content:
       L1Upgrade.muonEta:
         aliases:
         - event.emu_L1Upgrade_muonEta
+      L1Upgrade.muonEtaAtVtx:
+        aliases:
+        - event.emu_L1Upgrade_muonEtaAtVtx
+      L1Upgrade.muonIDEta:
+        aliases:
+        - event.emu_L1Upgrade_muonIDEta
+      L1Upgrade.muonIDPhi:
+        aliases:
+        - event.emu_L1Upgrade_muonIDPhi
       L1Upgrade.muonIEt:
         aliases:
         - event.emu_L1Upgrade_muonIEt
       L1Upgrade.muonIEta:
         aliases:
         - event.emu_L1Upgrade_muonIEta
+      L1Upgrade.muonIEtaAtVtx:
+        aliases:
+        - event.emu_L1Upgrade_muonIEtaAtVtx
       L1Upgrade.muonIPhi:
         aliases:
         - event.emu_L1Upgrade_muonIPhi
+      L1Upgrade.muonIPhiAtVtx:
+        aliases:
+        - event.emu_L1Upgrade_muonIPhiAtVtx
       L1Upgrade.muonIso:
         aliases:
         - event.emu_L1Upgrade_muonIso
       L1Upgrade.muonPhi:
         aliases:
         - event.emu_L1Upgrade_muonPhi
+      L1Upgrade.muonPhiAtVtx:
+        aliases:
+        - event.emu_L1Upgrade_muonPhiAtVtx
       L1Upgrade.muonQual:
         aliases:
         - event.emu_L1Upgrade_muonQual
@@ -1261,6 +1340,9 @@ content:
       L1Upgrade.egShape:
         aliases:
         - event.L1Upgrade_egShape
+      L1Upgrade.egTowerHoE:
+        aliases:
+        - event.L1Upgrade_egTowerHoE
       L1Upgrade.egTowerIEta:
         aliases:
         - event.L1Upgrade_egTowerIEta
@@ -1327,21 +1409,39 @@ content:
       L1Upgrade.muonEta:
         aliases:
         - event.L1Upgrade_muonEta
+      L1Upgrade.muonEtaAtVtx:
+        aliases:
+        - event.L1Upgrade_muonEtaAtVtx
+      L1Upgrade.muonIDEta:
+        aliases:
+        - event.L1Upgrade_muonIDEta
+      L1Upgrade.muonIDPhi:
+        aliases:
+        - event.L1Upgrade_muonIDPhi
       L1Upgrade.muonIEt:
         aliases:
         - event.L1Upgrade_muonIEt
       L1Upgrade.muonIEta:
         aliases:
         - event.L1Upgrade_muonIEta
+      L1Upgrade.muonIEtaAtVtx:
+        aliases:
+        - event.L1Upgrade_muonIEtaAtVtx
       L1Upgrade.muonIPhi:
         aliases:
         - event.L1Upgrade_muonIPhi
+      L1Upgrade.muonIPhiAtVtx:
+        aliases:
+        - event.L1Upgrade_muonIPhiAtVtx
       L1Upgrade.muonIso:
         aliases:
         - event.L1Upgrade_muonIso
       L1Upgrade.muonPhi:
         aliases:
         - event.L1Upgrade_muonPhi
+      L1Upgrade.muonPhiAtVtx:
+        aliases:
+        - event.L1Upgrade_muonPhiAtVtx
       L1Upgrade.muonQual:
         aliases:
         - event.L1Upgrade_muonQual

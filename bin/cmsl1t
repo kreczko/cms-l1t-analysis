@@ -5,9 +5,12 @@ import os
 from datetime import datetime
 from cmsl1t.utils.timers import timerfunc_log_to
 from cmsl1t.config import ConfigParser
+from cmsl1t.utils.module import load_L1TNTupleLibrary
+from cmsl1t.io.eventreader import EventReader
 import click
 import click_log
 from importlib import import_module
+import yaml
 import logging
 logger = logging.getLogger(__name__)
 logging.getLogger("rootpy.tree.chain").setLevel(logging.WARNING)
@@ -23,7 +26,7 @@ section = '\n'.join(section)
 
 
 @timerfunc_log_to(logger.info)
-def process_tuples(config, nevents, analyzers):
+def process_tuples(config, nevents, analyzers, producers):
     # Open the data files
     logger.info(section.format("Loading data"))
 
@@ -39,11 +42,11 @@ def process_tuples(config, nevents, analyzers):
     else:
         logger.info(input_files)
 
-    from cmsl1t.playground.eventreader import EventReader
-    load_trees = config.try_get('analysis', 'load_trees', ['event', 'upgrade'])
-    reader = EventReader(
-        input_files, events=nevents, load_trees=load_trees,
-    )
+    ntuple_map_file = 'config/ntuple_content.yaml'
+    with open(ntuple_map_file) as f:
+        ntuple_map = yaml.load(f)
+    load_L1TNTupleLibrary()
+    reader = EventReader(input_files, ntuple_map, nevents=nevents)
 
     results = [analyzer.prepare_for_events(reader) for analyzer in analyzers]
     check(results, analyzers, 'prepare_for_events')
@@ -59,6 +62,8 @@ def process_tuples(config, nevents, analyzers):
                 logger.info("{} of {}".format(entry, nevents))
             else:
                 logger.info("{} of <all>".format(entry))
+        results = [p.produce(event) for p in producers]
+        check(results, producers, 'produce')
         results = [analyzer.process_event(entry, event)
                    for analyzer in analyzers]
         check(results, analyzers, 'process_event')
@@ -111,12 +116,16 @@ def run(config, nevents, reload_histograms):
     analyzers = config.get('analysis', 'analyzers')
     analyzers = [load_analyzer(analyzer, config) for analyzer in analyzers]
 
+    producers = config.get('analysis', 'producers')
+    producers = [load_producer(producer, config) for producer in producers]
+    _check_producer_outputs(producers)
+
     if not reload_histograms:
         analysis_mode = config.try_get('analysis', 'mode', default='new')
         if analysis_mode == 'legacy':
             process_legacy(config, nevents, analyzers)
         else:
-            process_tuples(config, nevents, analyzers)
+            process_tuples(config, nevents, analyzers, producers)
     else:
         process_histogram_files(config, analyzers)
 
@@ -135,6 +144,18 @@ def run(config, nevents, reload_histograms):
     check(results, analyzers, 'finalize')
 
     return all(results)
+
+
+def _check_producer_outputs(producers):
+    outputs = []
+    for p in producers:
+        for o in p._outputs:
+            if o in outputs:
+                msg = 'Producer output {} already defined by other producers'.format(
+                    o)
+                logger.error(msg)
+                raise AttributeError(msg)
+        outputs += p._outputs
 
 
 def check(results, analyzers, method):
@@ -179,6 +200,20 @@ def load_analyzer(analyzer, config):
     module = import_module(name)
     logger.info("Successfully loaded analyzer:" + name)
     return module.Analyzer(config, **params)
+
+
+def load_producer(producer, config):
+    name = producer
+    params = {}
+    if isinstance(producer, dict):
+        name = producer.keys()[0]
+        params = producer[name]
+    if 'params' not in params:
+        params['params'] = None
+    logger.info("Try loading producer:" + name)
+    module = import_module(name)
+    logger.info("Successfully loaded producer:" + name)
+    return module.Producer(**params)
 
 
 if __name__ == '__main__':

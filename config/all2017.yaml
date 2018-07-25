@@ -37,7 +37,56 @@ analysis:
   pu_bins: [25,50,999]
   analyzers:
      - cmsl1t.analyzers.jetMet_analyzer
-  producers: []
+  producers:
+    - cmsl1t.producers.l1sums:
+        inputs:
+          - L1Upgrade_sumBx
+          - L1Upgrade_sumType
+          - L1Upgrade_sumEt
+          - L1Upgrade_sumPhi
+        outputs:
+          - l1Sums
+    - cmsl1t.producers.jets:
+        inputs:
+          - Jet_et
+          - Jet_eta
+          - Jet_phi
+          - Jet_etCorr
+          - Jet_cemef
+          - Jet_chef
+          - Jet_cMult
+          - Jet_mef
+          - Jet_muMult
+          - Jet_nemef
+          - Jet_nhef
+          - Jet_nMult
+        params:
+          jetType: PF
+          filter: cmsl1t.filters.jets.pfJetFilter
+        outputs:
+          - goodPFJets
+    - cmsl1t.producers.jets:
+        inputs:
+          - Jet_caloEt
+          - Jet_caloEta
+          - Jet_caloPhi
+          - Jet_caloEtCorr
+        params:
+          jetType: Calo
+          filter: null
+        outputs:
+          - caloJets
+    - cmsl1t.producers.jets:
+        inputs:
+          - L1Upgrade_jetEt
+          - L1Upgrade_jetEta
+          - L1Upgrade_jetPhi
+          - L1Upgrade_jetBx
+        params:
+          jetType: L1
+          filter: null
+        outputs:
+          - l1Jets
 
 output:
   template:

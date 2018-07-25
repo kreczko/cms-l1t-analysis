@@ -1,6 +1,8 @@
 import cmsl1t.geometry as geo
+from cmsl1t.utils.decorators import deprecated
 
 
+@deprecated(replacement='cmsl1t.filter.pfMetFilter')
 def pfMetFilter(event):
 
     reject_if = [

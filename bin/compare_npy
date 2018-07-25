@@ -1,0 +1,28 @@
+#!/usr/bin/env python
+'''
+Script to compare two numpy files containing event-by-event values
+e.g.
+    compare_npy d1/Sums_sumEt.npy d2/Sums_sumEt.npy
+'''
+import click
+import numpy as np
+
+
+@click.command()
+@click.argument('file1')
+@click.argument('file2')
+def main(file1, file2):
+    d1 = np.load(file1)
+    d2 = np.load(file2)
+    diff = d1 - d2
+    indices = np.nonzero(diff)
+    if diff[indices].size > 0:
+        print('The following events differ')
+        for i, d, v1, v2 in zip(indices[0], diff[indices], d1[indices], d2[indices]):
+            print('Event (#{0}): {1} ({2} - {3})'.format(i, d, v1, v2))
+    else:
+        print('All entries are identical')
+
+
+if __name__ == '__main__':
+    main()
