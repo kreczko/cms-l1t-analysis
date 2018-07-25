@@ -83,8 +83,8 @@ def extractSums(event, doEmu, doReco, doGen):
     online = dict()
     if doReco:
         offline.update(dict(
-            caloHT=EnergySum(event.Sums_caloSumEt),
-            pfHT=EnergySum(event.Sums_sumEt),
+            caloHT=EnergySum(event.Sums_caloHt),
+            pfHT=EnergySum(event.Sums_Ht),
             caloMETBE=Met(event.Sums_caloMetBE, event.Sums_caloMetPhiBE),
             caloMETHF=Met(event.Sums_caloMet, event.Sums_caloMetPhi),
             pfMET_NoMu=Met(event.Sums_pfMetNoMu, event.Sums_pfMetNoMuPhi),
@@ -98,8 +98,8 @@ def extractSums(event, doEmu, doReco, doGen):
         ))
         if doEmu:
             offline.update(dict(
-                caloHT_Emu=EnergySum(event.Sums_caloSumEt),
-                pfHT_Emu=EnergySum(event.Sums_sumEt),
+                caloHT_Emu=EnergySum(event.Sums_caloHt),
+                pfHT_Emu=EnergySum(event.Sums_Ht),
                 caloMETBE_Emu=Met(event.Sums_caloMetBE,
                                   event.Sums_caloMetPhiBE),
                 caloMETHF_Emu=Met(event.Sums_caloMet, event.Sums_caloMetPhi),
