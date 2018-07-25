@@ -1,7 +1,7 @@
 # cms-l1t-analysis
 Software package to analyse L1TNtuples
 
-Latest stable version: https://github.com/cms-l1t-offline/cms-l1t-analysis/releases/tag/v0.4.4
+Latest stable version: https://github.com/cms-l1t-offline/cms-l1t-analysis/releases/tag/v0.5.0
 
 [![Build Status](https://travis-ci.org/cms-l1t-offline/cms-l1t-analysis.svg?branch=master)](https://travis-ci.org/cms-l1t-offline/cms-l1t-analysis) [![DOI](https://zenodo.org/badge/80877637.svg)](https://zenodo.org/badge/latestdoi/80877637) [![Code Health](https://landscape.io/github/cms-l1t-offline/cms-l1t-analysis/master/landscape.svg?style=flat)](https://landscape.io/github/cms-l1t-offline/cms-l1t-analysis/master) [![docs](https://readthedocs.org/projects/cms-l1t-analysis/badge/?version=latest)](http://cms-l1t-analysis.readthedocs.io/en/latest/)
 

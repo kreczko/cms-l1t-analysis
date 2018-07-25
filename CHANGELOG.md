@@ -1,6 +1,14 @@
 # Changelog
 
-## [v0.4.4](https://github.com/cms-l1t-offline/cms-l1t-analysis/tree/v0.4.4)
+## [v0.5.0](https://github.com/cms-l1t-offline/cms-l1t-analysis/tree/v0.5.0)
+
+[Full Changelog](https://github.com/cms-l1t-offline/cms-l1t-analysis/compare/v0.4.4...v0.5.0)
+
+**Implemented enhancements:**
+
+- Moving analysers to the new eventReader & producers [\#140](https://github.com/cms-l1t-offline/cms-l1t-analysis/pull/140) ([kreczko](https://github.com/kreczko))
+
+## [v0.4.4](https://github.com/cms-l1t-offline/cms-l1t-analysis/tree/v0.4.4) (2018-07-25)
 
 [Full Changelog](https://github.com/cms-l1t-offline/cms-l1t-analysis/compare/v0.4.3...v0.4.4)
 
