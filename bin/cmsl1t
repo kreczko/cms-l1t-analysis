@@ -114,7 +114,7 @@ def run(config, nevents, reload_histograms):
     results = [False]
     # Fetch the analyzer
     analyzers = config.get('analysis', 'analyzers')
-    analyzers = [load_analyzer(analyzer, config) for analyzer in analyzers]
+    analyzers = [load_analyzer(analyzer) for analyzer in analyzers]
 
     producers = config.get('analysis', 'producers')
     producers = [load_producer(producer, config) for producer in producers]
@@ -190,30 +190,22 @@ def analyze(config_file, nevents, reload_histograms, hist_files):
         logger.info('\n' + separator + '\n')
 
 
-def load_analyzer(analyzer, config):
-    name = analyzer
-    params = {}
-    if isinstance(analyzer, dict):
-        name = analyzer.keys()[0]
-        params = analyzer[name]
-    logger.info("Try loading analyzer:" + name)
-    module = import_module(name)
-    logger.info("Successfully loaded analyzer:" + name)
-    return module.Analyzer(config, **params)
+def load_analyzer(analyzer):
+    name = analyzer['name']
+    module = analyzer.pop('module')
+    logger.info("Try loading analyzer: {0} ({1})".format(name, module))
+    module = import_module(module)
+    logger.info("Successfully loaded analyzer: {0} ({1})".format(name, module))
+    return module.Analyzer(**analyzer)
 
 
 def load_producer(producer, config):
-    name = producer
-    params = {}
-    if isinstance(producer, dict):
-        name = producer.keys()[0]
-        params = producer[name]
-    if 'params' not in params:
-        params['params'] = None
-    logger.info("Try loading producer:" + name)
-    module = import_module(name)
-    logger.info("Successfully loaded producer:" + name)
-    return module.Producer(**params)
+    name = producer.pop('name')
+    module = producer.pop('module')
+    logger.info("Try loading producer: {0} ({1})".format(name, module))
+    module = import_module(module)
+    logger.info("Successfully loaded producer: {0} ({1})".format(name, module))
+    return module.Producer(**producer)
 
 
 if __name__ == '__main__':

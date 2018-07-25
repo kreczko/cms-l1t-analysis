@@ -53,12 +53,12 @@ ETA_RANGES = dict(
 
 class Analyzer(BaseAnalyzer):
 
-    def __init__(self, config, **kwargs):
-        super(Analyzer, self).__init__("HW_Emu_jet_rates", config)
-        self.triggerName = self.config.get('input', 'trigger')['name']
+    def __init__(self):
+        super(Analyzer, self).__init__(**kwargs)
+        self.triggerName = self.params['triggerName']
 
         self._lumiFilter = None
-        self._lumiJson = config.try_get('input', 'lumi_json', '')
+        self._lumiJson = self.params['lumiJson']
         if self._lumiJson:
             self._lumiFilter = LuminosityFilter(self._lumiJson)
 

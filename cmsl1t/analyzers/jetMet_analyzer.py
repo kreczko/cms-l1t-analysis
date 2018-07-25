@@ -117,18 +117,20 @@ def extractSums(event, doEmu, doReco, doGen):
 
 class Analyzer(BaseAnalyzer):
 
-    def __init__(self, config, **kwargs):
-        super(Analyzer, self).__init__("jetMet_analyzer", config)
+    def __init__(self, **kwargs):
+        super(Analyzer, self).__init__(**kwargs)
 
         self._lumiFilter = None
-        self._lumiJson = config.try_get('input', 'lumi_json', '')
+        self._lumiJson = self.params['lumiJson']
         if self._lumiJson:
             self._lumiFilter = LuminosityFilter(self._lumiJson)
 
         self._lastRunAndLumi = (-1, -1)
         self._processLumi = True
 
-        loaded_trees = config.try_get('analysis', 'load_trees')
+        # TODO: this needs changing, these should be analyser parameters
+        # or even move out into separate calls of the same analyzer
+        loaded_trees = self.params['load_trees']
         self._doVertex = 'recoTree' in loaded_trees
         self._doEmu = 'emuUpgrade' in loaded_trees
         self._doReco = 'recoTree' in loaded_trees

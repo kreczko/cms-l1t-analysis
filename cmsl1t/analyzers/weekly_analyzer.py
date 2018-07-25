@@ -33,8 +33,8 @@ def ExtractSums(event):
 
 
 class Analyzer(BaseAnalyzer):
-    def __init__(self, config, **kwargs):
-        super(Analyzer, self).__init__("study_met", config)
+    def __init__(self, **kwargs):
+        super(Analyzer, self).__init__(**kwargs)
 
         for name in sum_types:
             eff_plot = EfficiencyPlot("online" + name, "offline" + name)

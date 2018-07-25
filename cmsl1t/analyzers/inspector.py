@@ -17,14 +17,10 @@ import os
 
 class Analyzer(BaseAnalyzer):
 
-    def __init__(self, config, **kwargs):
-        super(Analyzer, self).__init__("inspector", config)
+    def __init__(self, **kwargs):
+        super(Analyzer, self).__init__(**kwargs)
         self._inputs = []
-        # TODO need to implement scope reduction in config parser (issue #47)
-        analyzers = self.config.get('analysis', 'analyzers')
-        for ana in analyzers:
-            if isinstance(ana, dict) and 'cmsl1t.analyzers.inspector' in ana:
-                self._inputs = ana['cmsl1t.analyzers.inspector']['inputs']
+        self._inputs = self.params['inputs']
         self._map = {}
         for i in self._inputs:
             self._map[i] = []

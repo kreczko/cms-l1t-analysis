@@ -58,12 +58,10 @@ class Analyzer(BaseAnalyzer):
         similar to the new analyzers
     """
 
-    def __init__(self, config, **kwargs):
-        super(Analyzer, self).__init__("legacy_analyzer", config)
-        self._myConfig = self.config.get('analysis', 'analyzers')
-        self._params = kwargs
+    def __init__(self, **kwargs):
+        super(Analyzer, self).__init__(**kwargs)
         self.compiled_macro = None
-        self.input_files = self.config.get('input', 'files')
+        self.input_files = self.params['input_files']
 
     def prepare_for_events(self, reader):
         '''
@@ -71,7 +69,7 @@ class Analyzer(BaseAnalyzer):
             compile_macros
         '''
         logger.info('Compiling macro')
-        macro = os.path.abspath(self._params['macro'])
+        macro = os.path.abspath(self.params['macro'])
 
         with adjust_ntuple_cfg(self.input_files, self.output_folder):
             self.compiled_macro = compile_macro(macro)

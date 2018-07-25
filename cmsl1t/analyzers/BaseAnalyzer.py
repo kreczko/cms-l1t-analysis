@@ -11,18 +11,20 @@ class BaseAnalyzer(object):
     A Base class to be used by the various analyzers
     """
 
-    def __init__(self, name, config, **kwargs):
-        self.name = name
-        self.output_folder = config.get('output', 'folder')
-        self.plots_folder = config.get('output', 'plots_folder')
-        self.config = config
+    def __init__(self, **kwargs):
+        self.name = kwargs.pop('name')
+        self.output_folder = kwargs.pop('output_folder')
+        self.plots_folder = kwargs.pop('plots_folder')
+        self.all_plots = []
+        self.puBins = kwargs.pop('puBins')
+        self.thresholds = kwargs.pop('thresholds')
+        self.file_format = kwargs.pop('file_format')
+        self.params = kwargs
+
         if not os.path.exists(self.output_folder):
             os.makedirs(self.output_folder)
         if not os.path.exists(self.plots_folder):
             os.makedirs(self.plots_folder)
-        self.all_plots = []
-        self.puBins = config.try_get('analysis', 'pu_bins', [0, 999])
-        self.thresholds = config.try_get('analysis', 'thresholds', None)
 
     def prepare_for_events(self, reader):
         """
@@ -124,12 +126,7 @@ class BaseAnalyzer(object):
         """
         Register a plotter with this analyzer, and set up it's outputs
         """
-        file_format = self.config.try_get(
-            'output',
-            'plot_format',
-            BaseAnalyzer.DEFAULT_OUTPUT_FORMAT
-        )
-        plotter.set_plot_output_cfg(self.plots_folder, file_format)
+        plotter.set_plot_output_cfg(self.plots_folder, self.file_format)
         self.all_plots.append(plotter)
 
     _hist_file_format = "{analyzer}_histograms.root"
