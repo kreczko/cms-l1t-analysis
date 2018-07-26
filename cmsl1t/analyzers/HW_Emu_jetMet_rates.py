@@ -53,7 +53,7 @@ ETA_RANGES = dict(
 
 class Analyzer(BaseAnalyzer):
 
-    def __init__(self):
+    def __init__(self, **kwargs):
         super(Analyzer, self).__init__(**kwargs)
         self.triggerName = self.params['triggerName']
 
