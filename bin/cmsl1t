@@ -117,7 +117,7 @@ def run(config, nevents, reload_histograms):
     analyzers = [load_analyzer(analyzer) for analyzer in analyzers]
 
     producers = config.get('analysis', 'producers')
-    producers = [load_producer(producer, config) for producer in producers]
+    producers = [load_producer(producer) for producer in producers]
     _check_producer_outputs(producers)
 
     if not reload_histograms:
@@ -199,7 +199,7 @@ def load_analyzer(analyzer):
     return module.Analyzer(**analyzer)
 
 
-def load_producer(producer, config):
+def load_producer(producer):
     name = producer.pop('name')
     module = producer.pop('module')
     logger.info("Try loading producer: {0} ({1})".format(name, module))

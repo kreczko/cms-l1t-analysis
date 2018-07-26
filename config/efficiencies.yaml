@@ -42,7 +42,8 @@ analysis:
     JetET_HF_Emu: [35, 90, 120]
 
   analyzers:
-     - cmsl1t.analyzers.jetMet_analyzer
+     jetMet_analyzer:
+       module: cmsl1t.analyzers.jetMet_analyzer
   producers: []
 
 output:

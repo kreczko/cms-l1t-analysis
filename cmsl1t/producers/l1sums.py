@@ -19,9 +19,9 @@ class Producer(BaseProducer):
         sumTypes.kTotalEty: {'name': 'Mey', 'type': Mey},
     }
 
-    def __init__(self, inputs, outputs, params):
+    def __init__(self, inputs, outputs, **kwargs):
         self._expected_input_order = ['sumBx', 'type', 'et', 'phi']
-        super(Producer, self).__init__(inputs, outputs, params)
+        super(Producer, self).__init__(inputs, outputs, **kwargs)
 
     def produce(self, event):
         variables = [event[i] for i in self._inputs]

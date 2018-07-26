@@ -26,26 +26,29 @@ analysis:
   pu_type: 0PU12,13PU19,20PU
   pu_bins: 0,13,20,999
   analyzers:
-    - cmsl1t.analyzers.demo_analyzer
+    demo1:
+      module: cmsl1t.analyzers.demo_analyzer
+    demo2:
+      module: cmsl1t.analyzers.demo_analyzer
   producers:
-    - cmsl1t.producers.met:
-        inputs:
-          - L1CaloTower_iphi
-          - L1CaloTower_ieta
-          - L1CaloTower_iet
-        outputs:
-          - l1MetNot28
-        params:
-          method: l1MetNot28
-    - cmsl1t.producers.met:
-        inputs:
-          - L1CaloTower_iphi
-          - L1CaloTower_ieta
-          - L1CaloTower_iet
-        outputs:
-          - l1MetNot28HF
-        params:
-          method: l1MetNot28HF
+    l1MetNot28:
+      module: cmsl1t.producers.met
+      inputs:
+        - L1CaloTower_iphi
+        - L1CaloTower_ieta
+        - L1CaloTower_iet
+      outputs:
+        - l1MetNot28
+      method: l1MetNot28
+    l1MetNot28HF:
+      module: cmsl1t.producers.met
+      inputs:
+        - L1CaloTower_iphi
+        - L1CaloTower_ieta
+        - L1CaloTower_iet
+      outputs:
+        - l1MetNot28HF
+      method: l1MetNot28HF
 
 output:
   # template is a list here that is joined (os.path.join) in the config parser

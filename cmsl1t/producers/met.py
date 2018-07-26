@@ -67,10 +67,11 @@ class Producer(BaseProducer):
 
     INPUT_ORDER = ['phi', 'eta', 'et']
 
-    def __init__(self, inputs, outputs, params):
+    def __init__(self, inputs, outputs, **kwargs):
         self._expected_input_order = ['phi', 'eta', 'et']
-        super(Producer, self).__init__(inputs, outputs, params)
+        super(Producer, self).__init__(inputs, outputs, **kwargs)
 
+        params = self._params
         if params and 'method' in params:
             self._method = Producer.METHODS[params['method']]
         else:
