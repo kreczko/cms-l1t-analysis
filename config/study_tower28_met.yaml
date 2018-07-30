@@ -33,17 +33,23 @@ analysis:
       module: cmsl1t.analyzers.study_tower28_met
   producers:
     l1MetNot28:
-      module: cmsl1t.recalc.met.l1MetNot28
-        inputs:
-          - caloTowers
-        outputs:
-          - l1MetNot28
+      module: cmsl1t.producers.met
+      method: l1MetNot28
+      inputs:
+        - L1CaloTower_iphi
+        - L1CaloTower_ieta
+        - L1CaloTower_iet
+      outputs:
+        - l1MetNot28
     l1MetNot28HF:
-      module: cmsl1t.recalc.met.l1MetNot28HF
-        inputs:
-          - caloTowers
-        outputs:
-          - l1MetNot28
+      module: cmsl1t.producers.met
+      method: l1MetNot28HF
+      inputs:
+        - L1CaloTower_iphi
+        - L1CaloTower_ieta
+        - L1CaloTower_iet
+      outputs:
+        - l1MetNot28HF
 
 output:
   # template is a list here that is joined (os.path.join) in the config parser

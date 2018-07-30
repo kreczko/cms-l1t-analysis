@@ -33,6 +33,8 @@ services:
       - .:/code
     environment:
       NO_CVMFS: 1
+      CI_RUN_CONFIG: ${CI_RUN_CONFIG}
+      CI_RUN_TEST: ${CI_RUN_TEST}
     working_dir: /code
     hostname: cmsl1t-ci
     privileged: true
