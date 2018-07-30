@@ -4,7 +4,8 @@ name: 'Jet Met Rate vs Pileup'
 input:
   files:
       # Zero Bias
-       -  root://eoscms.cern.ch//eos/cms//store/group/dpg_trigger/comm_trigger/L1Trigger/bundocka/cmsl1t/zbMedPU_9.root
+       # -  root://eoscms.cern.ch//eos/cms//store/group/dpg_trigger/comm_trigger/L1Trigger/bundocka/cmsl1t/zbMedPU_9.root
+       - data/L1Ntuple_*.root
   sample:
     name: Data
     title: 2017 Data
@@ -40,7 +41,47 @@ analysis:
   analyzers:
      jetMet_analyzer:
        module: cmsl1t.analyzers.HW_Emu_jetMet_rates
-  producers: []
+  producers:
+    l1Sums:
+      module: cmsl1t.producers.l1sums
+      inputs:
+        - L1Upgrade_sumBx
+        - L1Upgrade_sumType
+        - L1Upgrade_sumEt
+        - L1Upgrade_sumPhi
+      outputs:
+        - l1Sums
+    l1EmuSums:
+      module: cmsl1t.producers.l1sums
+      inputs:
+        - emu_L1Upgrade_sumBx
+        - emu_L1Upgrade_sumType
+        - emu_L1Upgrade_sumEt
+        - emu_L1Upgrade_sumPhi
+      outputs:
+        - l1EmuSums
+    l1Jets:
+      module: cmsl1t.producers.jets
+      inputs:
+        - L1Upgrade_jetEt
+        - L1Upgrade_jetEta
+        - L1Upgrade_jetPhi
+        - L1Upgrade_jetBx
+      jetType: L1
+      filter: null
+      outputs:
+        - l1Jets
+    l1EmuJets:
+      module: cmsl1t.producers.jets
+      inputs:
+        - emu_L1Upgrade_jetEt
+        - emu_L1Upgrade_jetEta
+        - emu_L1Upgrade_jetPhi
+        - emu_L1Upgrade_jetBx
+      jetType: L1
+      filter: null
+      outputs:
+        - l1EmuJets
 
 output:
   template:
