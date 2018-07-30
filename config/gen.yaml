@@ -4,7 +4,8 @@ name: 'Jet Met MC Studies'
 input:
   files:
       # QCD MC
-       -   root://eoscms.cern.ch//eos/cms/store/group/dpg_trigger/comm_trigger/L1Trigger/bundocka/cmsl1t/100X_jec.root
+       # -   root://eoscms.cern.ch//eos/cms/store/group/dpg_trigger/comm_trigger/L1Trigger/bundocka/cmsl1t/100X_jec.root
+       - test/data/*.root
   sample:
     name: MC
     title: 100X MC
