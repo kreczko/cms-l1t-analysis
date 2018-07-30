@@ -6,3 +6,5 @@ source bin/env.sh
 make setup
 ls -l build
 make test
+
+./ci/integration-test.sh
