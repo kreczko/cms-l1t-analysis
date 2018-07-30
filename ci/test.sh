@@ -6,12 +6,12 @@ source bin/env.sh
 make setup
 ls -l build
 
-if [ "x${CI_RUN_TEST}"== "xUNIT" ]
+if [ "x${CI_RUN_TEST}" = 'xUNIT' ]
 then
   make test
 fi
 
-if [ "x${CI_RUN_TEST}"== "xINTEGRATION" ]
+if [ "x${CI_RUN_TEST}" = 'xINTEGRATION' ]
 then
   ./ci/integration-test.sh
 fi
