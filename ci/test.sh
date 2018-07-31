@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+set -e
 export PATH=~/.local/bin:$PATH
 
 cd ${CODE_PATH}
@@ -15,3 +16,4 @@ if [ "x${CI_RUN_TEST}" = 'xINTEGRATION' ]
 then
   ./ci/integration-test.sh
 fi
+set +e
