@@ -4,10 +4,11 @@ import numpy as np
 
 
 class Jet(object):
-    __slots__ = ['et', 'eta', 'phi']
+    __slots__ = ['et', 'eta', 'phi', 'etCorr']
 
     def __init__(self, *args):
         self.et, self.eta, self.phi = args
+        self.etCorr = self.et
 
     def __getitem__(self, name):
         return object.__getattribute__(self, name)
