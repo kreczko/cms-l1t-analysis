@@ -268,6 +268,12 @@ class ConfigParser(object):
 
     def reduce_scope_for_analyzer(self, analyzer_name):
         analyzer = self.get('analysis', 'analyzers')[analyzer_name]
+        forbidden_local_settings = ['name', 'input_files']
+        for s in forbidden_local_settings:
+            if s in analyzer:
+                logger.warn('Setting {0} is forbidden in analysis::analyzers::{1}'.format(s, analyzer_name))
+                analyzer.pop(s)
+
         global_settings = dict(
             output_folder=self.get('output', 'folder'),
             plots_folder=self.get('output', 'plots_folder'),
