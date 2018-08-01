@@ -92,25 +92,25 @@ def extractSums(event, doEmu, doReco, doGen):
 
     if doGen:
         offline.update(dict(
-            genHT=event.genSums["genHT"],
-            genMETHF=event.genSums["genMetHF"],
-            genMETBE=event.genSums["genMetBE"]
+            genHT=event.genSums_HT,
+            genMETHF=event.genSums_MetHF,
+            genMETBE=event.genSums_MetBE,
         ))
         online.update(dict(
-            genHT=event.l1Sums["L1Htt"],
-            genMETHF=event.l1Sums["L1MetHF"],
-            genMETBE=event.l1Sums["L1Met"]
+            genHT=event.l1Sums_Htt,
+            genMETHF=event.l1Sums_MetHF,
+            genMETBE=event.l1Sums_Met,
         ))
         if doEmu:
             offline.update(dict(
-                genHT_Emu=event.genSums["genHT"],
-                genMETHF_Emu=event.genSums["genMetHF"],
-                genMETBE_Emu=event.genSums["genMetBE"]
+                genHT_Emu=event.genSums_HT,
+                genMETHF_Emu=event.genSums_MetHF,
+                genMETBE_Emu=event.genSums_MetBE,
             ))
             online.update(dict(
-                genHT_Emu=event.l1Sums["L1EmuHtt"],
-                genMETHF_Emu=event.l1Sums["L1EmuMetHF"],
-                genMETBE_Emu=event.l1Sums["L1EmuMet"]
+                genHT_Emu=event.l1EmuSums_Htt,
+                genMETHF_Emu=event.l1EmuSums_MetHF,
+                genMETBE_Emu=event.l1EmuSums_Met,
             ))
     return offline, online
 
@@ -368,7 +368,7 @@ class Analyzer(BaseAnalyzer):
         if self._doReco or self._doVertex:
             recoNVtx = event.Vertex_nVtx
         if self._doGen:
-            genNVtx = event.nGenVertex
+            genNVtx = event.Generator_nVtx
 
         for name in self._sumTypes:
             if 'pfMET' in name and not pfMetFilter(event):
