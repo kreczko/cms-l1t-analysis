@@ -17,12 +17,14 @@ class BaseAnalyzer(object):
         self.plots_folder = kwargs.pop('plots_folder')
         self.all_plots = []
         self.file_format = kwargs.pop('file_format')
-        self.params = kwargs
+        self.__params = kwargs
 
         if not os.path.exists(self.output_folder):
             os.makedirs(self.output_folder)
         if not os.path.exists(self.plots_folder):
             os.makedirs(self.plots_folder)
+
+    params = property(fget=lambda x: x.__params, fset=None)
 
     def prepare_for_events(self, reader):
         """
