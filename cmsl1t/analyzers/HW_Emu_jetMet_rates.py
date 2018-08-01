@@ -77,8 +77,8 @@ class Analyzer(BaseAnalyzer):
 
     def prepare_for_events(self, reader):
         # bins = np.arange(0.0, 400.0, 1.0)
-        puBins = self.puBins
-        thresholds = self.thresholds
+        puBins = self.params['pu_bins']
+        thresholds = self.params['thresholds']
 
         for name in self._sumTypes + self._jetTypes:
             trig_thresholds = thresholds.get(name)
@@ -226,7 +226,7 @@ class Analyzer(BaseAnalyzer):
 
         # Get EMU thresholds for each HW threshold.
 
-        if self.thresholds is None:
+        if 'thresholds' not in self.params:
             print(
                 'Error: Please specify thresholds in the config .yaml in dictionary format')
 

@@ -271,16 +271,18 @@ class ConfigParser(object):
         global_settings = dict(
             output_folder=self.get('output', 'folder'),
             plots_folder=self.get('output', 'plots_folder'),
-            puBins=self.try_get('analysis', 'pu_bins', [0, 999]),
-            thresholds=self.try_get('analysis', 'thresholds', None),
             file_format=self.try_get('output', 'plot_format', 'pdf'),
             triggerName=self.get('input', 'trigger')['name'],
             lumiJson=self.try_get('input', 'lumi_json', ''),
-            # TODO: this one should be removed after refactoring jetMetAnalyzer
-            load_trees=self.try_get('analysis', 'load_trees'),
             # TODO: do better for legacy analyzer
             input_files=self.get('input', 'files'),
         )
+        # move analysis section minus producers and analyzers into analyzer scope
+        analysis = deepcopy(self.config['analysis'])
+        analysis.pop('analyzers')
+        analysis.pop('producers')
+        global_settings.update(analysis)
+
         reduced_scope = {'name': analyzer_name}
         reduced_scope.update(global_settings)
         reduced_scope.update(analyzer)

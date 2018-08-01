@@ -196,7 +196,7 @@ class Analyzer(BaseAnalyzer):
         self.register_plotter(self.res_vs_eta_CentralGenJets)
 
     def prepare_for_events(self, reader):
-        puBins = self.puBins
+        puBins = self.params['pu_bins']
         puBins_HR = [0, 999]
 
         Config = namedtuple(
@@ -264,8 +264,8 @@ class Analyzer(BaseAnalyzer):
         if emulator:
             prefix = '_Emu'
 
-        if self.thresholds:
-            allThresholds = self.thresholds
+        if 'thresholds' in self.params:
+            allThresholds = self.params['thresholds']
         else:
             allThresholds = ALL_THRESHOLDS
 

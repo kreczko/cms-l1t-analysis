@@ -16,8 +16,6 @@ class BaseAnalyzer(object):
         self.output_folder = kwargs.pop('output_folder')
         self.plots_folder = kwargs.pop('plots_folder')
         self.all_plots = []
-        self.puBins = kwargs.pop('puBins')
-        self.thresholds = kwargs.pop('thresholds')
         self.file_format = kwargs.pop('file_format')
         self.params = kwargs
 
