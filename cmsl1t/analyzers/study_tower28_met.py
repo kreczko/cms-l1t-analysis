@@ -6,7 +6,7 @@ from BaseAnalyzer import BaseAnalyzer
 from cmsl1t.collections import EfficiencyCollection
 from functools import partial
 import cmsl1t.recalc.met as recalc
-from cmsl1t.filters import muonfilter
+from cmsl1t.filters import muonfilter, pfMetFilter
 import numpy as np
 
 
@@ -19,10 +19,10 @@ class Analyzer(BaseAnalyzer):
         self.met_calcs = dict(
             RecalcL1EmuMETNot28=dict(
                 title="Emulated MET, |ieta|<28",
-                calculate=recalc.l1MetNot28),
+                attr='l1MetNot28',),
             RecalcL1EmuMETNot28HF=dict(
                 title="Emulated MET, |ieta|!=28",
-                calculate=recalc.l1MetNot28HF),
+                attr='l1MetNot28HF'),
         )
 
     def prepare_for_events(self, reader):
@@ -45,18 +45,18 @@ class Analyzer(BaseAnalyzer):
 
     def fill_histograms(self, entry, event):
         if self.triggerName == 'SingleMu':
-            if not muonfilter(event.muons):
+            if not muonfilter(event):
                 return True
-        pileup = event.nVertex
-        if pileup < 5 or not event.passesMETFilter():
+        pileup = event.Vertex_nVtx
+        if pileup < 5 or not pfMetFilter(event):
             return True
 
         self.efficiencies.set_pileup(pileup)
 
-        offlineMetBE = event.sums.caloMetBE
+        offlineMetBE = event.Sums_caloMetBE
         for name, config in self.met_calcs.items():
-            onlineMet = config['calculate'](event.caloTowers)
-            onlineMet = onlineMet.mag
+            onlineMet = getattr(event, config['attr'])
+            onlineMet = onlineMet.et
             self.efficiencies.fill(name, offlineMetBE, onlineMet)
         return True
 
