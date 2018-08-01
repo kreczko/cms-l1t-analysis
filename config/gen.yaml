@@ -2,10 +2,11 @@ version: 1
 name: 'Jet Met MC Studies'
 
 input:
+  ntuple_map_file: config/ntuple_content_mc.yaml
   files:
       # QCD MC
        # -   root://eoscms.cern.ch//eos/cms/store/group/dpg_trigger/comm_trigger/L1Trigger/bundocka/cmsl1t/100X_jec.root
-       - test/data/*.root
+       - test/data/*mc.root
   sample:
     name: MC
     title: 100X MC
@@ -41,7 +42,66 @@ analysis:
   analyzers:
      jetMet_analyzer:
        module: cmsl1t.analyzers.jetMet_analyzer
-  producers: []
+  producers:
+    l1Sums:
+      module: cmsl1t.producers.l1sums
+      inputs:
+        - L1Upgrade_sumBx
+        - L1Upgrade_sumType
+        - L1Upgrade_sumEt
+        - L1Upgrade_sumPhi
+      outputs:
+        - l1Sums
+    l1EmuSums:
+      module: cmsl1t.producers.l1sums
+      inputs:
+        - emu_L1Upgrade_sumBx
+        - emu_L1Upgrade_sumType
+        - emu_L1Upgrade_sumEt
+        - emu_L1Upgrade_sumPhi
+      outputs:
+        - l1EmuSums
+    genSums:
+      module: cmsl1t.producers.gensums
+      inputs:
+        - Generator_jetPt
+        - Generator_partId
+        - Generator_partPhi
+        - Generator_partPt
+        - Generator_partEta
+      outputs:
+        - genSums
+    goodGenJets:
+      module: cmsl1t.producers.jets
+      inputs:
+        - Generator_jetPt
+        - Generator_jetEta
+        - Generator_jetPhi
+      jetType: Gen
+      outputs:
+        - goodGenJets
+    l1Jets:
+      module: cmsl1t.producers.jets
+      inputs:
+        - L1Upgrade_jetEt
+        - L1Upgrade_jetEta
+        - L1Upgrade_jetPhi
+        - L1Upgrade_jetBx
+      jetType: L1
+      filter: null
+      outputs:
+        - l1Jets
+    l1EmuJets:
+      module: cmsl1t.producers.jets
+      inputs:
+        - emu_L1Upgrade_jetEt
+        - emu_L1Upgrade_jetEta
+        - emu_L1Upgrade_jetPhi
+        - emu_L1Upgrade_jetBx
+      jetType: L1
+      filter: null
+      outputs:
+        - l1EmuJets
 
 output:
   template:
