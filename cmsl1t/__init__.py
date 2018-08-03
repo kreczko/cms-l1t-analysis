@@ -4,7 +4,7 @@ from os import path
 import sys
 import logging
 
-__version__ = 'vv0.5.0'
+__version__ = 'vvv0.5.1'
 
 # logging
 logger = logging.getLogger(__name__)

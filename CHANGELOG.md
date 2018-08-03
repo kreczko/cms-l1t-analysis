@@ -1,6 +1,24 @@
 # Changelog
 
-## [v0.5.0](https://github.com/cms-l1t-offline/cms-l1t-analysis/tree/v0.5.0)
+## [v0.5.1](https://github.com/cms-l1t-offline/cms-l1t-analysis/tree/v0.5.1)
+
+[Full Changelog](https://github.com/cms-l1t-offline/cms-l1t-analysis/compare/v0.5.0...v0.5.1)
+
+**Implemented enhancements:**
+
+- Config scope reduction for analysers [\#47](https://github.com/cms-l1t-offline/cms-l1t-analysis/issues/47)
+
+**Closed issues:**
+
+- Extend CI to include running analyzers over a small test sample [\#146](https://github.com/cms-l1t-offline/cms-l1t-analysis/issues/146)
+- Master branch HW vs Emu jet rates analyser crashes [\#115](https://github.com/cms-l1t-offline/cms-l1t-analysis/issues/115)
+
+**Merged pull requests:**
+
+- Integration testing for data worfllow & fixes for \#144 [\#147](https://github.com/cms-l1t-offline/cms-l1t-analysis/pull/147) ([kreczko](https://github.com/kreczko))
+- Config scope reduction for analyzers and producers [\#144](https://github.com/cms-l1t-offline/cms-l1t-analysis/pull/144) ([kreczko](https://github.com/kreczko))
+
+## [v0.5.0](https://github.com/cms-l1t-offline/cms-l1t-analysis/tree/v0.5.0) (2018-07-25)
 
 [Full Changelog](https://github.com/cms-l1t-offline/cms-l1t-analysis/compare/v0.4.4...v0.5.0)
 
