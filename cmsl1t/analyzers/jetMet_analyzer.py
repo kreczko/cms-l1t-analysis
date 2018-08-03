@@ -117,18 +117,20 @@ def extractSums(event, doEmu, doReco, doGen):
 
 class Analyzer(BaseAnalyzer):
 
-    def __init__(self, config, **kwargs):
-        super(Analyzer, self).__init__("jetMet_analyzer", config)
+    def __init__(self, **kwargs):
+        super(Analyzer, self).__init__(**kwargs)
 
         self._lumiFilter = None
-        self._lumiJson = config.try_get('input', 'lumi_json', '')
+        self._lumiJson = self.params['lumiJson']
         if self._lumiJson:
             self._lumiFilter = LuminosityFilter(self._lumiJson)
 
         self._lastRunAndLumi = (-1, -1)
         self._processLumi = True
 
-        loaded_trees = config.try_get('analysis', 'load_trees')
+        # TODO: this needs changing, these should be analyser parameters
+        # or even move out into separate calls of the same analyzer
+        loaded_trees = self.params['load_trees']
         self._doVertex = 'recoTree' in loaded_trees
         self._doEmu = 'emuUpgrade' in loaded_trees
         self._doReco = 'recoTree' in loaded_trees
@@ -194,7 +196,7 @@ class Analyzer(BaseAnalyzer):
         self.register_plotter(self.res_vs_eta_CentralGenJets)
 
     def prepare_for_events(self, reader):
-        puBins = self.puBins
+        puBins = self.params['pu_bins']
         puBins_HR = [0, 999]
 
         Config = namedtuple(
@@ -262,8 +264,8 @@ class Analyzer(BaseAnalyzer):
         if emulator:
             prefix = '_Emu'
 
-        if self.thresholds:
-            allThresholds = self.thresholds
+        if 'thresholds' in self.params:
+            allThresholds = self.params['thresholds']
         else:
             allThresholds = ALL_THRESHOLDS
 

@@ -24,12 +24,12 @@ def types():
 
 def extractSums(event):
     online = dict(
-        HT=event.l1Sums["L1Htt"],
-        METBE=event.l1Sums["L1Met"],
-        METHF=event.l1Sums["L1MetHF"],
-        HT_Emu=event.l1Sums["L1EmuHtt"],
-        METBE_Emu=event.l1Sums["L1EmuMet"],
-        METHF_Emu=event.l1Sums["L1EmuMetHF"],
+        HT=event.l1Sums_Htt,
+        METBE=event.l1Sums_Met,
+        METHF=event.l1Sums_MetHF,
+        HT_Emu=event.l1EmuSums_Htt,
+        METBE_Emu=event.l1EmuSums_Met,
+        METHF_Emu=event.l1EmuSums_MetHF,
     )
 
     return online
@@ -53,12 +53,12 @@ ETA_RANGES = dict(
 
 class Analyzer(BaseAnalyzer):
 
-    def __init__(self, config, **kwargs):
-        super(Analyzer, self).__init__("HW_Emu_jet_rates", config)
-        self.triggerName = self.config.get('input', 'trigger')['name']
+    def __init__(self, **kwargs):
+        super(Analyzer, self).__init__(**kwargs)
+        self.triggerName = self.params['triggerName']
 
         self._lumiFilter = None
-        self._lumiJson = config.try_get('input', 'lumi_json', '')
+        self._lumiJson = self.params['lumiJson']
         if self._lumiJson:
             self._lumiFilter = LuminosityFilter(self._lumiJson)
 
@@ -77,8 +77,8 @@ class Analyzer(BaseAnalyzer):
 
     def prepare_for_events(self, reader):
         # bins = np.arange(0.0, 400.0, 1.0)
-        puBins = self.puBins
-        thresholds = self.thresholds
+        puBins = self.params['pu_bins']
+        thresholds = self.params['thresholds']
 
         for name in self._sumTypes + self._jetTypes:
             trig_thresholds = thresholds.get(name)
@@ -113,7 +113,7 @@ class Analyzer(BaseAnalyzer):
     '''
 
     def fill_histograms(self, entry, event):
-        if not self._passesLumiFilter(event._run, event._lumi):
+        if not self._passesLumiFilter(event['run'], event['lumi']):
             return True
         # Get pileup if ntuples have reco trees in them.
         # If not, set PU to 1 so that it fills the (only) pu bin.
@@ -131,14 +131,14 @@ class Analyzer(BaseAnalyzer):
             getattr(self, name + "_rate_vs_pileup").fill(pileup, on.et)
 
         # All jets:
-        l1JetEts = [jet.et for jet in event._l1Jets]
+        l1JetEts = [jet.et for jet in event.l1Jets]
         nJets = len(l1JetEts)
         if nJets > 0:
             maxL1JetEt = max(l1JetEts)
         else:
             maxL1JetEt = 0.
 
-        l1EmuJetEts = [jet.et for jet in event._l1EmuJets]
+        l1EmuJetEts = [jet.et for jet in event.l1EmuJets]
         nEmuJets = len(l1EmuJetEts)
         if nEmuJets > 0:
             maxL1EmuJetEt = max(l1EmuJetEts)
@@ -146,7 +146,7 @@ class Analyzer(BaseAnalyzer):
             maxL1EmuJetEt = 0.
 
         # Central Jets:
-        l1BEJets = [jet for jet in event._l1Jets if abs(jet.eta) < 3.0]
+        l1BEJets = [jet for jet in event.l1Jets if abs(jet.eta) < 3.0]
         l1BEJetEts = [beJet.et for beJet in l1BEJets]
         nBEJets = len(l1BEJets)
         if nBEJets > 0:
@@ -154,7 +154,7 @@ class Analyzer(BaseAnalyzer):
         else:
             maxL1BEJetEt = 0.
 
-        l1EmuBEJets = [jet for jet in event._l1EmuJets if abs(jet.eta) < 3.0]
+        l1EmuBEJets = [jet for jet in event.l1EmuJets if abs(jet.eta) < 3.0]
         l1EmuBEJetEts = [beJet.et for beJet in l1EmuBEJets]
         nEmuBEJets = len(l1EmuBEJetEts)
         if nEmuBEJets > 0:
@@ -163,7 +163,7 @@ class Analyzer(BaseAnalyzer):
             maxL1EmuBEJetEt = 0.
 
         # Forward Jets
-        l1HFJets = [jet for jet in event._l1Jets if abs(jet.eta) > 3.0]
+        l1HFJets = [jet for jet in event.l1Jets if abs(jet.eta) > 3.0]
         l1HFJetEts = [hfJet.et for hfJet in l1HFJets]
         nHFJets = len(l1HFJetEts)
         if nHFJets > 0:
@@ -171,7 +171,7 @@ class Analyzer(BaseAnalyzer):
         else:
             maxL1HFJetEt = 0.
 
-        l1EmuHFJets = [jet for jet in event._l1EmuJets if abs(jet.eta) > 3.0]
+        l1EmuHFJets = [jet for jet in event.l1EmuJets if abs(jet.eta) > 3.0]
         l1EmuHFJetEts = [hfJet.et for hfJet in l1EmuHFJets]
         nEmuHFJets = len(l1EmuHFJetEts)
         if nEmuHFJets > 0:
@@ -226,7 +226,7 @@ class Analyzer(BaseAnalyzer):
 
         # Get EMU thresholds for each HW threshold.
 
-        if self.thresholds is None:
+        if 'thresholds' not in self.params:
             print(
                 'Error: Please specify thresholds in the config .yaml in dictionary format')
 

@@ -12,9 +12,9 @@ import numpy as np
 
 class Analyzer(BaseAnalyzer):
 
-    def __init__(self, config, **kwargs):
-        super(Analyzer, self).__init__("study_tower28_met", config)
-        self.triggerName = self.config.get('input', 'trigger')['name']
+    def __init__(self, **kwargs):
+        super(Analyzer, self).__init__(**kwargs)
+        self.triggerName = self.params['triggerName']
 
         self.met_calcs = dict(
             RecalcL1EmuMETNot28=dict(

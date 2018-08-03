@@ -31,14 +31,21 @@ analysis:
   pu_type: 0PU12,13PU19,20PU
   pu_bins: 0,13,20,999
   analyzers:
-    - cmsl1t.analyzers.demo_analyzer
+    demo1:
+      module: cmsl1t.analyzers.demo_analyzer
   producers:
-    - cmsl1t.recalc.met.l1MetNot28:
-        in: event.caloTowers
-        out: event.l1MetNot28
-    - cmsl1t.recalc.met.l1MetNot28HF:
-        in: event.caloTowers
-        out: event.l1MetNot28HF
+    l1MetNot28:
+      module: cmsl1t.recalc.met.l1MetNot28
+      inputs:
+        - caloTowers
+      outputs:
+        - l1MetNot28
+    l1MetNot28HF:
+      module: cmsl1t.recalc.met.l1MetNot28HF
+      inputs:
+        - caloTowers
+      outputs:
+        - l1MetNot28HF
   progress_bar:
     report_every: 1000
   # or to switch it off

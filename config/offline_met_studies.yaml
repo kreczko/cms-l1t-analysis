@@ -31,7 +31,8 @@ analysis:
   pu_type: 0PU24,25PU49,50PU
   pu_bins: [0,25,50,999]
   analyzers:
-     - cmsl1t.analyzers.jetMet_analyzer
+     jetMet_analyzer:
+       module: cmsl1t.analyzers.jetMet_analyzer
   producers: []
 
 output:

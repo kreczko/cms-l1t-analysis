@@ -20,13 +20,16 @@ def _load_filter_module(filterPath):
 
 class Producer(BaseProducer):
 
-    def __init__(self, inputs, outputs, params):
+    def __init__(self, inputs, outputs, **kwargs):
+        self.__set_jetType(kwargs)
+        super(Producer, self).__init__(inputs, outputs, **kwargs)
+
+    def __set_jetType(self, params):
         if params and 'jetType' in params:
             self._jetType = params['jetType']
         else:
             self._jetType = 'Calo'
         self._init_jet_class()
-        super(Producer, self).__init__(inputs, outputs, params)
 
         if params and 'filter' in params:
             self._jetFilter = _load_filter_module(params['filter'])

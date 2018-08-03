@@ -11,9 +11,9 @@ def _check_inputs(inputs, expected_input_order):
 
 class BaseProducer(object):
 
-    def __init__(self, inputs, outputs, params):
+    def __init__(self, inputs, outputs, **kwargs):
         self._inputs = inputs
-        self._params = params
+        self._params = kwargs
         self._outputs = outputs
         self._checked_content = False
 

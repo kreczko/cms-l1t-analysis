@@ -84,6 +84,8 @@ class ConfigParser(object):
             logger.exception(msg)
             raise IOError(msg)
 
+        self._reduce_scopes()
+
     def sections(self):
         return self.config.keys()
 
@@ -164,7 +166,8 @@ class ConfigParser(object):
                 return False
         msg = []
         results = []
-        for m in modules:
+        for name in modules.keys():
+            m = modules[name]['module']
             if isinstance(m, dict):
                 m = m.keys()[0]
             if not module.exists(m):
@@ -249,6 +252,55 @@ class ConfigParser(object):
 
         with open(out_filename, "w") as out_file:
             out_file.write(yaml.dump(config))
+
+    def _reduce_scopes(self):
+        '''
+            Reduces config scopes for analyzers and producers
+        '''
+        cfg = self.config
+        analyzers = self.get('analysis', 'analyzers')
+        analyzers = [self.reduce_scope_for_analyzer(a) for a in analyzers]
+        cfg['analysis']['analyzers'] = analyzers
+
+        producers = self.get('analysis', 'producers')
+        producers = [self.reduce_scope_for_producer(p) for p in producers]
+        cfg['analysis']['producers'] = producers
+
+    def reduce_scope_for_analyzer(self, analyzer_name):
+        analyzer = self.get('analysis', 'analyzers')[analyzer_name]
+        forbidden_local_settings = ['name', 'input_files']
+        for s in forbidden_local_settings:
+            if s in analyzer:
+                logger.warn('Setting {0} is forbidden in analysis::analyzers::{1}'.format(s, analyzer_name))
+                analyzer.pop(s)
+
+        global_settings = dict(
+            output_folder=self.get('output', 'folder'),
+            plots_folder=self.get('output', 'plots_folder'),
+            file_format=self.try_get('output', 'plot_format', 'pdf'),
+            triggerName=self.get('input', 'trigger')['name'],
+            lumiJson=self.try_get('input', 'lumi_json', ''),
+            # TODO: do better for legacy analyzer
+            input_files=self.get('input', 'files'),
+        )
+        # move analysis section minus producers and analyzers into analyzer scope
+        analysis = deepcopy(self.config['analysis'])
+        analysis.pop('analyzers')
+        analysis.pop('producers')
+        global_settings.update(analysis)
+
+        reduced_scope = {'name': analyzer_name}
+        reduced_scope.update(global_settings)
+        reduced_scope.update(analyzer)
+
+        return reduced_scope
+
+    def reduce_scope_for_producer(self, producer_name):
+        producer = self.get('analysis', 'producers')[producer_name]
+        reduced_scope = {'name': producer_name}
+        reduced_scope.update(producer)
+
+        return reduced_scope
 
 
 if __name__ == '__main__':

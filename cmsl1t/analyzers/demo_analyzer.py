@@ -10,8 +10,8 @@ import numpy as np
 
 class Analyzer(BaseAnalyzer):
 
-    def __init__(self, config, **kwargs):
-        super(Analyzer, self).__init__("demo_analyzer", config)
+    def __init__(self, **kwargs):
+        super(Analyzer, self).__init__(**kwargs)
 
         self.met_calcs = dict(
             RecalcL1EmuMETNot28=dict(

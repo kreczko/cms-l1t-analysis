@@ -33,8 +33,10 @@ analysis:
   pu_type: 0PU12,13PU19,20PU
   pu_bins: 0,13,20,999
   analyzers:
-      - cmsl1t.analyzers.weekly_analyzer
-      - cmsl1t.analyzers.jetMet_analyzer
+      weekly_analyzer:
+        module: cmsl1t.analyzers.weekly_analyzer
+      jetMet_analyzer:
+        module: cmsl1t.analyzers.jetMet_analyzer
   producers: []
 
 output:
