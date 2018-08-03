@@ -56,6 +56,8 @@ class Analyzer(BaseAnalyzer):
     def __init__(self, **kwargs):
         super(Analyzer, self).__init__(**kwargs)
         self.triggerName = self.params['triggerName']
+        self.thresholds = self.params['thresholds']
+        self.puBins = self.params['pu_bins']
 
         self._lumiFilter = None
         self._lumiJson = self.params['lumiJson']
@@ -77,8 +79,8 @@ class Analyzer(BaseAnalyzer):
 
     def prepare_for_events(self, reader):
         # bins = np.arange(0.0, 400.0, 1.0)
-        puBins = self.params['pu_bins']
-        thresholds = self.params['thresholds']
+        puBins = self.puBins
+        thresholds = self.thresholds
 
         for name in self._sumTypes + self._jetTypes:
             trig_thresholds = thresholds.get(name)
