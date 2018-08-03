@@ -24,7 +24,9 @@ class BaseAnalyzer(object):
         if not os.path.exists(self.plots_folder):
             os.makedirs(self.plots_folder)
 
-    params = property(fget=lambda x: x.__params, fset=None)
+    @property
+    def params(self):
+        return self.__params
 
     def prepare_for_events(self, reader):
         """
