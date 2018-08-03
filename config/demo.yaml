@@ -3,7 +3,8 @@ name: Demo
 
 input:
   files:
-    - data/L1Ntuple_*.root
+    # - data/L1Ntuple_*.root
+    - test/data/*.root
   sample:
     name: Data
     title: 2016 Data

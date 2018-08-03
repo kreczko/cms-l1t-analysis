@@ -12,6 +12,7 @@ from cmsl1t.energySums import EnergySum, Met
 from math import pi
 import pprint
 from collections import namedtuple
+from cmsl1t.filters import pfMetFilter
 
 
 sum_types = ["HTT", "MHT", "MET_HF", "MET_noHF"]
@@ -96,7 +97,7 @@ class Analyzer(BaseAnalyzer):
         return True
 
     def fill_histograms(self, entry, event):
-        if not event.passesMETFilter():
+        if not pfMetFilter(event):
             return True
 
         offline, online = ExtractSums(event)

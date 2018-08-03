@@ -4,10 +4,11 @@ name: 'Offline Met Studies'
 input:
   files:
       # Single Muons
-      -   root://eoscms.cern.ch//eos/cms/store/group/dpg_trigger/comm_trigger/L1Trigger/treis/l1t-integration-v97p7-CMSSW-940pre3/SingleMuon/crab_l1t-integration-v97p7-CMSSW-940pre3__SingleMuon_Run2017E-17Nov2017-v1/180125_121715/0001/L1Ntuple_*.root
+      # -   root://eoscms.cern.ch//eos/cms/store/group/dpg_trigger/comm_trigger/L1Trigger/treis/l1t-integration-v97p7-CMSSW-940pre3/SingleMuon/crab_l1t-integration-v97p7-CMSSW-940pre3__SingleMuon_Run2017E-17Nov2017-v1/180125_121715/0001/L1Ntuple_*.root
       # Zero Bias
       # -  root://eoscms.cern.ch//eos/cms/store/group/dpg_trigger/comm_trigger/L1Trigger/safarzad/2017/ZeroBias/Fill6*/Collision2017-noRECO-l1t-integration-96p27_NoPUS/ZeroBias/crab_Collision2017-noRECO-l1t-integration-96p27_NoPUS__ZeroBias_Run2017C/*/0000/L1Ntuple_*root
       # -  root://eoscms.cern.ch//eos/cms/store/group/dpg_trigger/comm_trigger/L1Trigger/safarzad/2017/ZeroBias/Collision2017-noRECO-l1t-integration-96p20/ZeroBias/crab_Collision2017-noRECO-l1t-integration-96p20__ZeroBias_Run2017C/170726_094745/0000/*root
+      - test/data/*.root
   sample:
     name: Data
     title: 2017 Data
@@ -33,7 +34,77 @@ analysis:
   analyzers:
      jetMet_analyzer:
        module: cmsl1t.analyzers.jetMet_analyzer
-  producers: []
+  producers:
+    l1Sums:
+      module: cmsl1t.producers.l1sums
+      inputs:
+        - L1Upgrade_sumBx
+        - L1Upgrade_sumType
+        - L1Upgrade_sumEt
+        - L1Upgrade_sumPhi
+      outputs:
+        - l1Sums
+    l1EmuSums:
+      module: cmsl1t.producers.l1sums
+      inputs:
+        - emu_L1Upgrade_sumBx
+        - emu_L1Upgrade_sumType
+        - emu_L1Upgrade_sumEt
+        - emu_L1Upgrade_sumPhi
+      outputs:
+        - l1EmuSums
+    goodPFJets:
+      module: cmsl1t.producers.jets
+      inputs:
+        - Jet_et
+        - Jet_eta
+        - Jet_phi
+        - Jet_etCorr
+        - Jet_cemef
+        - Jet_chef
+        - Jet_cMult
+        - Jet_mef
+        - Jet_muMult
+        - Jet_nemef
+        - Jet_nhef
+        - Jet_nMult
+      jetType: PF
+      filter: cmsl1t.filters.jets.pfJetFilter
+      outputs:
+        - goodPFJets
+    caloJets:
+      module: cmsl1t.producers.jets
+      inputs:
+        - Jet_caloEt
+        - Jet_caloEta
+        - Jet_caloPhi
+        - Jet_caloEtCorr
+      jetType: Calo
+      filter: null
+      outputs:
+        - caloJets
+    l1Jets:
+      module: cmsl1t.producers.jets
+      inputs:
+        - L1Upgrade_jetEt
+        - L1Upgrade_jetEta
+        - L1Upgrade_jetPhi
+        - L1Upgrade_jetBx
+      jetType: L1
+      filter: null
+      outputs:
+        - l1Jets
+    l1EmuJets:
+      module: cmsl1t.producers.jets
+      inputs:
+        - emu_L1Upgrade_jetEt
+        - emu_L1Upgrade_jetEta
+        - emu_L1Upgrade_jetPhi
+        - emu_L1Upgrade_jetBx
+      jetType: L1
+      filter: null
+      outputs:
+        - l1EmuJets
 
 output:
   template:
