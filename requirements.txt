@@ -1,3 +1,6 @@
+numpy
+matplotlib
+pandas==0.23
 memory_profiler
 flake8
 pep8
@@ -15,3 +18,4 @@ tabulate
 pytest>=3.5.0
 uproot
 mock
+requests

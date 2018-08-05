@@ -1,37 +1,49 @@
 # travis-ci.org build & test configuration
-sudo: required
+sudo: false
+cache:
+  directories:
+    - $HOME/.cache/pip
+    - $HOME/download
+    - $HOME/miniconda2
 
 language: python
 
-services:
-  - docker
+python:
+  - "2.7"
+  - "3.6"
+
+env:
+  - CI_RUN_TEST=UNIT CI_RUN_CONFIG=NONE
+  - CI_RUN_TEST=INTEGRATION CI_RUN_CONFIG=all2017
+  - CI_RUN_TEST=INTEGRATION CI_RUN_CONFIG=demo
+  - CI_RUN_TEST=INTEGRATION CI_RUN_CONFIG=efficiencies
+  - CI_RUN_TEST=INTEGRATION CI_RUN_CONFIG=offline_met_studies
+  - CI_RUN_TEST=INTEGRATION CI_RUN_CONFIG=rates
+  - CI_RUN_TEST=INTEGRATION CI_RUN_CONFIG=rateVsPU
+  - CI_RUN_TEST=INTEGRATION CI_RUN_CONFIG=weekly_checks
+  - CI_RUN_TEST=INTEGRATION CI_RUN_CONFIG=gen
+  - CI_RUN_TEST=INTEGRATION CI_RUN_CONFIG=study_tower28_met
 
 before_install:
-  - docker pull hepsw/cvmfs-cms
-  - docker pull kreczko/cms-l1t-analysis-ci-base
-  - docker pull kreczko/cms-l1t-analysis:ci
-  - echo -e "machine github.com\n  login $GITHUB_TOKEN" > ~/.netrc
-  - git lfs pull
+  - export CMSL1T_CONDA_PATH=$HOME/miniconda2
+  - ./.ci/before_install.sh
+  - export PATH=${CMSL1T_CONDA_PATH}/bin:$PATH
+  - export NO_CVMFS=1
 
 install:
-  - source ci/mapping.sh
-  - docker-compose build ci
+  - ./.ci/install.sh
 
 script:
-  - docker-compose up --exit-code-from ci ci
+  - ./.ci/test.sh
+
 
 matrix:
-  include:
-    - env: CI_RUN_TEST=UNIT CI_RUN_CONFIG=NONE
-    - env: CI_RUN_TEST=INTEGRATION CI_RUN_CONFIG=all2017
-    - env: CI_RUN_TEST=INTEGRATION CI_RUN_CONFIG=demo
-    - env: CI_RUN_TEST=INTEGRATION CI_RUN_CONFIG=efficiencies
-    - env: CI_RUN_TEST=INTEGRATION CI_RUN_CONFIG=offline_met_studies
-    - env: CI_RUN_TEST=INTEGRATION CI_RUN_CONFIG=rates
-    - env: CI_RUN_TEST=INTEGRATION CI_RUN_CONFIG=rateVsPU
-    - env: CI_RUN_TEST=INTEGRATION CI_RUN_CONFIG=weekly_checks
-  # currently no Generator or MuonReco test file
   allow_failures:
-    - env: CI_RUN_TEST=INTEGRATION CI_RUN_CONFIG=gen
-    - env: CI_RUN_TEST=INTEGRATION CI_RUN_CONFIG=study_tower28_met
+    - python: "3.6"
 cache: apt
+
+addons:
+  apt:
+    packages:
+    - build-essential
+    - python-psutil

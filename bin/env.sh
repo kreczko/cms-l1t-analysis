@@ -58,16 +58,17 @@ else
     PATH=${CMSL1T_CONDA_PATH}/bin:$PATH; export PATH
     rm -f miniconda.sh
     echo "Finished conda installation, creating new conda environment"
-    conda update conda -yq
-    conda update pip -yq
-    conda install psutil -yq
     conda config --add channels http://conda.anaconda.org/NLeSC
     conda config --set show_channel_urls yes
     conda create -n cms python=2.7 -yq
     source activate cms
-    conda install root=6 root-numpy numpy matplotlib nose \
-    sphinx pytables rootpy pandas -yq
+    conda install -y -q \
+      matplotlib \
+      numpy \
+      root>=6.04 \
+      rootpy
     echo "Created conda environment, installing basic dependencies"
+    pip install -U pip
     pip install -r requirements.txt
     conda clean -t -y
   fi
@@ -75,7 +76,7 @@ else
 fi
 
 # Capture the user's site-packages directory:
-USER_SITE_PACKAGES="$(python -c "import site; print site.USER_SITE")"
+USER_SITE_PACKAGES="$(python -c "import site; print(site.USER_SITE)")"
 # add project to PYTHONPATH
 PYTHONPATH="${USER_SITE_PACKAGES}:$PYTHONPATH"
 

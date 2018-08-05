@@ -2,7 +2,6 @@
 set -e
 export PATH=~/.local/bin:$PATH
 
-cd ${CODE_PATH}
 source bin/env.sh
 make setup
 ls -l build
@@ -14,6 +13,6 @@ fi
 
 if [ "x${CI_RUN_TEST}" = 'xINTEGRATION' ]
 then
-  ./ci/integration-test.sh
+  ./.ci/integration-test.sh
 fi
 set +e

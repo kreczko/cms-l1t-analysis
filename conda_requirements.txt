@@ -1,8 +1,5 @@
 root>=6.04
-root-numpy
 numpy
 matplotlib
-pytables
-rootpy
-pandas==0.22.0
+pandas==0.23
 psutil
