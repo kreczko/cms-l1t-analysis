@@ -36,10 +36,6 @@ install:
 script:
   - ./.ci/test.sh
 
-
-matrix:
-  allow_failures:
-    - python: "3.6"
 cache: apt
 
 addons:
