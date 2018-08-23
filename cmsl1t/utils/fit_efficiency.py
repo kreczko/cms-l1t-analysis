@@ -1,3 +1,4 @@
+from __future__ import print_function
 from collections import OrderedDict
 import math
 from rootpy.plotting.func import F1
@@ -72,7 +73,7 @@ def do_fit(efficiency, fitFcn):
         graph = asrootpy(efficiency.CreateGraph("e0"))
         opt, data = prepare_data_graph(graph)
     else:
-        print "fit_efficiency(): Unknown object to fit of type:", type(efficiency)
+        print("fit_efficiency(): Unknown object to fit of type:", type(efficiency))
         return False
 
     # Create the model
