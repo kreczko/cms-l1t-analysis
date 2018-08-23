@@ -1,6 +1,7 @@
 import bisect
 from copy import deepcopy
 import logging
+import six
 
 
 logger = logging.getLogger(__name__)
@@ -218,7 +219,7 @@ class EtaRegions(Base):
 
     def find_bins(self, key):
         regions = []
-        for region, is_contained in self.eta_regions.iteritems():
+        for region, is_contained in six.iteritems(self.eta_regions):
             if is_contained(key):
                 regions.append(region)
         return regions

@@ -1,4 +1,5 @@
 import json
+import six
 import six.moves.urllib as urllib
 import numpy as np
 
@@ -35,7 +36,7 @@ class LuminosityFilter(object):
     def __init__(self, lumi_json):
         data = _load_json(lumi_json)
         self.valid_lumi_sections = []
-        for run, lumi_ranges in data.iteritems():
+        for run, lumi_ranges in six.iteritems(data):
             lumis = _expand_lumi_ranges(lumi_ranges)
             tuples = map(lambda x: (int(run), x), lumis)
             self.valid_lumi_sections.extend(tuples)

@@ -363,7 +363,7 @@ class EventReader(object):
         self._names = []
         load_ROOT_library('L1TAnalysisDataformats.so')
         allTrees = get_trees(load_trees)
-        for name, path in allTrees.iteritems():
+        for name, path in six.iteritems(allTrees):
             try:
                 chain = TreeChain(path, input_files, cache=True, events=events)
             except RuntimeError:
