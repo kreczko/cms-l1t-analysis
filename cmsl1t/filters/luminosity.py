@@ -1,5 +1,5 @@
 import json
-import urllib2
+import six.moves.urllib as urllib
 import numpy as np
 
 
@@ -9,7 +9,7 @@ def _load_json(lumi_json):
     has_local_prefix = input_file.startswith('file://')
     if not is_remote and not has_local_prefix:
         input_file = 'file://' + input_file
-    input_stream = urllib2.urlopen(input_file)
+    input_stream = urllib.request.urlopen(input_file)
     data = json.load(input_stream)
     return data
 

@@ -4,7 +4,6 @@ from cmsl1t.filters.luminosity import _load_json, _expand_lumi_range, \
     _expand_lumi_ranges, LuminosityFilter
 import json
 import numpy as np
-import urllib2
 
 EXAMPLE_JSON = {"273158": [[1, 12]], "273302": [[1, 4]]}
 
@@ -27,7 +26,7 @@ class MockResponse(object):
 class TestLumiFilter(unittest.TestCase):
 
     def setUp(self):
-        self.patcher = patch('urllib2.urlopen')
+        self.patcher = patch('six.moves.urllib.request.urlopen')
         self.urlopen_mock = self.patcher.start()
 
     def test_load_json(self):
