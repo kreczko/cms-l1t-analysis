@@ -10,9 +10,11 @@ where var* is an attribute of an event (e.g. 'run').
 If attributes of objects need to be accessed, simply use the '.' notation, e.g. "l1Sums_Htt.et"
 
 """
-from BaseAnalyzer import BaseAnalyzer
-import numpy as np
 import os
+
+import numpy as np
+
+from .BaseAnalyzer import BaseAnalyzer
 
 
 class Analyzer(BaseAnalyzer):

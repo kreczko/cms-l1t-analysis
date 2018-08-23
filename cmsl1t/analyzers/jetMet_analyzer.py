@@ -1,23 +1,22 @@
-import os
-from cmsl1t.analyzers.BaseAnalyzer import BaseAnalyzer
-from cmsl1t.plotting.efficiency import EfficiencyPlot
-from cmsl1t.collections import EfficiencyCollection
-from cmsl1t.plotting.onlineVsOffline import OnlineVsOffline
-from cmsl1t.plotting.resolution import ResolutionPlot
-from cmsl1t.plotting.resolution_vs_X import ResolutionVsXPlot
-from cmsl1t.playground.jetfilters import pfJetFilter
-# from cmsl1t.playground.metfilters import pfMetFilter
-from cmsl1t.filters import pfMetFilter
-from cmsl1t.filters import LuminosityFilter
-import cmsl1t.recalc.met as recalc
-from cmsl1t.energySums import EnergySum, Met
-from math import pi
-import pprint
 from collections import namedtuple
-import numpy as np
 import csv
+from math import pi
+import os
+
 import cmsl1t
-from cmsl1t.jet import match
+from .BaseAnalyzer import BaseAnalyzer
+from ..collections import EfficiencyCollection
+from ..energySums import EnergySum, Met
+from ..filters import pfMetFilter
+from ..filters import LuminosityFilter
+from ..jet import match
+from ..playground.jetfilters import pfJetFilter
+from ..plotting.efficiency import EfficiencyPlot
+from ..plotting.onlineVsOffline import OnlineVsOffline
+from ..plotting.resolution import ResolutionPlot
+from ..plotting.resolution_vs_X import ResolutionVsXPlot
+# from cmsl1t.playground.metfilters import pfMetFilter
+import ..recalc.met as recalc
 
 
 def types(doEmu, doReco, doGen):

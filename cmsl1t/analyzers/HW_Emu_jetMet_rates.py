@@ -2,19 +2,22 @@
 Study the MET distibutions and various PUS schemes
 """
 from __future__ import division, print_function
+import os
+
 import numpy as np
 import pandas as pd
 import ROOT
 from tabulate import tabulate
-import os
 import csv
 import cmsl1t
-from cmsl1t.analyzers.BaseAnalyzer import BaseAnalyzer
-from cmsl1t.plotting.rates import RatesPlot
-from cmsl1t.plotting.rate_vs_pileup import RateVsPileupPlot
-from cmsl1t.filters import LuminosityFilter
-import cmsl1t.hist.binning as bn
-from cmsl1t.utils.hist import cumulative_hist, normalise_to_collision_rate
+
+from .BaseAnalyzer import BaseAnalyzer
+from ..plotting.rates import RatesPlot
+from ..plotting.rate_vs_pileup import RateVsPileupPlot
+
+from ..filters import LuminosityFilter
+import ..hist.binning as bn
+from ..utils.hist import cumulative_hist, normalise_to_collision_rate
 
 
 def types():
@@ -135,7 +138,7 @@ class Analyzer(BaseAnalyzer):
         except AttributeError:
             pileup = 1.
 
-        pileup = self._lumiMu[(event['run'],event['lumi'])]        
+        pileup = self._lumiMu[(event['run'],event['lumi'])]
 
         #if self._lumiMu[(event['run'],event['lumi'])] < 50:
         #    return True

@@ -1,11 +1,13 @@
 """
 Study the MET distibutions and various PUS schemes
 """
-from BaseAnalyzer import BaseAnalyzer
-from cmsl1t.collections import EfficiencyCollection
 from functools import partial
-import cmsl1t.recalc.met as recalc
+
 import numpy as np
+
+from .BaseAnalyzer import BaseAnalyzer
+from cmsl1t.collections import EfficiencyCollection
+import cmsl1t.recalc.met as recalc
 
 
 class Analyzer(BaseAnalyzer):
