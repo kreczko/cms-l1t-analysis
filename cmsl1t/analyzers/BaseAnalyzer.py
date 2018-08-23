@@ -1,9 +1,10 @@
 import os
 import logging
-logger = logging.getLogger(__name__)
 
 from rootpy.io import root_open
 from rootpy import ROOTError
+
+logger = logging.getLogger(__name__)
 
 
 class BaseAnalyzer(object):
