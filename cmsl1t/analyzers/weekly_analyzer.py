@@ -63,7 +63,7 @@ class Analyzer(BaseAnalyzer):
 
     def prepare_for_events(self, reader):
         # TODO: Get these from a common place, and / or the config file
-        puBins = range(0, 50, 10) + [999]
+        puBins = list(range(0, 50, 10)) + [999]
         thresholds = [70, 90, 110, 130]
 
         Config = namedtuple("Config", "name off_title on_title off_max on_max")

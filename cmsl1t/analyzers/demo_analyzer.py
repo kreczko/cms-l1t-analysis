@@ -27,7 +27,7 @@ class Analyzer(BaseAnalyzer):
     def prepare_for_events(self, reader):
         bins = np.arange(0, 200, 25)
         thresholds = [70, 90, 110]
-        puBins = range(0, 50, 10) + [999]
+        puBins = list(range(0, 50, 10)) + [999]
 
         self.efficiencies = EfficiencyCollection(pileupBins=puBins)
         add_met_variable = partial(
