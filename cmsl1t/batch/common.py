@@ -3,6 +3,7 @@ import math
 import logging
 import os
 import pandas as pd
+import six
 import stat
 from cmsl1t.config import get_unique_out_dir
 logger = logging.getLogger(__name__)
