@@ -31,7 +31,7 @@ class Base():
         self.use_everything_bin = use_everything_bin
         self.label = label
         self.n_bins = n_bins
-        keys = range(self.n_bins) + [self.overflow, self.underflow]
+        keys = list(range(self.n_bins)) + [self.overflow, self.underflow]
         if use_everything_bin:
             keys += [self.everything]
         self.values = {}
