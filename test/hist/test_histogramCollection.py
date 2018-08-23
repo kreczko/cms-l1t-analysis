@@ -43,8 +43,8 @@ def test_dimension_multi():
 
 
 def test_dimension_region():
-    assert regions.find_bins(0) == ["BE", "B"]
-    assert regions.find_bins(2) == ["BE", "E"]
+    assert sorted(regions.find_bins(0)) == sorted(["BE", "B"])
+    assert sorted(regions.find_bins(2)) == sorted(["BE", "E"])
     assert regions.find_bins(3.1) == ["HF"]
 
 
