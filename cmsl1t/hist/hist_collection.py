@@ -1,6 +1,5 @@
 import collections
 import bisect
-from exceptions import RuntimeError, KeyError, NotImplementedError
 from copy import deepcopy
 import logging
 from cmsl1t.hist.factory import HistFactory

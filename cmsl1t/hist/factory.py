@@ -1,7 +1,6 @@
 from cmsl1t.hist import BaseHistogram
 import logging
 import rootpy.plotting.hist as rootpy_hists
-from exceptions import RuntimeError
 from copy import deepcopy
 
 

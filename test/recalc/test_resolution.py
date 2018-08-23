@@ -2,7 +2,6 @@ from __future__ import print_function
 import numpy as np
 from math import radians, sqrt
 import cmsl1t.recalc.resolution as funcs
-from exceptions import RuntimeError
 import pytest
 
 

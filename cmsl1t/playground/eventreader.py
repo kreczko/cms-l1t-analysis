@@ -11,7 +11,6 @@ from cmsl1t.utils import load_ROOT_library
 from cmsl1t.energySums import EnergySum, Mex, Mey, Met
 from cmsl1t.playground.mapping import EventMap
 from rootpy import ROOT
-from exceptions import RuntimeError
 import logging
 logger = logging.getLogger(__name__)
 

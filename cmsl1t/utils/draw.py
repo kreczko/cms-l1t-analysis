@@ -6,7 +6,6 @@ from rootpy.context import preserve_current_style
 from rootpy.ROOT import gStyle, TLatex, TStyle
 from rootpy import asrootpy
 import rootpy.ROOT as ROOT
-from exceptions import RuntimeError
 
 
 """

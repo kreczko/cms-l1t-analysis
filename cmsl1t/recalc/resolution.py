@@ -1,5 +1,4 @@
 import numpy as np
-from exceptions import RuntimeError
 from math import pi, degrees
 twopi = 2 * pi
 

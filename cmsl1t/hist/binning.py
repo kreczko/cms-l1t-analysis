@@ -1,5 +1,4 @@
 import bisect
-from exceptions import KeyError, IndexError
 from copy import deepcopy
 import logging
 
