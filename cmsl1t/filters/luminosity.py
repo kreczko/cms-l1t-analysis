@@ -27,7 +27,7 @@ def _expand_lumi_ranges(lumi_ranges):
     '''
         Expands `[[1,4], [10,12]` to `[1,2,3,4,10,11,12]`
     '''
-    result = np.array(map(_expand_lumi_range, lumi_ranges))
+    result = list(map(_expand_lumi_range, lumi_ranges))
     return np.concatenate(result).ravel()
 
 
