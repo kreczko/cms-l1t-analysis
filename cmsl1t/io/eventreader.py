@@ -81,7 +81,7 @@ class EventReader(object):
 
     def __iter__(self):
         # event loop
-        for trees in six.moves.zip(*self._trees.itervalues()):
+        for trees in six.moves.zip(*six.itervalues(self._trees)):
             yield Event(self._trees, self._aliasMap)
 
 
