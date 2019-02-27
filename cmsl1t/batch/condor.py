@@ -2,8 +2,10 @@ import htcondor
 import logging
 import os
 import socket
+import re
 
 from .common import Status, Batch
+from plumbum import local
 
 logger = logging.getLogger(__name__)
 
@@ -42,10 +44,12 @@ def __submit_one(txn, index, config_file, batch_directory, batch_log_dir, run_sc
         error=stderr_log,
         log=job_log,
     )
+    out = None
     if 'cern.ch' in socket.gethostname():
-        job_cfg['requirements']='(NoEos == true)',
-    sub = htcondor.Submit(job_cfg)
-    out = sub.queue(txn)
+        out = _submit_one_console(job_cfg, batch_log_dir)
+    else:
+        sub = htcondor.Submit(job_cfg)
+        out = sub.queue(txn)
     return dict(
         batch_id=int(out),
         batch=Batch.condor,
@@ -55,6 +59,22 @@ def __submit_one(txn, index, config_file, batch_directory, batch_log_dir, run_sc
         job_log=job_log,
         status=Status.CREATED,
     )
+
+
+def _submit_one_console(job_cfg, batch_log_dir):
+    condor_submit_file = os.path.join(batch_log_dir, 'job_{0}.submit'.format(index))
+    with open(condor_submit_file, 'w') as f:
+        content = '\n'.join([k + ' = ' + v for k, v in job_cfg.items()])
+        content += 'queue' + '\n'
+        f.write(content)
+    condor_submit = local('condor_submit')
+    out = condor_submit[condor_submit_file]
+    return __parse_condor_submit_output(out)
+
+
+def __parse_condor_submit_output(out):
+    m = re.search(r"(submitted to cluster) (\d+)\.", out)
+    return int(m.group(2))
 
 
 def get_status(batch_id):
