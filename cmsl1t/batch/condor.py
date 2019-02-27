@@ -1,6 +1,7 @@
 import htcondor
 import logging
 import os
+import socket
 
 from .common import Status, Batch
 
@@ -41,6 +42,8 @@ def __submit_one(txn, index, config_file, batch_directory, batch_log_dir, run_sc
         error=stderr_log,
         log=job_log,
     )
+    if 'cern.ch' in socket.gethostname():
+        job_cfg['requirements']='(NoEos == true)',
     sub = htcondor.Submit(job_cfg)
     out = sub.queue(txn)
     return dict(
