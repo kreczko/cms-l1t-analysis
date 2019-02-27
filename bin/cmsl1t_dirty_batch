@@ -12,8 +12,14 @@ import math
 from textwrap import dedent
 import logging
 import subprocess
+import pandas as pd
 logger = logging.getLogger(__name__)
 click_log.basic_config(logger)
+
+JOB_INFO = pd.DataFrame(
+    columns=['local_id', 'batch_id', 'config_file', 'output_folder',
+             'stderr_log', 'stdout_log', 'status', 'batch']
+)
 
 
 class cmsl1t_batch_job_htcondor(object):
@@ -21,7 +27,8 @@ class cmsl1t_batch_job_htcondor(object):
 
     def __init__(self, batch_directory, debug):
         self.debug = debug
-        setup_script = os.path.join(os.environ["PROJECT_ROOT"], "bin", "env.sh")
+        setup_script = os.path.join(
+            os.environ["PROJECT_ROOT"], "bin", "env.sh")
 
         run_script_contents = dedent("""\
         #! /bin/bash
@@ -29,24 +36,39 @@ class cmsl1t_batch_job_htcondor(object):
         cmsl1t $@
         """).format(setup_script=setup_script)
 
-        self.run_script = os.path.realpath(os.path.join(batch_directory, self.run_script_name))
+        self.run_script = os.path.realpath(
+            os.path.join(batch_directory, self.run_script_name))
         with open(self.run_script, "w") as run_script:
             run_script.write(run_script_contents)
         os.chmod(self.run_script, 0777)
 
     def submit(self, config_files):
+        global JOB_INFO
         logger.info("Will submit %d jobs" % len(config_files))
         schedd = htcondor.Schedd()
         results = []
-        for cfg in config_files:
+        for local_id, config_file in enumerate(config_files):
             with schedd.transaction() as txn:
-                cfg = os.path.realpath(cfg)
-                job_cfg = dict(executable=self.run_script_name,
-                               arguments="-c {}".format(cfg),
-                               )
+                cfg = os.path.realpath(config_file)
+                config = ConfigParser()
+                with open(config_file) as f:
+                    config.read(f)
+                output_folder = config.config['output']['folder']
+                error_log = os.path.join(output_folder, 'error.log')
+                out_log = os.path.join(output_folder, 'out.log')
+
+                job_cfg = dict(
+                    executable=self.run_script_name,
+                    arguments="-c {}".format(cfg),
+                    Err=error_log,
+                    Out=out_log,
+                )
                 sub = htcondor.Submit(job_cfg)
-                out = sub.queue(txn)
-                results.append(out)
+                batch_id = sub.queue(txn)
+                results.append(batch_id)
+                JOB_INFO.loc[len(JOB_INFO)] = [
+                    local_id, batch_id, config_file, output_folder, error_log,
+                    out_log, 'SUBMITTED', 'htcondor']
         logger.info(dedent("""\
         Jobs should be running on htcondor now.  To monitor their progress use:
 
@@ -61,17 +83,19 @@ class cmsl1t_batch_job_bsub(object):
     def __init__(self, batch_directory, debug):
         self.batch_directory = batch_directory
         self.debug = debug
-        setup_script = os.path.join(os.environ["PROJECT_ROOT"], "bin", "env.sh")
+        setup_script = os.path.join(
+            os.environ["PROJECT_ROOT"], "bin", "env.sh")
 
         run_script_contents = dedent("""\
         #! /bin/bash
         pushd {project_root}
         source {setup_script}
-        popd
         cmsl1t -c "$1"
+        popd
         """).format(project_root=os.environ["PROJECT_ROOT"], setup_script=setup_script)
 
-        self.run_script = os.path.realpath(os.path.join(batch_directory, self.run_script_name))
+        self.run_script = os.path.realpath(
+            os.path.join(batch_directory, self.run_script_name))
         with open(self.run_script, "w") as run_script:
             run_script.write(run_script_contents)
         os.chmod(self.run_script, 0777)
@@ -81,29 +105,44 @@ class cmsl1t_batch_job_bsub(object):
         logger.info("Will submit %s jobs using bsub" % n_cfgs)
 
         job_group = "/CMS-L1T--"
-        directory_name = os.path.basename(os.path.dirname(self.batch_directory))
+        directory_name = os.path.basename(
+            os.path.dirname(self.batch_directory))
         job_group += directory_name.replace("/", "--")
 
         results = []
         for i, cfg in enumerate(config_files):
             logger.info("submitting: " + cfg)
-            results.append(self._submit_one(cfg, job_group))
+            results.append(self._submit_one(cfg, i, group=job_group))
 
-        logger.info("    Check job status using:\n\n         bjobs -g {group}".format(group=job_group))
+        logger.info(
+            "    Check job status using:\n\n         bjobs -g {group}".format(group=job_group))
         return results
 
-    def _submit_one(self, config, group=None):
+    def _submit_one(self, config_file, local_id, group=None):
+        global JOB_INFO
+        config = ConfigParser()
+        with open(config_file) as f:
+            config.read(f)
+        output_folder = config.config['output']['folder']
+        error_log = os.path.join(output_folder, 'error.log')
+        out_log = os.path.join(output_folder, 'out.log')
+        # create empty log files
+        os.makedirs(output_folder)
+        open(error_log, 'a').close()
+        open(out_log, 'a').close()
         # Prepare the args
         args = ["bsub", "-q", "8nm"]
         if group:
             args += ["-g", group]
-        if not self.debug:
-            args += ["-eo", os.devnull, "-oo", os.devnull]
-        command = ' '.join([self.run_script, config])
+        args += ["-eo", error_log, "-oo", out_log]
+        #args += ['-outdir', output_folder]
+        command = ' '.join([self.run_script, config_file])
         args += [command]
 
+        batch_id = 0
         try:
-            subprocess.check_output(args)
+            batch_output = subprocess.check_output(args)
+            batch_id = self.get_bsub_id(batch_output)
         except subprocess.CalledProcessError as e:
             msg = dedent("""\
                     Error submitting to bsub.
@@ -113,8 +152,21 @@ class cmsl1t_batch_job_bsub(object):
                     Return code was:
                        {e.returncode}""")
             logger.error(msg.format(e=e))
+            JOB_INFO.loc[len(JOB_INFO)] = [
+                local_id, -1, config_file, output_folder, error_log,
+                out_log, 'SUBMIT_FAILED', 'LSF']
             return False
+
+        JOB_INFO.loc[len(JOB_INFO)] = [
+            local_id, batch_id, config_file, output_folder, error_log,
+            out_log, 'SUBMITTED', 'LSF']
         return True
+
+    def get_bsub_id(self, bsub_output):
+        tokens = bsub_output.split(' ')
+        job_id = tokens[1]
+        job_id = job_id.strip('<>')
+        return int(job_id)
 
 
 def prepare_input_file_groups(input_ntuples, files_per_job):
@@ -130,11 +182,17 @@ def prepare_input_file_groups(input_ntuples, files_per_job):
             file_lists.append(current_list)
             current_list = []
 
-    # Even if the last list had fewer files than needed, make sure to use this too
+    # Even if the last list had fewer files than needed, make sure to use this
+    # too
     if current_list:
         file_lists.append(current_list)
 
     return file_lists
+
+
+def create_info_file(batch_dir):
+    global JOB_INFO
+    JOB_INFO.to_csv(os.path.join(batch_dir, 'info.csv'))
 
 
 @click.command()
@@ -214,9 +272,10 @@ def run(config_file, debug, batch, files_per_job):
 
     logger.info(next_steps.format(cfg=config_file.name,
                                   out_dir=out_dir.format(index="*")))
-
+    create_info_file(batch_dir)
     return True
 
 
 if __name__ == '__main__':
     run()
+
