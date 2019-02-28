@@ -194,21 +194,17 @@ class Analyzer(BaseAnalyzer):
                                                                  maxL1EmuHFJetEt)
                 else:
                     getattr(self, name + '_rates').fill(pileup, maxL1EmuJetEt)
-                    getattr(self, name +
-                            '_rate_vs_pileup').fill(pileup, maxL1EmuJetEt)
+                    getattr(self, name + '_rate_vs_pileup').fill(pileup, maxL1EmuJetEt)
             else:
                 if 'BE' in name:
                     getattr(self, name + '_rates').fill(pileup, maxL1BEJetEt)
-                    getattr(self, name +
-                            '_rate_vs_pileup').fill(pileup, maxL1BEJetEt)
+                    getattr(self, name + '_rate_vs_pileup').fill(pileup, maxL1BEJetEt)
                 elif 'HF' in name:
                     getattr(self, name + '_rates').fill(pileup, maxL1HFJetEt)
-                    getattr(self, name +
-                            '_rate_vs_pileup').fill(pileup, maxL1HFJetEt)
+                    getattr(self, name + '_rate_vs_pileup').fill(pileup, maxL1HFJetEt)
                 else:
                     getattr(self, name + '_rates').fill(pileup, maxL1JetEt)
-                    getattr(self, name +
-                            '_rate_vs_pileup').fill(pileup, maxL1JetEt)
+                    getattr(self, name + '_rate_vs_pileup').fill(pileup, maxL1JetEt)
 
         return True
 
@@ -279,8 +275,12 @@ class Analyzer(BaseAnalyzer):
                     else:
                         rate_delta.append(abs(hw_rate - emu_rate))
                 emu_thresholds.append(rate_delta.index(min(rate_delta)))
-            outputline = ('    {0}: {1}'.format(histo_name, thresholds) +
-                          '\n' + '    {0}: {1}'.format(histo_name + '_Emu', emu_thresholds))
+            msg = '    {histo_name}: {thresholds}\n    {histo_name}_Emu: {emu_thresholds}'
+            outputline = msg.format(
+                histo_name=histo_name,
+                thresholds=thresholds,
+                emu_thresholds=emu_thresholds,
+            )
             print(outputline)
 
         '''

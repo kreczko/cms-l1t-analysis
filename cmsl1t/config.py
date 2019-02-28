@@ -64,7 +64,7 @@ class ConfigParser(object):
         input_files = cfg['input']['files']
         try:
             input_files = resolve_file_paths(input_files)
-        except Exception, e:
+        except Exception as e:
             msg = 'Could not resolve file paths:' + str(e)
             logger.exception(msg)
             raise IOError(msg)
@@ -79,7 +79,7 @@ class ConfigParser(object):
 
         try:
             self.__fill_outdir_and_reload_files(reload_histograms, hist_files)
-        except Exception, e:
+        except Exception as e:
             msg = 'Could not fill out output template: ' + str(e)
             logger.exception(msg)
             raise IOError(msg)

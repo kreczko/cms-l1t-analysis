@@ -306,20 +306,21 @@ class Analyzer(BaseAnalyzer):
                 ]
                 if "HT" in cfg.name:
                     params = [
-                        cfg.on_title, cfg.off_title +
-                        " (GeV)", puBins, thresholds,
+                        cfg.on_title,
+                        cfg.off_title + " (GeV)",
+                        puBins, thresholds,
                         105, 30, 2130,
                     ]
                 if "JetET" in cfg.name:
                     params = [
-                        cfg.on_title, cfg.off_title +
-                        " (GeV)", puBins, thresholds,
+                        cfg.on_title, cfg.off_title + " (GeV)",
+                        puBins, thresholds,
                         105, 20, 2120,
                     ]
                 if "MET" in cfg.name:
                     params = [
-                        cfg.on_title, cfg.off_title +
-                        " (GeV)", puBins, thresholds,
+                        cfg.on_title, cfg.off_title + " (GeV)",
+                        puBins, thresholds,
                         100, 0, 2000,
                     ]
 
