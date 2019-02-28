@@ -3,8 +3,10 @@ import os
 import socket
 import re
 
-from .common import Status, Batch
+import htcondor
 from plumbum import local
+
+from .common import Status, Batch
 
 logger = logging.getLogger(__name__)
 
@@ -18,7 +20,6 @@ CONDOR_STATUS = [
 
 
 def submit(config_files, batch_directory, batch_log_dir, run_script):
-    import htcondor
     logger.info("Will submit {0} jobs".format(len(config_files)))
     schedd = htcondor.Schedd()
     results = []
@@ -53,7 +54,6 @@ def __create_job_cfg(index, config_file, batch_directory, batch_log_dir, run_scr
 
 
 def __submit_one(txn, job_cfg, cfg):
-    import htcondor
     sub = htcondor.Submit(job_cfg)
     out = sub.queue(txn)
     return dict(
@@ -120,7 +120,7 @@ def get_status(batch_id):
 
 
 def __status_from_schedd(batch_id, schedd):
-    query = schedd.query('ClusterId=={0:d}'.format(
+    query = schedd.query('ClusterId=={0}'.format(
         batch_id), ['JobStatus', 'ExitCode'])
     if not query or query is None:
         return Status.UNKNOWN, None
@@ -131,7 +131,7 @@ def __status_from_schedd(batch_id, schedd):
 
 
 def __status_from_history(batch_id, schedd):
-    query = 'ClusterId=={0:d}'.format(batch_id)
+    query = 'ClusterId=={0}'.format(batch_id)
     for job in schedd.history(query, ['JobStatus', 'ExitCode'], 1):
         exit_code = job['ExitCode'] if 'ExitCode' in job else None
         status = CONDOR_STATUS[job['JobStatus']]
