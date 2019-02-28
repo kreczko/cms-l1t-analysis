@@ -20,3 +20,4 @@ uproot
 mock
 requests
 plumbum
+six
