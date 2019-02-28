@@ -92,8 +92,13 @@ def _submit_via_command_line(job_cfgs, config_files, batch_directory):
 
 
 def _parse_condor_submit_output(out):
-    last_line = out.split('\n')[-1]
-    m = re.search(r"(\d+)( .* )(\d+)\.", last_line)
+    # last_line = out.split('\n')[-1]
+    important_line = ''
+    for line in out.split('\n'):
+        if 'submitted to cluster' in line:
+            important_line = line
+            break
+    m = re.search(r"(\d+)( .* )(\d+)\.", important_line)
     n_jobs, _, condor_id = m.groups()
     for i in range(int(n_jobs)):
         yield condor_id + '.' + str(i)
