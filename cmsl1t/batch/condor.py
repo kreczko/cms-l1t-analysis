@@ -44,12 +44,14 @@ def __create_job_cfg(index, config_file, batch_directory, batch_log_dir, run_scr
     stderr_log = os.path.join(batch_log_dir, 'job_{0}.err'.format(index))
     stdout_log = os.path.join(batch_log_dir, 'job_{0}.out'.format(index))
     job_log = os.path.join(batch_log_dir, 'job_{0}.log'.format(index))
+    environment = "HOME = {}".format(os.environ["HOME"])
     return dict(
         executable=run_script,
         arguments="-c {}".format(cfg),
         output=stdout_log,
         error=stderr_log,
         log=job_log,
+        environment=environment,
     )
 
 
