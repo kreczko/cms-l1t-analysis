@@ -95,14 +95,20 @@ class ConfigParser(object):
     def options(self, section):
         return self.config[section].keys()
 
-    def get(self, section, option):
-        return self.config[section][option]
+    def get(self, *args):
+        opt = self.config
+        for arg in args:
+            opt = opt[arg]
+        return opt
 
-    def try_get(self, section, option, default=None):
-        if section in self.config:
-            if option in self.config[section]:
-                return self.config[section][option]
-        return default
+    def try_get(self, *args, **kwargs):
+        default = kwargs.pop("default", None)
+        opt = self.config
+        for arg in args:
+            opt = opt.get(arg, None)
+            if opt is None:
+                return default
+        return opt
 
     def is_valid(self):
         results = [self.validate_sections()]
@@ -303,11 +309,8 @@ class ConfigParser(object):
                 analyzer.pop(s)
 
         global_settings = dict(
-            output_folder=self.get('output', 'folder'),
-            plots_folder=self.get('output', 'plots_folder'),
-            file_format=self.try_get('output', 'plot_format', 'pdf'),
             triggerName=self.get('input', 'trigger')['name'],
-            lumiJson=self.try_get('input', 'lumi_json', ''),
+            lumiJson=self.try_get('input', 'lumi_json', default=''),
             # TODO: do better for legacy analyzer
             input_files=self.get('input', 'files'),
         )
