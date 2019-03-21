@@ -69,6 +69,9 @@ class ConfigParser(object):
             logger.exception(msg)
             raise IOError(msg)
         cfg['input']['files'] = input_files
+        ntuple_map_file = cfg['input'].get("ntuple_map_file", None)
+        if ntuple_map_file:
+            cfg['input']['ntuple_map_file'] = os.path.realpath(ntuple_map_file)
 
         self.config = cfg
 
