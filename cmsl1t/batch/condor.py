@@ -124,7 +124,7 @@ def get_status(batch_id):
 def __status_from_schedd(batch_id, schedd):
     cluster, process = batch_id.split(".")
     query = 'ClusterId=={} && ProcId=={}'.format(cluster, process)
-    query = schedd.query(query , ['JobStatus', 'ExitCode'])
+    query = schedd.query(query, ['JobStatus', 'ExitCode'])
     if not query or query is None:
         return Status.UNKNOWN, None
     for job in query:
