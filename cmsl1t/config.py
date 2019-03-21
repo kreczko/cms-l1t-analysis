@@ -164,6 +164,15 @@ class ConfigParser(object):
                 msg += "::".join(config_keys)
                 self.config_errors.append(msg)
                 return False
+        if isinstance(modules, dict):
+            msg, results = self.__validate_module_setup_dict(modules)
+        elif isinstance(modules, list):
+            msg, results = self.__validate_module_setup_list(modules)
+        if msg:
+            self.config_errors.append('\n'.join(msg))
+        return all(results)
+
+    def __validate_module_setup_dict(self, modules):
         msg = []
         results = []
         for name in modules.keys():
@@ -175,9 +184,20 @@ class ConfigParser(object):
                 results += [False]
             else:
                 results += [True]
-        if msg:
-            self.config_errors.append('\n'.join(msg))
-        return all(results)
+        return msg, results
+
+    def __validate_module_setup_list(self, modules):
+        msg = []
+        results = []
+        for m in modules:
+            if isinstance(m, dict):
+                m = m['module']
+            if not module.exists(m):
+                msg += ['Module {0} does not exist!'.format(m)]
+                results += [False]
+            else:
+                results += [True]
+        return msg, results
 
     def __repr__(self):
         return self.config.__repr__()
@@ -267,7 +287,12 @@ class ConfigParser(object):
         cfg['analysis']['producers'] = producers
 
     def reduce_scope_for_analyzer(self, analyzer_name):
-        analyzer = self.get('analysis', 'analyzers')[analyzer_name]
+        analyzer_spec = self.get('analysis', 'analyzers')
+        if isinstance(analyzer_spec, list):
+            # Already reduced to a list
+            return [a for a in analyzer_spec if a == analyzer_name][-1]
+
+        analyzer = analyzer_spec[analyzer_name]
         forbidden_local_settings = ['name', 'input_files']
         for s in forbidden_local_settings:
             if s in analyzer:
@@ -295,10 +320,15 @@ class ConfigParser(object):
 
         return reduced_scope
 
-    def reduce_scope_for_producer(self, producer_name):
-        producer = self.get('analysis', 'producers')[producer_name]
-        reduced_scope = {'name': producer_name}
-        reduced_scope.update(producer)
+    def reduce_scope_for_producer(self, producer):
+        producers_spec = self.get('analysis', 'producers')
+        if isinstance(producers_spec, list):
+            # Already reduced to a list
+            return producer
+
+        producer_dict = producers_spec[producer]
+        reduced_scope = {'name': producer}
+        reduced_scope.update(producer_dict)
 
         return reduced_scope
 
