@@ -74,6 +74,9 @@ def _get_run_script(setup_script, project_root, shared_fs=True):
         'pushd {project_root}',
         'source {setup_script}',
         'popd',
+	'echo == start ENV ==',
+	'env',
+	'echo == END ENV ==',
         'cmsl1t -c "$1"',
         '',
     ]

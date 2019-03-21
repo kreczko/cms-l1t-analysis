@@ -41,10 +41,10 @@ def submit(config_files, batch_directory, batch_log_dir, run_script):
 
 def __create_job_cfg(index, config_file, batch_directory, batch_log_dir, run_script):
     cfg = os.path.realpath(config_file)
-    stderr_log = os.path.join(batch_log_dir, 'job_{0}.err'.format(index))
+    stderr_log = os.path.join(batch_log_dir, 'job_{0}.out'.format(index))
     stdout_log = os.path.join(batch_log_dir, 'job_{0}.out'.format(index))
     job_log = os.path.join(batch_log_dir, 'job_{0}.log'.format(index))
-    environment = "HOME = {}".format(os.environ["HOME"])
+    environment = 'HOME={}'.format(os.environ["HOME"])
     return dict(
         executable=run_script,
         arguments="-c {}".format(cfg),
