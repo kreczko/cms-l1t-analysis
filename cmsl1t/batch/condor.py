@@ -47,7 +47,7 @@ def __create_job_cfg(index, config_file, batch_directory, batch_log_dir, run_scr
     environment = 'HOME={}'.format(os.environ["HOME"])
     return dict(
         executable=run_script,
-        arguments="-c {}".format(cfg),
+        arguments=cfg,
         output=stdout_log,
         error=stderr_log,
         log=job_log,
