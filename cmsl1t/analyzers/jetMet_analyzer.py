@@ -42,7 +42,7 @@ def types(doEmu, doReco, doGen):
 ETA_RANGES = dict(
     HT="|\\eta| < 2.4",
     METBE="|\\eta| < 3.0",
-    METHF="|\\eta| < 5.0, PU \\geq 50",
+    METHF="|\\eta| < 5.0, 50 \\leq PU \\gt 60",
     JetET_BE="|\\eta| < 3.0",
     JetET_HF="3.0 < |\\eta| < 5.0",
 )
