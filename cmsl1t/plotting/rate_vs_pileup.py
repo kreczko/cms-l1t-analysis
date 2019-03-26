@@ -118,7 +118,7 @@ class RateVsPileupPlot(BasePlotter):
     def __make_overlay(self, hists, fits, labels, thresholds, suffix=""):
         with preserve_current_style():
             # Draw each rate vs pileup (with fit)
-            xtitle = "Average pileup in lumi section"
+            xtitle = "< \\mu >"
             ytitle = "Rate (kHz)"
             canvas = draw(hists, draw_args={"xtitle": xtitle, "ytitle": ytitle, "xlimits": (20, 50), "ylimits": (0, 5)})
             if fits:
