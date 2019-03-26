@@ -7,6 +7,7 @@ import pandas as pd
 import ROOT
 from tabulate import tabulate
 import os
+import csv
 from cmsl1t.analyzers.BaseAnalyzer import BaseAnalyzer
 from cmsl1t.plotting.rates import RatesPlot
 from cmsl1t.plotting.rate_vs_pileup import RateVsPileupPlot
@@ -61,6 +62,13 @@ class Analyzer(BaseAnalyzer):
         self.thresholds = self.params['thresholds']
         self.puBins = self.params['pu_bins']
 
+        lumiMuDict = dict()
+        with open('run_lumi.csv', 'rb') as runLumiFile:
+            reader = csv.reader(runLumiFile, delimiter=',')
+            for line in reader:
+                lumiMuDict[(int(line[1]),int(line[2]))] = float(line[3])
+        self._lumiMu = lumiMuDict
+
         self._lumiFilter = None
         self._lumiJson = self.params['lumiJson']
         if self._lumiJson:
@@ -97,7 +105,7 @@ class Analyzer(BaseAnalyzer):
             rates_plot.build("L1 " + name, puBins, 200, 0, 200, ETA_RANGES.get(name))
 
             rate_vs_pileup_plot = getattr(self, name + "_rate_vs_pileup")
-            rate_vs_pileup_plot.build("L1 " + name, trig_thresholds, 16, 0, 80, ETA_RANGES.get(name))
+            rate_vs_pileup_plot.build("L1 " + name, trig_thresholds, 18, 20, 56, ETA_RANGES.get(name))
 
         '''
         self.rates = HistogramsByPileUpCollection(
@@ -125,6 +133,12 @@ class Analyzer(BaseAnalyzer):
             pileup = event.nVertex
         except AttributeError:
             pileup = 1.
+
+        pileup = self._lumiMu[(event['run'],event['lumi'])]        
+
+        #if self._lumiMu[(event['run'],event['lumi'])] < 50:
+        #    return True
+
 
         # Sums:
         online = extractSums(event)
@@ -194,17 +208,21 @@ class Analyzer(BaseAnalyzer):
                                                                  maxL1EmuHFJetEt)
                 else:
                     getattr(self, name + '_rates').fill(pileup, maxL1EmuJetEt)
-                    getattr(self, name + '_rate_vs_pileup').fill(pileup, maxL1EmuJetEt)
+                    getattr(self, name +
+                            '_rate_vs_pileup').fill(pileup, maxL1EmuJetEt)
             else:
                 if 'BE' in name:
                     getattr(self, name + '_rates').fill(pileup, maxL1BEJetEt)
-                    getattr(self, name + '_rate_vs_pileup').fill(pileup, maxL1BEJetEt)
+                    getattr(self, name +
+                            '_rate_vs_pileup').fill(pileup, maxL1BEJetEt)
                 elif 'HF' in name:
                     getattr(self, name + '_rates').fill(pileup, maxL1HFJetEt)
-                    getattr(self, name + '_rate_vs_pileup').fill(pileup, maxL1HFJetEt)
+                    getattr(self, name +
+                            '_rate_vs_pileup').fill(pileup, maxL1HFJetEt)
                 else:
                     getattr(self, name + '_rates').fill(pileup, maxL1JetEt)
-                    getattr(self, name + '_rate_vs_pileup').fill(pileup, maxL1JetEt)
+                    getattr(self, name +
+                            '_rate_vs_pileup').fill(pileup, maxL1JetEt)
 
         return True
 
@@ -275,12 +293,8 @@ class Analyzer(BaseAnalyzer):
                     else:
                         rate_delta.append(abs(hw_rate - emu_rate))
                 emu_thresholds.append(rate_delta.index(min(rate_delta)))
-            msg = '    {histo_name}: {thresholds}\n    {histo_name}_Emu: {emu_thresholds}'
-            outputline = msg.format(
-                histo_name=histo_name,
-                thresholds=thresholds,
-                emu_thresholds=emu_thresholds,
-            )
+            outputline = ('    {0}: {1}'.format(histo_name, thresholds) +
+                          '\n' + '    {0}: {1}'.format(histo_name + '_Emu', emu_thresholds))
             print(outputline)
 
         '''
@@ -312,7 +326,7 @@ class Analyzer(BaseAnalyzer):
             all_stats[collection_type] += [plot.get_stats(summary_label=summary_label, summary_bins=summary_bins)]
 
         for collection_type in all_stats:
-            df = pd.concat(all_stats[collection_type], sort=False)
+            df = pd.concat(all_stats[collection_type])#, sort=False)
             df.sort_values(by=['identifier'], inplace=True)
             df.fillna('------', inplace=True)
             print('Histogram collection:', collection_type)
