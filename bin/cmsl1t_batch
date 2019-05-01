@@ -48,7 +48,7 @@ def run(config_file, debug, batch, files_per_job):
         config, batch_filename, outdir, files_per_job)
 
     project_root = os.environ["PROJECT_ROOT"]
-    setup_script = os.path.join(project_root, "bin", "env.sh")
+    setup_script = os.path.join(project_root,"setup.sh")
     run_script = create_run_script(setup_script, project_root, batch_dir)
     # submit jobs
     submit = condor_submit
