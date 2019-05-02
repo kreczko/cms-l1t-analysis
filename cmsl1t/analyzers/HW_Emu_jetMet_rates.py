@@ -16,7 +16,7 @@ from ..plotting.rates import RatesPlot
 from ..plotting.rate_vs_pileup import RateVsPileupPlot
 
 from ..filters import LuminosityFilter
-import ..hist.binning as bn
+import cmsl1t.hist.binning as bn
 from ..utils.hist import cumulative_hist, normalise_to_collision_rate
 
 
