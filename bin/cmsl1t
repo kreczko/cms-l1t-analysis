@@ -42,8 +42,7 @@ def process_tuples(config, nevents, analyzers, producers):
     else:
         logger.info(input_files)
 
-    ntuple_map = 'config/ntuple_content.yaml'
-    ntuple_map = config.try_get('input', 'ntuple_map_file', default=ntuple_map)
+    ntuple_map = config.get('input', 'ntuple_map_file')
     with open(ntuple_map) as f:
         ntuple_map = yaml.load(f)
     load_L1TNTupleLibrary()

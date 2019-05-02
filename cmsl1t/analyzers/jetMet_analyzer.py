@@ -1,3 +1,4 @@
+import os
 from cmsl1t.analyzers.BaseAnalyzer import BaseAnalyzer
 from cmsl1t.plotting.efficiency import EfficiencyPlot
 from cmsl1t.collections import EfficiencyCollection
@@ -14,6 +15,8 @@ from math import pi
 import pprint
 from collections import namedtuple
 import numpy as np
+import csv
+import cmsl1t
 from cmsl1t.jet import match
 
 
@@ -41,7 +44,7 @@ def types(doEmu, doReco, doGen):
 ETA_RANGES = dict(
     HT="|\\eta| < 2.4",
     METBE="|\\eta| < 3.0",
-    METHF="|\\eta| < 5.0",
+    METHF="|\\eta| < 5.0, 50 \\leq PU < 60",
     JetET_BE="|\\eta| < 3.0",
     JetET_HF="3.0 < |\\eta| < 5.0",
 )
@@ -119,6 +122,14 @@ class Analyzer(BaseAnalyzer):
 
     def __init__(self, **kwargs):
         super(Analyzer, self).__init__(**kwargs)
+
+        lumiMuDict = dict()
+	run_lumi_csv = os.path.join(cmsl1t.PROJECT_ROOT, 'run_lumi.csv')
+        with open(run_lumi_csv, 'rb') as runLumiFile:
+            reader = csv.reader(runLumiFile, delimiter=',')
+            for line in reader:
+                lumiMuDict[(int(line[1]),int(line[2]))] = float(line[3])
+        self._lumiMu = lumiMuDict
 
         self._lumiFilter = None
         self._lumiJson = self.params['lumiJson']
@@ -306,21 +317,20 @@ class Analyzer(BaseAnalyzer):
                 ]
                 if "HT" in cfg.name:
                     params = [
-                        cfg.on_title,
-                        cfg.off_title + " (GeV)",
-                        puBins, thresholds,
+                        cfg.on_title, cfg.off_title +
+                        " (GeV)", puBins, thresholds,
                         105, 30, 2130,
                     ]
                 if "JetET" in cfg.name:
                     params = [
-                        cfg.on_title, cfg.off_title + " (GeV)",
-                        puBins, thresholds,
+                        cfg.on_title, cfg.off_title +
+                        " (GeV)", puBins, thresholds,
                         105, 20, 2120,
                     ]
                 if "MET" in cfg.name:
                     params = [
-                        cfg.on_title, cfg.off_title + " (GeV)",
-                        puBins, thresholds,
+                        cfg.on_title, cfg.off_title +
+                        " (GeV)", puBins, thresholds,
                         100, 0, 2000,
                     ]
 
@@ -370,6 +380,12 @@ class Analyzer(BaseAnalyzer):
             recoNVtx = event.Vertex_nVtx
         if self._doGen:
             genNVtx = event.Generator_nVtx
+
+        pileup = self._lumiMu[(event['run'],event['lumi'])]
+        #print pileup
+        if pileup >= 60 or pileup < 50:
+            return True
+
 
         for name in self._sumTypes:
             if 'pfMET' in name and not pfMetFilter(event):
