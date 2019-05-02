@@ -1,4 +1,3 @@
-import six
 import math
 import logging
 import os
