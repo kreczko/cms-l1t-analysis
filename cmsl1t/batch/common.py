@@ -73,7 +73,6 @@ def _get_run_script(setup_script, project_root, shared_fs=True):
         '#!/usr/bin/env bash',
         'pushd {project_root}',
         'source {setup_script}',
-        'popd',
         'echo == start ENV ==',
         'env',
         'echo == END ENV ==',

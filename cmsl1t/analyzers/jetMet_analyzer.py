@@ -1,3 +1,4 @@
+import os
 from cmsl1t.analyzers.BaseAnalyzer import BaseAnalyzer
 from cmsl1t.plotting.efficiency import EfficiencyPlot
 from cmsl1t.collections import EfficiencyCollection
@@ -15,6 +16,7 @@ import pprint
 from collections import namedtuple
 import numpy as np
 import csv
+import cmsl1t
 from cmsl1t.jet import match
 
 
@@ -122,7 +124,8 @@ class Analyzer(BaseAnalyzer):
         super(Analyzer, self).__init__(**kwargs)
 
         lumiMuDict = dict()
-        with open('run_lumi.csv', 'rb') as runLumiFile:
+	run_lumi_csv = os.path.join(cmsl1t.PROJECT_ROOT, 'run_lumi.csv')
+        with open(run_lumi_csv, 'rb') as runLumiFile:
             reader = csv.reader(runLumiFile, delimiter=',')
             for line in reader:
                 lumiMuDict[(int(line[1]),int(line[2]))] = float(line[3])
