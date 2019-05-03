@@ -66,7 +66,7 @@ class Analyzer(BaseAnalyzer):
         self.puBins = self.params['pu_bins']
 
         lumiMuDict = dict()
-        with open(os.path.join(cmsl1t.PROJECT_ROOT, 'run_lumi.csv'), 'rb') as runLumiFile:
+        with open(os.path.join(cmsl1t.PROJECT_ROOT, 'run_lumi.csv')) as runLumiFile:
             reader = csv.reader(runLumiFile, delimiter=',')
             for line in reader:
                 lumiMuDict[(int(line[1]), int(line[2]))] = float(line[3])

@@ -120,7 +120,7 @@ class Analyzer(BaseAnalyzer):
 
         lumiMuDict = dict()
         run_lumi_csv = os.path.join(cmsl1t.PROJECT_ROOT, 'run_lumi.csv')
-        with open(run_lumi_csv, 'rb') as runLumiFile:
+        with open(run_lumi_csv) as runLumiFile:
             reader = csv.reader(runLumiFile, delimiter=',')
             for line in reader:
                 lumiMuDict[(int(line[1]), int(line[2]))] = float(line[3])
