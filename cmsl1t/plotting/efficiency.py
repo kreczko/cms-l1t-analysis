@@ -1,15 +1,17 @@
 from __future__ import print_function
 from cmsl1t.plotting.base import BasePlotter
+
+import numpy as np
+from rootpy import asrootpy, ROOT
+from rootpy.context import preserve_current_style
+from rootpy.plotting import Legend, HistStack, Efficiency
+import six
+
 from cmsl1t.hist.hist_collection import HistogramCollection
 from cmsl1t.hist.factory import HistFactory
 import cmsl1t.hist.binning as bn
 from cmsl1t.utils.draw import draw, label_canvas
 from cmsl1t.utils.fit_efficiency import fit_efficiency
-import numpy as np
-
-from rootpy.plotting import Legend, HistStack, Efficiency
-from rootpy.context import preserve_current_style
-from rootpy import asrootpy, ROOT
 
 
 # Hack to fix Efficiency.__iadd__ for now
@@ -276,7 +278,7 @@ class EfficiencyPlot(BasePlotter):
                 line.SetLineColor(15)
                 line.Draw()
 
-            for t in xrange(60, 300, 20):
+            for t in six.moves.range(60, 300, 20):
                 line = ROOT.TLine(t, 0., t, 1.)
                 line.SetLineStyle("dashed")
                 line.SetLineColor(15)
