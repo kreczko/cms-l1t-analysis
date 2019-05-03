@@ -6,7 +6,6 @@ from rootpy.plotting.hist import _HistBase, Efficiency
 from rootpy.plotting.graph import _GraphBase
 from rootpy.ROOT import Fit, Math
 from rootpy import asrootpy
-import array
 
 
 def fit_efficiency(efficiency, in_mean, in_sigma=10,

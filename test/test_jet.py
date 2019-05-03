@@ -1,4 +1,3 @@
-import pytest
 from cmsl1t.jet import Jet, CaloJet, PFJet
 
 

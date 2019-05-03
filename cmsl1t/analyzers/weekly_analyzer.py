@@ -4,8 +4,6 @@ Make plots for the weekly checks
 from collections import namedtuple
 from math import pi
 
-import pprint
-
 from .BaseAnalyzer import BaseAnalyzer
 from cmsl1t.energySums import EnergySum, Met
 from cmsl1t.filters import pfMetFilter
@@ -13,7 +11,6 @@ from cmsl1t.plotting.efficiency import EfficiencyPlot
 from cmsl1t.plotting.onlineVsOffline import OnlineVsOffline
 from cmsl1t.plotting.resolution import ResolutionPlot
 from cmsl1t.plotting.resolution_vs_X import ResolutionVsXPlot
-import cmsl1t.recalc.met as recalc
 
 
 sum_types = ["HTT", "MHT", "MET_HF", "MET_noHF"]

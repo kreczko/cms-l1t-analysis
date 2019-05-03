@@ -4,11 +4,10 @@ from cmsl1t.plotting.base import BasePlotter
 import numpy as np
 from rootpy import asrootpy, ROOT
 from rootpy.context import preserve_current_style
-from rootpy.plotting import Legend, HistStack, Efficiency
+from rootpy.plotting import Legend, Efficiency
 import six
 
 from cmsl1t.hist.hist_collection import HistogramCollection
-from cmsl1t.hist.factory import HistFactory
 import cmsl1t.hist.binning as bn
 from cmsl1t.utils.draw import draw, label_canvas
 from cmsl1t.utils.fit_efficiency import fit_efficiency

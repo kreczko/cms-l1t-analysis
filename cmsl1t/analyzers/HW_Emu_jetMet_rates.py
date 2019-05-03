@@ -4,7 +4,6 @@ Study the MET distibutions and various PUS schemes
 from __future__ import division, print_function
 import os
 
-import numpy as np
 import pandas as pd
 import ROOT
 from tabulate import tabulate

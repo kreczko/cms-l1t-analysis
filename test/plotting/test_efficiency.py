@@ -1,7 +1,6 @@
 from __future__ import print_function
 from cmsl1t.plotting.efficiency import EfficiencyPlot
 import cmsl1t.hist.binning as bn
-from rootpy.io import root_open
 import numpy as np
 
 
@@ -38,10 +37,6 @@ def fake_efficiency_plots(prefix, n_points=10000, online_offset=10, online_resol
 
 def test_EffiencyPlot_noPU_oneThreshold():
     plotters = fake_efficiency_plots("", 10000, thresholds=[53])
-
-    # with root_open("test/outputs/plotting-test_efficiency.root", "w") as out_file:
-    #     for name, plotter in plotters.items():
-    #         plotter.to_root(out_file.mkdir(plotter.directory_name))
 
     for plotter in plotters.values():
         if not isinstance(plotter, EfficiencyPlot):

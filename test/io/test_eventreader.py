@@ -1,5 +1,5 @@
 import pytest
-from cmsl1t.io.eventreader import EventReader, Event
+from cmsl1t.io.eventreader import Event
 from collections import namedtuple
 
 

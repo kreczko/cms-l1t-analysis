@@ -2,7 +2,7 @@ from rootpy.io.pickler import dump, load
 from rootpy.plotting.hist import Hist, _HistBase
 from cmsl1t.hist.hist_collection import HistogramCollection
 # no pickles without dill
-import dill
+import dill  # noqa: F401
 
 
 def to_root(obj, output_file):

@@ -2,7 +2,6 @@
     .. module:: collections.efficiency
        :synopsis: Module for creating efficiency(turnon)-curves
 """
-from collections import defaultdict
 from . import HistogramsByPileUpCollection
 
 from cmsl1t.utils.iterators import pairwise

@@ -1,5 +1,5 @@
 import numpy as np
-from math import pi, degrees
+from math import pi
 twopi = 2 * pi
 
 

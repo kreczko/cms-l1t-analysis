@@ -1,5 +1,4 @@
 from cmsl1t.collections import EfficiencyCollection
-import cmsl1t.geometry as geo
 import unittest
 import numpy as np
 

@@ -5,18 +5,14 @@ import os
 
 import cmsl1t
 from .BaseAnalyzer import BaseAnalyzer
-from ..collections import EfficiencyCollection
 from ..energySums import EnergySum, Met
 from ..filters import pfMetFilter
 from ..filters import LuminosityFilter
 from ..jet import match
-from ..playground.jetfilters import pfJetFilter
 from ..plotting.efficiency import EfficiencyPlot
 from ..plotting.onlineVsOffline import OnlineVsOffline
 from ..plotting.resolution import ResolutionPlot
 from ..plotting.resolution_vs_X import ResolutionVsXPlot
-# from cmsl1t.playground.metfilters import pfMetFilter
-from ..recalc import met as recalc
 
 
 def types(doEmu, doReco, doGen):

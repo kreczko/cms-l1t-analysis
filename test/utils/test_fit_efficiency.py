@@ -1,6 +1,5 @@
 import cmsl1t.utils.fit_efficiency as fit
-from rootpy.plotting import F1, Hist, Canvas
-from rootpy import asrootpy, ROOT
+from rootpy.plotting import F1, Hist
 
 
 def test_get_asymmetric_formula():

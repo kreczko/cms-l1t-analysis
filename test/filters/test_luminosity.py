@@ -1,4 +1,4 @@
-from mock import patch, Mock
+from mock import patch
 import unittest
 from cmsl1t.filters.luminosity import _load_json, _expand_lumi_range, \
     _expand_lumi_ranges, LuminosityFilter

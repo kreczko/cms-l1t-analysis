@@ -1,4 +1,3 @@
-import cmsl1t.geometry as geo
 from cmsl1t.utils.decorators import deprecated
 
 

@@ -1,6 +1,3 @@
-import os
-from textwrap import dedent
-
 from .common import Batch, create_run_script, create_info_file, \
     get_config_name_template, prepare_jobs, prepare_output_folders, Status
 

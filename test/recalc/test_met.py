@@ -1,5 +1,4 @@
 import unittest
-import numpy as np
 from cmsl1t.recalc.met import l1Met28Only
 import math
 

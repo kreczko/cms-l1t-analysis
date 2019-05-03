@@ -8,7 +8,6 @@ import numpy as np
 from .BaseAnalyzer import BaseAnalyzer
 from cmsl1t.collections import EfficiencyCollection
 from cmsl1t.filters import muonfilter, pfMetFilter
-import cmsl1t.recalc.met as recalc
 
 
 class Analyzer(BaseAnalyzer):

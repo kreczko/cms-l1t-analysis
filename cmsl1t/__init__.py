@@ -1,7 +1,6 @@
 from __future__ import absolute_import
 import os
 from os import path
-import sys
 import logging
 
 __version__ = '0.5.1'

@@ -2,16 +2,12 @@
 Study the MET distibutions and various PUS schemes
 """
 from contextlib import contextmanager
-from functools import partial
 import logging
 import os
 
-import numpy as np
 import ROOT
 
 from .BaseAnalyzer import BaseAnalyzer
-from cmsl1t.collections import EfficiencyCollection
-import cmsl1t.recalc.met as recalc
 
 logger = logging.getLogger(__name__)
 

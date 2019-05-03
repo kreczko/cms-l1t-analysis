@@ -2,13 +2,11 @@ from __future__ import print_function
 import ROOT
 import os
 import glob
-import math
 import logging
 import numpy as np
 from eventreader import EventReader
 from cmsl1t.collections import EfficiencyCollection
 from functools import partial
-import cmsl1t.recalc.met as rmet
 
 logging.getLogger("rootpy.tree.chain").setLevel(logging.WARNING)
 

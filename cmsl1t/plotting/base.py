@@ -1,6 +1,5 @@
 from rootpy.ROOT import gPad
 from cmsl1t.io import to_root, from_root
-from copy import deepcopy
 import logging
 logger = logging.getLogger(__name__)
 

@@ -1,5 +1,4 @@
 import numpy as np
-import pprint
 
 
 def jet_match(jetlist1, jetlist2, max_R_to_match=0.5):

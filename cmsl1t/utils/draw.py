@@ -1,9 +1,9 @@
 from rootpy.plotting.utils import draw as r_draw
-from rootpy.plotting.hist import _HistBase, Efficiency
+from rootpy.plotting.hist import Efficiency
 from rootpy.plotting.graph import _GraphBase
-from rootpy.plotting import Style, Canvas
+from rootpy.plotting import Canvas
 from rootpy.context import preserve_current_style
-from rootpy.ROOT import gStyle, TLatex, TStyle
+from rootpy.ROOT import gStyle, TLatex
 from rootpy import asrootpy
 import rootpy.ROOT as ROOT
 

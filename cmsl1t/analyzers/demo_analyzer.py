@@ -7,7 +7,6 @@ import numpy as np
 
 from .BaseAnalyzer import BaseAnalyzer
 from cmsl1t.collections import EfficiencyCollection
-import cmsl1t.recalc.met as recalc
 
 
 class Analyzer(BaseAnalyzer):
