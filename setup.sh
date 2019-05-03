@@ -81,40 +81,43 @@ export PATH=~/.local/bin:$PATH
 unset old_projectbase
 unset envscript
 
-if [[ -z "${NO_CVMFS}" ]]
+if [[ -z "${NO_SETUP}" ]]
 then
-  echo "Getting dependencies from CVMFS"
-  # this gives you voms-proxy-*, xrdcp and other grid tools
-  source /cvmfs/grid.cern.ch/etc/profile.d/setup-cvmfs-ui.sh
-  # ROOT 6, voms-proxy-init and other things
-  source /cvmfs/sft.cern.ch/lcg/views/${LCG_VERSION}/${LCG_ARCH}/setup.sh
-  # to fix java for the hadoop commands:
-  unset JAVA_HOME
-  pip install --user -r requirements.txt
-else
-  echo "No CVMFS available, setting up Anaconda Python"
-  if [ ! -d "${CMSL1T_CONDA_PATH}" ]
+  if [[ -z "${NO_CVMFS}" ]]
   then
-    wget -nv https://repo.continuum.io/miniconda/Miniconda2-latest-Linux-x86_64.sh -O /tmp/miniconda.sh
-    bash /tmp/miniconda.sh -b -p ${CMSL1T_CONDA_PATH}
-    PATH=${CMSL1T_CONDA_PATH}/bin:$PATH; export PATH
-    rm -f miniconda.sh
-    echo "Finished conda installation, creating new conda environment"
-    conda config --add channels http://conda.anaconda.org/NLeSC
-    conda config --set show_channel_urls yes
-    conda create -n cms python=2.7 -yq
+    echo "Getting dependencies from CVMFS"
+    # this gives you voms-proxy-*, xrdcp and other grid tools
+    source /cvmfs/grid.cern.ch/etc/profile.d/setup-cvmfs-ui.sh
+    # ROOT 6, voms-proxy-init and other things
+    source /cvmfs/sft.cern.ch/lcg/views/${LCG_VERSION}/${LCG_ARCH}/setup.sh
+    # to fix java for the hadoop commands:
+    unset JAVA_HOME
+    pip install --user -r requirements.txt
+  else
+    echo "No CVMFS available, setting up Anaconda Python"
+    if [ ! -d "${CMSL1T_CONDA_PATH}" ]
+    then
+      wget -nv https://repo.continuum.io/miniconda/Miniconda2-latest-Linux-x86_64.sh -O /tmp/miniconda.sh
+      bash /tmp/miniconda.sh -b -p ${CMSL1T_CONDA_PATH}
+      PATH=${CMSL1T_CONDA_PATH}/bin:$PATH; export PATH
+      rm -f miniconda.sh
+      echo "Finished conda installation, creating new conda environment"
+      conda config --add channels http://conda.anaconda.org/NLeSC
+      conda config --set show_channel_urls yes
+      conda create -n cms python=2.7 -yq
+      source activate cms
+      conda install -y -q \
+        matplotlib \
+        numpy \
+        root>=6.04 \
+        rootpy
+      echo "Created conda environment, installing basic dependencies"
+      pip install -U pip
+      pip install -r requirements.txt
+      conda clean -t -y
+    fi
     source activate cms
-    conda install -y -q \
-      matplotlib \
-      numpy \
-      root>=6.04 \
-      rootpy
-    echo "Created conda environment, installing basic dependencies"
-    pip install -U pip
-    pip install -r requirements.txt
-    conda clean -t -y
   fi
-  source activate cms
 fi
 
 # Capture the user's site-packages directory:
