@@ -46,7 +46,12 @@ def process_tuples(config, nevents, analyzers, producers):
     with open(ntuple_map) as f:
         ntuple_map = yaml.load(f)
     load_L1TNTupleLibrary()
-    reader = EventReader(input_files, ntuple_map, nevents=nevents)
+    reader = EventReader(
+        input_files,
+        ntuple_map,
+        nevents=nevents,
+        vectorized=config.try_get('analysis', 'vectorized', default=False),
+    )
 
     results = [analyzer.prepare_for_events(reader) for analyzer in analyzers]
     check(results, analyzers, 'prepare_for_events')
