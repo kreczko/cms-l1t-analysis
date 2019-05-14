@@ -20,7 +20,7 @@ class MET(object):
 def recalcMET(caloTowerIphis, caloTowerIetas, caloTowerIets, exclude=None):
     validTowers = [1] * len(caloTowerIphis)
     if exclude is not None:
-        validTowers = map(exclude, caloTowerIetas)
+        validTowers = list(map(exclude, caloTowerIetas))
 
     ets = 0.5 * np.array(caloTowerIets)[validTowers]
     phis = (math.pi / 36.0) * np.array(caloTowerIphis)[validTowers]
