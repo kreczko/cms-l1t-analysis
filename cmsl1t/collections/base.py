@@ -8,7 +8,9 @@ ways to create and access sets of histograms.
 **References**
 .. [rootpy] https://pypi.python.org/pypi/rootpy.
 """
-
+import dill
+import sys
+from functools import partial
 import six
 from collections import defaultdict
 import logging
@@ -22,8 +24,8 @@ logger = logging.getLogger(__name__)
 def create_n_dim_dict(dimensions, initiaValue=0):
     if dimensions < 1:
         return initiaValue
-    return defaultdict(lambda: create_n_dim_dict(dimensions - 1,
-                                                 initiaValue))
+    factory = partial(create_n_dim_dict, dimensions=dimensions - 1, initiaValue=initiaValue)
+    return defaultdict(factory)
 
 
 # def n_dim_dict_itervalues(dictionary, dimensions):
@@ -52,8 +54,11 @@ class BaseHistCollection(defaultdict):
         '''
         # TODO: add possibility for different lambda expresions for each
         # dimension. This will allow to have custom dicts in certain dimensions
-        defaultdict.__init__(self, lambda: create_n_dim_dict(
-            dimensions - 1, initiaValue))
+        factory = partial(create_n_dim_dict, dimensions=dimensions - 1, initiaValue=initiaValue)
+        if sys.version_info[0] < 3:
+            defaultdict.__init__(self, factory)
+        else:
+            super(BaseHistCollection, self).__init__(factory)
         self._dimensions = dimensions
 
     @property
