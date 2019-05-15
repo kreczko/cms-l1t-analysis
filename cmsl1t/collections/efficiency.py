@@ -2,6 +2,8 @@
     .. module:: collections.efficiency
        :synopsis: Module for creating efficiency(turnon)-curves
 """
+import numpy as np
+
 from . import HistogramsByPileUpCollection
 
 from cmsl1t.utils.iterators import pairwise
@@ -33,6 +35,21 @@ class _EfficiencyCurve(object):
         self._dist.fill(l1Value, weight)
         if l1Value > self._threshold:
             self._pass.fill(recoValue, weight)
+
+    def fill_array(self, recoValue, l1Value, weight=None):
+        """ Fills the histograms used for efficiency calculation
+        :param recoValue: the reconstructed quanity
+        :type recoValue: array of floats
+        :param l1Value: the L1 Trigger quantity
+        :type l1Value: array of floats
+        :param weight: weight to fill the histograms with, default=1.0
+        :type weight: array of floats
+        """
+        if weight is None:
+            weight = np.ones(np.size(recoValue))
+        self._total.fill_array(recoValue, weight)
+        self._dist.fill_array(l1Value, weight)
+        self._pass.fill_array(recoValue[l1Value > self._threshold], weight[l1Value > self._threshold])
 
     def calculate_efficiency(self):
         from rootpy import asrootpy
@@ -106,10 +123,22 @@ class EfficiencyCollection(HistogramsByPileUpCollection):
             logger.error('Histogram {0} does not exist'.format(hist_name))
             return
         if hist_name not in self._thresholds:
-            logger.warn(
-                'No valid current thresholds.')
+            logger.warn('No valid current thresholds.')
         for threshold in self._thresholds[hist_name]:
             h[threshold].fill(recoValue, l1Value, w)
+
+    def fill_array(self, hist_name, recoValue, l1Value, w=None):
+        if w is None:
+            w = np.ones(np.size(recoValue))
+        # TODO: proper indexing for vectorized input
+        h = self[-1][hist_name]
+        if not h:
+            logger.error('Histogram {0} does not exist'.format(hist_name))
+            return
+        if hist_name not in self._thresholds:
+            logger.warn('No valid current thresholds.')
+        for threshold in self._thresholds[hist_name]:
+            h[threshold].fill_array(recoValue, l1Value, w)
 
     def _calculateEfficiencies(self):
         for puBinLower, _ in pairwise(self._pileUpBins):
