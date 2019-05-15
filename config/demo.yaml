@@ -4,7 +4,7 @@ name: Demo
 input:
   files:
     # - data/L1Ntuple_*.root
-    - test/data/*.root
+    - test/data/2kmu.root
   sample:
     name: Data
     title: 2016 Data
@@ -15,6 +15,8 @@ input:
   run_number: 276243
 
 analysis:
+  vectorized: True
+  batch_size: 10000
   load_trees:
     - event
     - upgrade
@@ -33,7 +35,7 @@ analysis:
       module: cmsl1t.analyzers.demo_analyzer
   producers:
     l1MetNot28:
-      module: cmsl1t.producers.met
+      module: cmsl1t.producers.met_vectorized
       inputs:
         - L1CaloTower_iphi
         - L1CaloTower_ieta
@@ -42,7 +44,7 @@ analysis:
         - l1MetNot28
       method: l1MetNot28
     l1MetNot28HF:
-      module: cmsl1t.producers.met
+      module: cmsl1t.producers.met_vectorized
       inputs:
         - L1CaloTower_iphi
         - L1CaloTower_ieta

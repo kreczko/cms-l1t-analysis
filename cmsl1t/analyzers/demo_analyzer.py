@@ -32,7 +32,7 @@ class Analyzer(BaseAnalyzer):
         add_met_variable = partial(
             self.efficiencies.add_variable,
             bins=bins, thresholds=thresholds)
-        map(add_met_variable, self.met_calcs)
+        list(map(add_met_variable, self.met_calcs))
         return True
 
     def reload_histograms(self, input_file):
@@ -42,15 +42,13 @@ class Analyzer(BaseAnalyzer):
 
     def fill_histograms(self, entry, event):
         pileup = event['Vertex_nVtx']
-        if pileup < 5 or not event.MetFilters_hbheNoiseFilter:
-            return True
         self.efficiencies.set_pileup(pileup)
 
         offlineMetBE = event.Sums_caloMetBE
         for name, config in self.met_calcs.items():
             onlineMet = event[config['attr']]
             onlineMet = onlineMet.mag
-            self.efficiencies.fill(name, offlineMetBE, onlineMet)
+            self.efficiencies.fill_array(name, offlineMetBE, onlineMet)
         return True
 
     def write_histograms(self):

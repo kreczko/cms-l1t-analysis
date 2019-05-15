@@ -88,3 +88,7 @@ histograms:
 
 # Benchmark
 http://stefaanlippens.net/python_profiling_with_pstats_interactive_mode/
+
+## DemoAnalyzer
+ - regular: 436 seconds
+ - vectorized: 9 seconds
