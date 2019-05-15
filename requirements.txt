@@ -11,6 +11,7 @@ pyfakefs==3.2
 htcondor
 pyaml
 rootpy
+root_numpy
 dill
 mock
 boltons
