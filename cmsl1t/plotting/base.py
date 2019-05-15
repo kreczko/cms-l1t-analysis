@@ -83,7 +83,7 @@ class BasePlotter(object):
         self._is_built = True
         return True
 
-    def fill(self):
+    def fill(self, *vargs, **kwargs):
         """
         Has to be overloaded by users code.
 

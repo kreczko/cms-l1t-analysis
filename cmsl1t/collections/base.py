@@ -8,7 +8,6 @@ ways to create and access sets of histograms.
 **References**
 .. [rootpy] https://pypi.python.org/pypi/rootpy.
 """
-import dill
 import sys
 from functools import partial
 import six
