@@ -55,7 +55,10 @@ class HistogramsByPileUpCollection(BaseHistCollection):
 
     def set_pileup(self, pileUp):
         self._pileUp = pileUp
-        self._pileupHist.fill(pileUp)
+        if np.size(pileUp) > 1:
+            self._pileupHist.fill_array(pileUp)
+        else:
+            self._pileupHist.fill(pileUp)
 
     def fill(self, hist_name, x, w=1.0):
         h = self[self._pileUp][hist_name]
