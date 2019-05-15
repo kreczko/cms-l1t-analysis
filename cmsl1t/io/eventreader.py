@@ -54,7 +54,7 @@ def _create_alias_map(ntuple_map):
 
 class EventReader(object):
 
-    def __init__(self, input_files, ntuple_map, nevents=-1, vectorized=False):
+    def __init__(self, input_files, ntuple_map, nevents=-1, vectorized=False, batch_size=1):
         '''
             Reads ntuple_info as defined by bin/create-map-file
         '''
@@ -67,7 +67,7 @@ class EventReader(object):
         self._used_arrays = False
         self._used_trees = False
         self._passed_events = 0
-        self._batch_size = 1
+        self._batch_size = batch_size
 
         if vectorized:
             self._load_arrays()
@@ -126,8 +126,8 @@ class EventReader(object):
                 for treeGen in six.moves.zip(*six.itervalues(self._trees)):
                     data = dict(six.moves.zip(self._trees, treeGen))
                     yield UprootEvent(data, self._aliasMap, batch_size=self._batch_size)
-                    self._passed_events += 1
-                    if self._passed_events >= self.nevents:
+                    self._passed_events += self._batch_size
+                    if self.nevents > 0 and self._passed_events >= self.nevents:
                         break
         except Exception as e:
             logger.critical("Error when reading data from ROOT file: {}".format(e))
@@ -142,6 +142,7 @@ class UprootEvent(object):
         self._cache = {}
         self._isPy3 = sys.version_info[0] == 3
         self._batch_size = batch_size
+        self.is_vectorized = batch_size > 1
 
     def _contruct_cache(self):
         pass
@@ -180,6 +181,7 @@ class Event(object):
         self._map = mapping
         self._trees = trees
         self._cache = {}
+        self.is_vectorized = False
 
     def __getattr__(self, name):
         if name in object.__getattribute__(self, '_cache'):

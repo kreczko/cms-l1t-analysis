@@ -51,6 +51,7 @@ def process_tuples(config, nevents, analyzers, producers):
         ntuple_map,
         nevents=nevents,
         vectorized=config.try_get('analysis', 'vectorized', default=False),
+        batch_size=config.try_get('analysis', 'batch_size', default=1),
     )
 
     results = [analyzer.prepare_for_events(reader) for analyzer in analyzers]
