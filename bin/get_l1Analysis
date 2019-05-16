@@ -4,7 +4,7 @@ import os
 import requests
 
 # should we make this into a parameter
-CMSSW_BRANCH = 'l1t-integration-CMSSW_10_3_1'
+CMSSW_BRANCH = 'l1t-integration-CMSSW_9_2_8'
 BASE_URL = 'https://raw.githubusercontent.com/cms-l1t-offline/cmssw/{0}/L1Trigger/L1TNtuples/interface/'.format(
     CMSSW_BRANCH)
 files_to_load = [
