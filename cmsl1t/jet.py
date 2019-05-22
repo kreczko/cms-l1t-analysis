@@ -1,16 +1,28 @@
 from __future__ import absolute_import
 import numpy as np
 
+import uproot_methods
+import awkward
+
 
 class Jet(object):
     __slots__ = ['et', 'eta', 'phi', 'etCorr']
 
     def __init__(self, *args):
-        self.et, self.eta, self.phi = args
-        self.etCorr = self.et
+        if len(args) == 3:
+            self.et, self.eta, self.phi = args
+            self.etCorr = self.et
+        else:
+            self.et, self.eta, self.phi, self.etCorr = args
 
     def __getitem__(self, name):
+        # TODO: check if "name" is a list
+        # if yes --> to selection
         return object.__getattribute__(self, name)
+
+    def select(self, mask):
+        selected_values = [self[v][mask] for v in self.__slots__]
+        return self.__class__(*selected_values)
 
 
 class L1Jet(Jet):
