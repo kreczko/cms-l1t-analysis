@@ -22,3 +22,4 @@ mock
 requests
 plumbum
 six
+numba
