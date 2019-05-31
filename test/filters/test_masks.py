@@ -1,7 +1,7 @@
 import numpy as np
 import pytest
 
-from cmsl1t.filters import create_event_mask, combine_with_AND, combine_with_OR
+from cmsl1t.filters import combine_with_AND, combine_with_OR
 
 
 scalar_filters_all_passing = [True, True, True]

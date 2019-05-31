@@ -7,7 +7,6 @@ import cmsl1t
 from .BaseAnalyzer import BaseAnalyzer
 from ..energySums import EnergySum, Met
 from ..filters import pfMetFilter
-from ..filters import LuminosityFilter
 from ..jet import match
 from ..plotting.efficiency import EfficiencyPlot
 from ..plotting.onlineVsOffline import OnlineVsOffline

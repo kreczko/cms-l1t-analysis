@@ -38,6 +38,7 @@ def test_mask(event, data_and_mapping, mask):
 
     assert result == expected
 
+
 def test_invalid_mask(event, data_and_mapping):
     data, mapping = data_and_mapping
     with pytest.raises(ValueError):

@@ -53,6 +53,8 @@ pep8:
 flake8:
 	@python -m flake8 $(shell file -p bin/* |awk -F: '/python.*text/{print $$1}') cmsl1t test --max-line-length=120
 
+lint: flake8
+
 # benchmarks
 NTUPLE_CFG := "legacy/Config/ntuple_cfg.h"
 benchmark: clean-benchmark setup-benchmark run-benchmark

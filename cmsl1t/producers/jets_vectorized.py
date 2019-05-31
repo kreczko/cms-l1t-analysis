@@ -58,11 +58,12 @@ class Producer(BaseProducer):
 
     def produce(self, event):
         variables = [event[i] for i in self._inputs]
-        # self.awkward.ObjectArray.__init__(self, table, lambda row: TLorentzVector(row["fX"], row["fY"], row["fZ"], row["fE"]))
+        # self.awkward.ObjectArray.__init__(self, table, lambda row:
+        # TLorentzVector(row["fX"], row["fY"], row["fZ"], row["fE"]))
         jets = self._jetClass(*variables)
         # jets = [self._jetClass(*args) for args in zip(*variables)]
         if 'L1' in self._jetType:
-            jets = jets.select(jets.bx== 0)
+            jets = jets.select(jets.bx == 0)
         if self._jetFilter:
             jets = self._jetFilter(jets)
 

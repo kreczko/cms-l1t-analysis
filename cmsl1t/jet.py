@@ -1,9 +1,6 @@
 from __future__ import absolute_import
 import numpy as np
 
-import uproot_methods
-import awkward
-
 
 class Jet(object):
     __slots__ = ['et', 'eta', 'phi', 'etCorr']
