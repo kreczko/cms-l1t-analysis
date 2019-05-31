@@ -116,6 +116,7 @@ class ConfigParser(object):
         results += [self.validate_input_files()]
         results += [self.validate_analyzers()]
         results += [self.validate_producers()]
+        results += [self.validate_filters()]
         return all(results)
 
     def validate_sections(self):
@@ -163,6 +164,9 @@ class ConfigParser(object):
 
     def validate_producers(self):
         return self.__validate_module_imports(['analysis', 'producers'])
+
+    def validate_filters(self):
+        return self.__validate_module_imports(['analysis', 'filters'])
 
     def __validate_module_imports(self, config_keys):
         modules = deepcopy(self.config)
@@ -296,6 +300,10 @@ class ConfigParser(object):
         producers = [self.reduce_scope_for_producer(p) for p in producers]
         cfg['analysis']['producers'] = producers
 
+        filters = self.get('analysis', 'filters')
+        filters = [self.reduce_scope_for_filter(f) for f in filters]
+        cfg['analysis']['filters'] = filters
+
     def reduce_scope_for_analyzer(self, analyzer_name):
         analyzer_spec = self.get('analysis', 'analyzers')
         if isinstance(analyzer_spec, list):
@@ -319,6 +327,7 @@ class ConfigParser(object):
         analysis = deepcopy(self.config['analysis'])
         analysis.pop('analyzers')
         analysis.pop('producers')
+        analysis.pop('filters')
         global_settings.update(analysis)
 
         reduced_scope = {'name': analyzer_name}
@@ -336,6 +345,18 @@ class ConfigParser(object):
         producer_dict = producers_spec[producer]
         reduced_scope = {'name': producer}
         reduced_scope.update(producer_dict)
+
+        return reduced_scope
+
+    def reduce_scope_for_filter(self, filter):
+        filters_spec = self.get('analysis', 'filters')
+        if isinstance(filters_spec, list):
+            # Already reduced to a list
+            return filter
+
+        filter_dict = filters_spec[filter]
+        reduced_scope = {'name': filter}
+        reduced_scope.update(filter_dict)
 
         return reduced_scope
 
