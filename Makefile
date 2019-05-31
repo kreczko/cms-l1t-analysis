@@ -71,9 +71,9 @@ endif
 run-benchmark:
 	@time python -m memory_profiler bin/run_benchmark
 
-test: test-code flake8
+test: lint test-code
 
-test-all: test-code-full flake8
+test-all: lint test-code-full
 
 test-code:
 	@pytest -v -m "not xrootdtest" test
