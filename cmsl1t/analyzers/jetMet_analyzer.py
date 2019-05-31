@@ -126,14 +126,6 @@ class Analyzer(BaseAnalyzer):
                 lumiMuDict[(int(line[1]), int(line[2]))] = float(line[3])
         self._lumiMu = lumiMuDict
 
-        self._lumiFilter = None
-        self._lumiJson = self.params['lumiJson']
-        if self._lumiJson:
-            self._lumiFilter = LuminosityFilter(self._lumiJson)
-
-        self._lastRunAndLumi = (-1, -1)
-        self._processLumi = True
-
         # TODO: this needs changing, these should be analyser parameters
         # or even move out into separate calls of the same analyzer
         loaded_trees = self.params['load_trees']
@@ -355,10 +347,6 @@ class Analyzer(BaseAnalyzer):
             )
 
     def fill_histograms(self, entry, event):
-
-        if not self._passesLumiFilter(event.run, event.lumi):
-            return True
-
         offline, online = extractSums(
             event, self._doEmu, self._doReco, self._doGen)
 
@@ -370,7 +358,9 @@ class Analyzer(BaseAnalyzer):
         if self._doGen:
             genNVtx = event.Generator_nVtx
 
-        pileup = self._lumiMu[(event['run'], event['lumi'])]
+        # TODO: vectorize
+        # pileup = self._lumiMu[(event['run'], event['lumi'])]
+        pileup = 51
         # print pileup
         if pileup >= 60 or pileup < 50:
             return True
@@ -543,17 +533,6 @@ class Analyzer(BaseAnalyzer):
                         )
 
         return True
-
-    def _passesLumiFilter(self, run, lumi):
-        if self._lumiFilter is None:
-            return True
-        if (run, lumi) == self._lastRunAndLumi:
-            return self._processLumi
-
-        self._lastRunAndLumi = (run, lumi)
-        self._processLumi = self._lumiFilter(run, lumi)
-
-        return self._processLumi
 
     def make_plots(self):
         """

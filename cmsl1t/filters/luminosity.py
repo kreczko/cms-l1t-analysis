@@ -44,16 +44,8 @@ class LuminosityFilter(object):
         self.valid_lumi_sections = np.array(self.valid_lumi_sections)
 
     def __call__(self, event):
-        # TODO: wrong way around!
-        # need to create a new array from the event.run and event.lumi
-        # https://stackoverflow.com/questions/35091879/merge-2-arrays-vertical-to-tuple-numpy
-        # https://docs.scipy.org/doc/numpy/reference/generated/numpy.isin.html
         to_test = np.array(list(zip(event.run, event.lumi)))
-        # print(np.size(to_test), np.size(self.valid_lumi_sections))
-        # print(self.valid_lumi_sections)
-        # mask = np.isin(self.valid_lumi_sections, to_test, assume_unique=True)
         mask = filter_lumis(to_test, self.valid_lumi_sections)
-        print('Lumi filter', to_test, mask, '({})'.format(np.size(mask)))
         return mask
 
 

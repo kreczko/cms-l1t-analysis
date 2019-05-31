@@ -24,9 +24,11 @@ input:
     title: Single Muon
   pileup_file: ""
   run_number: 2017
-  lumi_json: "https://cms-service-dqm.web.cern.ch/cms-service-dqm/CAF/certification/Collisions17/13TeV/PromptReco/Cert_294927-306462_13TeV_PromptReco_Collisions17_JSON.txt"
+  # lumi_json: "https://cms-service-dqm.web.cern.ch/cms-service-dqm/CAF/certification/Collisions17/13TeV/PromptReco/Cert_294927-306462_13TeV_PromptReco_Collisions17_JSON.txt"
 
 analysis:
+  vectorized: True
+  batch_size: 1000
   load_trees:
     - event
     - upgrade
@@ -39,9 +41,13 @@ analysis:
   analyzers:
     jetMet_analyzer:
       module: cmsl1t.analyzers.jetMet_analyzer
+  filters:
+    lumi_filter:
+      module: cmsl1t.filters.LuminosityFilter
+      lumi_json: "https://cms-service-dqm.web.cern.ch/cms-service-dqm/CAF/certification/Collisions17/13TeV/PromptReco/Cert_294927-306462_13TeV_PromptReco_Collisions17_JSON.txt"
   producers:
     l1Sums:
-      module: cmsl1t.producers.l1sums
+      module: cmsl1t.producers.l1sums_vectorized
       inputs:
         - L1Upgrade_sumBx
         - L1Upgrade_sumType
@@ -50,7 +56,7 @@ analysis:
       outputs:
         - l1Sums
     goodPFJets:
-      module: cmsl1t.producers.jets
+      module: cmsl1t.producers.jets_vectorized
       inputs:
         - Jet_et
         - Jet_eta
@@ -65,11 +71,11 @@ analysis:
         - Jet_nhef
         - Jet_nMult
       jetType: PF
-      filter: cmsl1t.filters.jets.pfJetFilter
+      filter: cmsl1t.filters.jets_vectorized.pfJetFilter
       outputs:
         - goodPFJets
     caloJets:
-      module: cmsl1t.producers.jets
+      module: cmsl1t.producers.jets_vectorized
       inputs:
         - Jet_caloEt
         - Jet_caloEta
@@ -80,7 +86,7 @@ analysis:
       outputs:
         - caloJets
     l1Jets:
-      module: cmsl1t.producers.jets
+      module: cmsl1t.producers.jets_vectorized
       inputs:
         - L1Upgrade_jetEt
         - L1Upgrade_jetEta
