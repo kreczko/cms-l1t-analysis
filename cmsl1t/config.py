@@ -348,14 +348,14 @@ class ConfigParser(object):
 
         return reduced_scope
 
-    def reduce_scope_for_filter(self, filter):
+    def reduce_scope_for_filter(self, current_filter):
         filters_spec = self.get('analysis', 'filters')
         if isinstance(filters_spec, list):
             # Already reduced to a list
-            return filter
+            return current_filter
 
-        filter_dict = filters_spec[filter]
-        reduced_scope = {'name': filter}
+        filter_dict = filters_spec[current_filter]
+        reduced_scope = {'name': current_filter}
         reduced_scope.update(filter_dict)
 
         return reduced_scope
