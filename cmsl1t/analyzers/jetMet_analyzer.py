@@ -357,7 +357,9 @@ class Analyzer(BaseAnalyzer):
         if self._doGen:
             genNVtx = event.Generator_nVtx
 
-        pileup = self._lumiMu[(event['run'], event['lumi'])]
+        # TODO: vectorize
+        # pileup = self._lumiMu[(event['run'], event['lumi'])]
+        pileup = 51
         # print pileup
         # if pileup >= 60 or pileup < 50:
         #    return True
