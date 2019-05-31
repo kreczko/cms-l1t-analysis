@@ -1,6 +1,7 @@
 import sys
 
 import logging
+import numpy as np
 import six
 import uproot
 
@@ -143,6 +144,7 @@ class UprootEvent(object):
         self._isPy3 = sys.version_info[0] == 3
         self._batch_size = batch_size
         self.is_vectorized = batch_size > 1
+        self._mask = None
 
     def _contruct_cache(self):
         pass
@@ -174,6 +176,22 @@ class UprootEvent(object):
     def __getitem__(self, name):
         return object.__getattribute__(self, '__getattr__')(name)
 
+    def mask(self, mask):
+        mask_size = np.size(mask)
+        if mask_size != self._batch_size:
+            msg = 'Event mask size mismatch: expected {}, got {}'.format(self._batch_size, mask_size)
+            logger.error(msg)
+            raise ValueError(msg)
+
+        if mask_size > 1:
+            for tree, attributes in self._data.items():
+                for attr in attributes:
+                    self._data[tree][attr] = self._data[tree][attr][mask]
+            return self
+        if mask:
+            return self
+        return None
+
 
 class Event(object):
 
@@ -199,3 +217,12 @@ class Event(object):
 
     def __getitem__(self, name):
         return object.__getattribute__(self, '__getattr__')(name)
+
+    def mask(self, mask):
+        if np.size(mask) > 1:
+            msg = 'Event class does not support vectorized filters'
+            logger.error(msg)
+            raise ValueError(msg)
+        if mask:
+            return self
+        return None
