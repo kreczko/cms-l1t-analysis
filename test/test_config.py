@@ -46,6 +46,7 @@ analysis:
         - caloTowers
       outputs:
         - l1MetNot28HF
+  filters: []
   progress_bar:
     report_every: 1000
   # or to switch it off

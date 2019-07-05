@@ -1,9 +1,10 @@
+from collections import namedtuple
 from mock import patch
+import numpy as np
 import unittest
 from cmsl1t.filters.luminosity import _load_json, _expand_lumi_range, \
     _expand_lumi_ranges, LuminosityFilter
 import json
-import numpy as np
 
 EXAMPLE_JSON = {"273158": [[1, 12]], "273302": [[1, 4]]}
 
@@ -54,16 +55,14 @@ class TestLumiFilter(unittest.TestCase):
     def test_lumifilter(self):
         self.urlopen_mock.return_value = MockResponse(json.dumps(EXAMPLE_JSON))
         lumiFilter = LuminosityFilter('dummy')
-        self.assertTrue(lumiFilter(273158, 1))
-        self.assertTrue(lumiFilter(273158, 2))
-        self.assertTrue(lumiFilter(273158, 3))
-        self.assertTrue(lumiFilter(273158, 12))
-
-        self.assertTrue(lumiFilter(273302, 1))
-        self.assertTrue(lumiFilter(273302, 2))
-        self.assertTrue(lumiFilter(273302, 4))
-
-        self.assertFalse(lumiFilter(273302, 5))
+        Event = namedtuple('Event', ['run', 'lumi'])
+        runs = [273158, 273158, 273158, 273158, 273302, 273302, 273302, 273302]
+        lumis = [1, 2, 3, 12, 1, 2, 4, 5]
+        events = Event(runs, lumis)
+        expected = np.ones(len(runs), dtype=np.int8)
+        expected[-1] = 0
+        results = lumiFilter(events)
+        self.assertTrue((results == expected).all())
 
     def tearDown(self):
         self.patcher.stop()
