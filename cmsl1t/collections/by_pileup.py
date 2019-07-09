@@ -39,7 +39,7 @@ class HistogramsByPileUpCollection(BaseHistCollection):
                 'No bins specified for histogram {0}'.format(hist_name))
 
         if hist_name in self[self._pileupBins[0]].keys():
-            logger.warn('Histogram {0} already exists!'.format(hist_name))
+            logger.warning('Histogram {0} already exists!'.format(hist_name))
             return
         hist_names = []
         add_name = hist_names.append

@@ -76,7 +76,7 @@ class Producer(BaseProducer):
             self._method = Producer.METHODS[params['method']]
         else:
             msg = 'Could not find specified MET method, using default.'
-            logger.warn(msg)
+            logger.warning(msg)
             self._method = Producer.METHODS['default']
 
     def produce(self, event):

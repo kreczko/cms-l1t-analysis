@@ -55,7 +55,7 @@ class ResolutionCollection(HistogramsByPileUpCollection):
             logger.error('Histogram {0} does not exist'.format(hist_name))
             return
         if not self._currentRegions:
-            logger.warn(
+            logger.warning(
                 'No valid current regions. Did you set_region_by_eta()?')
         for region in self._currentRegions:
             h[region].fill(x, w)
@@ -63,7 +63,7 @@ class ResolutionCollection(HistogramsByPileUpCollection):
     def add_variable(self, variable, bins=[]):
         from rootpy.plotting import Hist
         if variable in self.keys():
-            logger.warn('Variable {0} already exists!')
+            logger.warning('Variable {0} already exists!')
             return
         hist_names = []
         add_name = hist_names.append

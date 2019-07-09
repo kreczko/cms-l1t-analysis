@@ -22,8 +22,8 @@ ch.setFormatter(formatter)
 logger.addHandler(ch)
 
 if 'PROJECT_ROOT' not in os.environ:
-    logger.warn("Could not find environmental variable 'PROJECT_ROOT'")
-    logger.warn("You should to run 'source setup.sh' first!")
+    logger.warning("Could not find environmental variable 'PROJECT_ROOT'")
+    logger.warning("You should to run 'source setup.sh' first!")
     HERE = path.dirname(path.abspath(__file__))
     PROJECT_ROOT = path.abspath(path.join(HERE, path.pardir))
 else:

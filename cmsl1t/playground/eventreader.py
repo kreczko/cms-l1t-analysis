@@ -367,7 +367,7 @@ class EventReader(object):
             try:
                 chain = TreeChain(path, input_files, cache=True, events=events)
             except RuntimeError:
-                logger.warn("Cannot find tree: {0} in input file".format(path))
+                logger.warning("Cannot find tree: {0} in input file".format(path))
                 continue
             self._names.append(name)
             self._trees.append(chain)

@@ -100,7 +100,7 @@ class EfficiencyCollection(HistogramsByPileUpCollection):
         """
         # TODO: this will no longer work since 1st dimension is pileup
         if variable in self.keys():
-            logger.warn('Variable {0} already exists!')
+            logger.warning('Variable {0} already exists!')
             return
         self._thresholds[variable] = thresholds
         hist_names = []
@@ -123,7 +123,7 @@ class EfficiencyCollection(HistogramsByPileUpCollection):
             logger.error('Histogram {0} does not exist'.format(hist_name))
             return
         if hist_name not in self._thresholds:
-            logger.warn('No valid current thresholds.')
+            logger.warning('No valid current thresholds.')
         for threshold in self._thresholds[hist_name]:
             h[threshold].fill(recoValue, l1Value, w)
 
@@ -136,7 +136,7 @@ class EfficiencyCollection(HistogramsByPileUpCollection):
             logger.error('Histogram {0} does not exist'.format(hist_name))
             return
         if hist_name not in self._thresholds:
-            logger.warn('No valid current thresholds.')
+            logger.warning('No valid current thresholds.')
         for threshold in self._thresholds[hist_name]:
             h[threshold].fill_array(recoValue, l1Value, w)
 

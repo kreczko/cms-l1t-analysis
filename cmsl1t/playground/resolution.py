@@ -36,7 +36,7 @@ class Resolution(object):
         for region in regions:
             name = prefix + region
             if name in self._hists:
-                logger.warn('Overwriting existing histogram {0}'.format(name))
+                logger.warning('Overwriting existing histogram {0}'.format(name))
                 del self._hists[name]
             logger.debug('Adding histogram {0}'.format(name))
             self._hists[name] = Hist(bins, name=name)

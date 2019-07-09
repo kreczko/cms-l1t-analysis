@@ -314,7 +314,7 @@ class ConfigParser(object):
         forbidden_local_settings = ['name', 'input_files']
         for s in forbidden_local_settings:
             if s in analyzer:
-                logger.warn('Setting {0} is forbidden in analysis::analyzers::{1}'.format(s, analyzer_name))
+                logger.warning('Setting {0} is forbidden in analysis::analyzers::{1}'.format(s, analyzer_name))
                 analyzer.pop(s)
 
         global_settings = dict(
