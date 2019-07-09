@@ -1,6 +1,8 @@
-from cmsl1t.collections import BaseHistCollection
-import unittest
 from collections import defaultdict
+import pytest
+import unittest
+
+from cmsl1t.collections import BaseHistCollection
 
 
 class TestBaseHistCollection(unittest.TestCase):
@@ -9,6 +11,7 @@ class TestBaseHistCollection(unittest.TestCase):
         dimensions = 4
         initial_value = 0
         hists = BaseHistCollection(dimensions, initial_value)
+        self.assertEqual(len(hists), 0)
         self.assertIs(type(hists[1]), defaultdict)
         self.assertIs(type(hists[1][2][3][4]), type(initial_value))
         self.assertEqual(hists[1][2][3][4], initial_value)
@@ -23,3 +26,9 @@ class TestBaseHistCollection(unittest.TestCase):
 
         # length_from_iterator = len(list(six.itervalues(hists)))
         # self.assertEqual(length_from_iterator, 3)
+
+
+@pytest.mark.parametrize("dimensions", [1, 2, 3])
+def test_empty(dimensions):
+    c = BaseHistCollection(dimensions)
+    assert len(c) == 0
