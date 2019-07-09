@@ -1,3 +1,5 @@
+aghast
+git+https://github.com/scikit-hep/boost-histogram.git@develop
 numpy
 matplotlib
 pandas==0.23
