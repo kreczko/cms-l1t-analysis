@@ -383,8 +383,8 @@ class Analyzer(BaseAnalyzer):
 
         pileup = self._lumiMu[(event['run'],event['lumi'])]
         #print pileup
-        if pileup >= 60 or pileup < 50:
-            return True
+        #if pileup >= 60 or pileup < 50:
+        #    return True
 
 
         for name in self._sumTypes:
