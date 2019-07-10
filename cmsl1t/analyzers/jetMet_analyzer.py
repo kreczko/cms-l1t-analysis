@@ -357,12 +357,10 @@ class Analyzer(BaseAnalyzer):
         if self._doGen:
             genNVtx = event.Generator_nVtx
 
-        # TODO: vectorize
-        # pileup = self._lumiMu[(event['run'], event['lumi'])]
-        pileup = 51
+        pileup = self._lumiMu[(event['run'], event['lumi'])]
         # print pileup
-        if pileup >= 60 or pileup < 50:
-            return True
+        # if pileup >= 60 or pileup < 50:
+        #    return True
 
         for name in self._sumTypes:
             if 'pfMET' in name and not pfMetFilter(event):
