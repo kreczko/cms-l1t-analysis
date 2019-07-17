@@ -32,8 +32,14 @@ class VectorizedHistCollection(BaseHistCollection):
         self._innerHist = Hist(100, 0, 100, name='inner')
 
     def __getitem__(self, key):
-        real_key = self._get_inner_indices(key)
-        return defaultdict.__getitem__(self, real_key)
+        if not isinstance(key, (list, np.ndarray, np.generic)):
+            key = np.array([key])
+        real_keys = self._get_inner_indices(key)
+        # Python tries to copy the whole nested default dict ... which is infinite
+        # print(key, real_keys)
+        # return object()
+        return VectorizedBinProxy(self, real_keys)
+        return [defaultdict.__getitem__(self, k) for k in real_keys.tolist()]
 
     def _get_inner_indices(self, values):
         '''
@@ -54,20 +60,61 @@ class VectorizedHistCollection(BaseHistCollection):
             logger.error(
                 'No bins specified for histogram {0}'.format(hist_name))
 
-        if name in self[1]:
+        if name in defaultdict.__getitem__(self, 1):
             logger.warning('Histogram {0} already exists!'.format(hist_name))
             return
         names = []
         add_name = names.append
-        print(self)
 
         for i, (lowerEdge, upperEdge) in enumerate(pairwise(self._innerBins)):
             hist_name = f"{name}_{self._innerLabel}{lowerEdge}To{upperEdge}"
-            if i + 1 not in self or hist_name not in self[i + 1]:
+            if i + 1 not in self or hist_name not in defaultdict.__getitem__(self, i + 1):
                 add_name(hist_name)
-                self[i + 1][hist_name] = Hist(bins, name=hist_name)
+                defaultdict.__getitem__(self, i + 1)[hist_name] = Hist(bins, name=hist_name)
         logger.debug('Created {0} histograms: {1}'.format(
             len(names), ', '.join(names)))
 
-    def fill(self):
-        pass
+    def fill(self, x, w=None):
+        if w is None:
+            w = np.ones()
+
+
+
+class VectorizedBinProxy(object):
+
+    def __init__(self, collection, inner_indices):
+        self.collection = collection
+        self._inner_indices = inner_indices
+
+    def __getitem__(self, key):
+        # TODO, if key != string, return a BinProxy
+        return VectorizedHistProxy(self, key)
+
+    def __add__(self, other):
+        if self.collection != other.collection:
+            msg = 'Cannot add VectorizedBinProxy for two different collections'
+            logger.error(msg)
+            raise ValueError(msg)
+        self._inner_indices = np.append(self._inner_indices, other._inner_indices)
+        return self
+
+    def __eq__(self, other):
+        if self.collection != other.collection:
+            msg = 'Cannot compare VectorizedBinProxy for two different collections'
+            logger.error(msg)
+            raise ValueError(msg)
+        return self._inner_indices.tolist() == other._inner_indices.tolist()
+
+    def flatten(self):
+        self._inner_indices = np.unique(self._inner_indices)
+        return self
+
+class VectorizedHistProxy(object):
+
+    def __init__(self, bin_proxy, hist_name):
+        self._bin_proxy = bin_proxy.flatten()
+        self._hist_name = hist_name
+
+    def fill(self, x, w=None):
+        if w is None:
+            w = np.ones(x)
