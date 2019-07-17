@@ -78,9 +78,10 @@ class VectorizedHistCollection(BaseHistCollection):
         lowerEdge, upperEdge = self._innerBins[innerIndex - 1], self._innerBins[innerIndex]
         return f"{name}_{self._innerLabel}{lowerEdge}To{upperEdge}"
 
-    def fill(self, x, w=None):
+    def inner_fill(self, x, w=None):
         if w is None:
-            w = np.ones()
+            w = np.ones(len(x))
+        self._innerHist.fill_array(x, w)
 
 
 class VectorizedBinProxy(object):
