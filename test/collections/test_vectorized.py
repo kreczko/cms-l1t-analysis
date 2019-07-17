@@ -1,7 +1,6 @@
 import awkward
 import pytest
 import numpy as np
-from rootpy.plotting import Hist
 
 from cmsl1t.collections import VectorizedHistCollection
 from cmsl1t.collections.vectorized import VectorizedBinProxy, VectorizedHistProxy, extend

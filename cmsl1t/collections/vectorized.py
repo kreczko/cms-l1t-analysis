@@ -1,6 +1,5 @@
 from collections import defaultdict
 import logging
-import numba
 import numpy as np
 from rootpy.plotting import Hist
 
@@ -55,10 +54,10 @@ class VectorizedHistCollection(BaseHistCollection):
         bins = np.asarray(bins)
         if bins.size == 0:
             logger.error(
-                'No bins specified for histogram {0}'.format(hist_name))
+                'No bins specified for histogram {0}'.format(name))
 
         if name in defaultdict.__getitem__(self, 1):
-            logger.warning('Histogram {0} already exists!'.format(hist_name))
+            logger.warning('Histogram {0} already exists!'.format(name))
             return
         names = []
         add_name = names.append
