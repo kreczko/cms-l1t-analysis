@@ -4,7 +4,7 @@ import numpy as np
 from rootpy.plotting import Hist
 
 from cmsl1t.collections import VectorizedHistCollection
-from cmsl1t.collections.vectorized import VectorizedBinProxy, VectorizedHistProxy
+from cmsl1t.collections.vectorized import VectorizedBinProxy, VectorizedHistProxy, extend
 
 
 @pytest.fixture
@@ -54,13 +54,60 @@ def test_bin_proxy_flatten(collection, values, expected):
     proxy = VectorizedBinProxy(collection, values)
     assert proxy.flatten()._inner_indices.tolist() == expected
 
-# def test_fill(collection):
-#     innerValues = [1, 12, 1, 50]
-#     outerValues = awkward.fromiter([
-#         [60, 50, 40, 30, 20],
-#         [32, 23],
-#         [56, 34, 31],
-#     ])
-#     collection.add('test', bins=[35, 90, 120])
-#     weights = np.ones(len(outerValues.content))
-#     collection[innerValues][hist_name].fill(outerValues, weights)
+
+@pytest.mark.parametrize(
+    "bins, x, expected",
+    [
+        (
+            np.array([1, 12, 1, 50]),
+            np.array([10, 20, 30, 40]),
+            [np.array([10, 30]), np.array([20]), np.array([40])]
+        ),
+        (
+            np.array([1, 1, 1, 2, 1, 2]),
+            np.array([10, 20, 30, 40, 50, 60]),
+            [np.array([10, 20, 30, 50]), np.array([40, 60])]
+        ),
+    ])
+def test_split(bins, x, expected):
+    unique_bins = np.unique(bins)
+    result = []
+    for b in unique_bins:
+        result.append(x[bins == b])
+    for chunk, exp in zip(result, expected):
+        assert chunk.tolist() == exp.tolist()
+
+
+def test_fill(collection):
+    innerValues = [1, 12, 1, 50]
+    outerValues = awkward.fromiter([
+        [60, 50, 40, 30, 20],
+        [32, 23],
+        [56, 34, 31],
+        [],
+    ])
+    expected = [
+        [4.0, 4.0, 0.0, 0.0],
+        [2.0, 0.0, 0.0, 0.0],
+        [0.0, 0.0, 0.0, 0.0],
+    ]
+
+    hist_name = 'test'
+    collection.add(hist_name, bins=[35, 90, 120])
+    weights = np.ones(len(outerValues.content))
+    collection[innerValues][hist_name].fill(outerValues, weights)
+    for i in range(len(np.unique(innerValues))):
+        hist = collection[innerValues][hist_name]._get_hist(i + 1)
+        assert list(hist.y(overflow=True)) == expected[i]
+
+
+def test_extend():
+    innerValues = [1, 12, 1, 50]
+    outerValues = awkward.fromiter([
+        [60, 50, 40, 30, 20],
+        [32, 23],
+        [56, 34, 31],
+        [],
+    ])
+    innerValues = extend(innerValues, outerValues.starts, outerValues.stops)
+    assert len(innerValues) == len(outerValues.content)
