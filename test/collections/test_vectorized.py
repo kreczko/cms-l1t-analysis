@@ -39,8 +39,8 @@ def test_access(collection):
     assert type(collection[innerValues]['test']) == VectorizedHistProxy
 
 
-def test_copy(collection):
-    proxy = VectorizedBinProxy(collection, [1, 12, 1, 50])
+# def test_copy(collection):
+#     proxy = VectorizedBinProxy(collection, [1, 12, 1, 50])
 
 
 @pytest.mark.parametrize(
