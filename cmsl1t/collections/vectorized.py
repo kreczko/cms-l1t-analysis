@@ -1,6 +1,7 @@
 from collections import defaultdict
 import logging
 import numpy as np
+import random
 from rootpy.plotting import Hist
 
 from . import BaseHistCollection
@@ -21,6 +22,7 @@ class VectorizedHistCollection(BaseHistCollection):
         # if we want to generalize to N dim, innerBins needs to be an array of innerBins
         # TODO: last dimension should probably be a normal dictionary
         dimensions = kwargs.pop('dimensions', 2)
+        name = kwargs.pop('name', str(hex(random.getrandbits(128)))[2:10])
         if PY3:
             super(VectorizedHistCollection, self).__init__(dimensions)
         else:
@@ -28,7 +30,7 @@ class VectorizedHistCollection(BaseHistCollection):
 
         self._innerBins = innerBins
         self._innerLabel = innerLabel
-        self._innerHist = Hist(100, 0, 100, name='inner')
+        self._innerHist = Hist(100, 0, 100, name=innerLabel + '_' + name)
 
     def __getitem__(self, key):
         if not isinstance(key, (list, np.ndarray, np.generic)):
@@ -147,6 +149,7 @@ class VectorizedHistProxy(object):
             hist = self._get_hist(i)
             hist.fill_array(x_i, w_i)
 
+# class VectorizedEfficiencyProxy(object):
 
 # def split_input():
 #     a = np.array([1, 12, 1, 10, 50, 10])
