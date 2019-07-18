@@ -25,5 +25,7 @@ def test_fill():
     pileup = np.repeat(pileup, repeat, axis=0)
     # expand pileup to size ets
     assert len(pileup) == len(ets.content)
+    # weights are not yet supported
     # hist.fill(pileup, ets.content, bh.weight(weights))
-    hist(pileup, ets.content)
+    hist.fill(pileup, ets.content)
+    # hist(pileup, ets.content)
