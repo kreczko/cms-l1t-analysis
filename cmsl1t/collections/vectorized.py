@@ -49,8 +49,8 @@ class VectorizedHistCollection(BaseHistCollection):
         '''
         return np.digitize(values, self._innerBins)
 
-    def add(self, name, bins, hist_type=Hist):
-
+    def add(self, name, bins, hist_type=Hist, **kwargs):
+        title = kwargs.pop('title', name)
         bins = np.asarray(bins)
         if bins.size == 0:
             logger.error(
@@ -65,7 +65,7 @@ class VectorizedHistCollection(BaseHistCollection):
         for i, hist_name in enumerate(self._create_hist_names(name)):
             if i + 1 not in self or hist_name not in defaultdict.__getitem__(self, i + 1):
                 add_name(hist_name)
-                defaultdict.__getitem__(self, i + 1)[hist_name] = Hist(bins, name=hist_name)
+                defaultdict.__getitem__(self, i + 1)[hist_name] = hist_type(bins, name=hist_name, title=title)
         logger.debug('Created {0} histograms: {1}'.format(
             len(names), ', '.join(names)))
 
@@ -79,7 +79,7 @@ class VectorizedHistCollection(BaseHistCollection):
 
     def inner_fill(self, x, w=None):
         if w is None:
-            w = np.ones(len(x))
+            w = np.ones(np.size(x))
         self._innerHist.fill_array(x, w)
 
 
@@ -122,20 +122,35 @@ class VectorizedHistProxy(object):
 
     def _split_input(self, x, w):
         inner_indices = self._bin_proxy._inner_indices
-        # TODO: what if x is not jagged
-        inner_indices = extend(inner_indices, x.starts, x.stops)
+        content = x
+        if hasattr(x, 'starts'):
+            inner_indices = extend(inner_indices, x.starts, x.stops)
+            content = x.content
+
         for u in np.unique(inner_indices):
             mask = inner_indices == u
-            yield u, x.content[mask], w[mask]
+            if not isinstance(mask, (list, np.ndarray)):
+                mask = np.array([mask])
+            yield u, content[mask], w[mask]
 
     def _get_hist(self, inner_index):
         hist_name = self._bin_proxy.collection.get_hist_name(self._hist_name, inner_index)
         return defaultdict.__getitem__(self._bin_proxy.collection, inner_index)[hist_name]
 
     def fill(self, x, w=None):
+        if not isinstance(x, (list, np.ndarray)):
+            x = np.array([x])
         if w is None:
-            # TODO: what if x is not jagged
-            w = np.ones(len(x.content))
+            n = np.size(x.content) if hasattr(x, 'content') else np.size(x)
+            w = np.ones(n)
         for i, x_i, w_i in self._split_input(x, w):
             hist = self._get_hist(i)
             hist.fill_array(x_i, w_i)
+
+
+# def split_input():
+#     a = np.array([1, 12, 1, 10, 50, 10])
+#     b = np.array([10, 20, 30, 40, 50, 60])
+#     arg = a.argsort(kind='stable')
+#     offsets, = np.where(np.r_[True, np.diff(a[arg]) > 0])
+#     output = awkward.JaggedArray.fromoffsets(offsets.flatten(), awkward.IndexedArray(arg, b))
