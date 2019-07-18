@@ -1,3 +1,4 @@
+import awkward
 from collections import defaultdict
 import logging
 import numpy as np
@@ -15,6 +16,19 @@ logger = logging.getLogger(__name__)
 def extend(arr1, starts, stops):
     repeat = stops - starts
     return np.repeat(arr1, repeat, axis=0)
+
+
+def split_input(inner_indices, x, w):
+    content = x
+    if hasattr(x, 'starts'):
+        inner_indices = extend(inner_indices, x.starts, x.stops)
+        content = x.content
+
+    for u in np.unique(inner_indices):
+        mask = inner_indices == u
+        if not isinstance(mask, (list, np.ndarray)):
+            mask = np.array([mask])
+        yield u, content[mask], w[mask]
 
 
 class VectorizedHistCollection(BaseHistCollection):
@@ -129,30 +143,17 @@ class VectorizedHistProxy(object):
         self._bin_proxy = bin_proxy
         self._hist_name = hist_name
 
-    def _split_input(self, x, w):
-        inner_indices = self._bin_proxy._inner_indices
-        content = x
-        if hasattr(x, 'starts'):
-            inner_indices = extend(inner_indices, x.starts, x.stops)
-            content = x.content
-
-        for u in np.unique(inner_indices):
-            mask = inner_indices == u
-            if not isinstance(mask, (list, np.ndarray)):
-                mask = np.array([mask])
-            yield u, content[mask], w[mask]
-
     def _get_hist(self, inner_index):
         hist_name = self._bin_proxy.collection.get_hist_name(self._hist_name, inner_index)
         return defaultdict.__getitem__(self._bin_proxy.collection, inner_index)[hist_name]
 
     def fill(self, x, w=None):
-        if not isinstance(x, (list, np.ndarray)):
+        if not isinstance(x, (list, np.ndarray, awkward.JaggedArray)):
             x = np.array([x])
         if w is None:
             n = np.size(x.content) if hasattr(x, 'content') else np.size(x)
             w = np.ones(n)
-        for i, x_i, w_i in self._split_input(x, w):
+        for i, x_i, w_i in split_input(self._bin_proxy._inner_indices, x, w):
             hist = self._get_hist(i)
             hist.fill_array(x_i, w_i)
 

@@ -3,7 +3,7 @@ import pytest
 import numpy as np
 
 from cmsl1t.collections import VectorizedHistCollection
-from cmsl1t.collections.vectorized import VectorizedBinProxy, VectorizedHistProxy, extend
+from cmsl1t.collections.vectorized import VectorizedBinProxy, VectorizedHistProxy, extend, split_input
 
 
 @pytest.fixture
@@ -110,3 +110,26 @@ def test_extend():
     ])
     innerValues = extend(innerValues, outerValues.starts, outerValues.stops)
     assert len(innerValues) == len(outerValues.content)
+
+def test_split_input():
+    innerValues = [1, 12, 1, 50]
+    outerValues = awkward.fromiter([
+        [60, 50, 40, 30, 20],
+        [32, 23],
+        [56, 34, 31],
+        [],
+    ])
+    weights = np.ones(len(outerValues.content))
+
+    expected = [
+        (1, [60, 50, 40, 30, 20, 56, 34, 31], list(np.ones(8))),
+        [12, [32, 23], list(np.ones(2))],
+    ]
+    results = list(split_input(innerValues, outerValues, weights))
+    assert len(results) == len(expected)
+    for r, e in zip(results, expected):
+        i, o, w = r
+        i_e, o_e, w_e = e
+        assert i == i_e
+        assert o.tolist() == o_e
+        assert w.tolist() == w_e
