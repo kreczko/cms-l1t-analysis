@@ -7,6 +7,7 @@ from rootpy.plotting import Hist
 from . import BaseHistCollection
 from ..utils.iterators import pairwise
 from .. import PY3
+from ..io import to_root
 
 logger = logging.getLogger(__name__)
 
@@ -22,7 +23,8 @@ class VectorizedHistCollection(BaseHistCollection):
         # if we want to generalize to N dim, innerBins needs to be an array of innerBins
         # TODO: last dimension should probably be a normal dictionary
         dimensions = kwargs.pop('dimensions', 2)
-        name = kwargs.pop('name', str(hex(random.getrandbits(128)))[2:10])
+        self._name = kwargs.pop('name', str(hex(random.getrandbits(128)))[2:10])
+        self._execute_before_write = kwargs.pop('execute_before_write', [])
         if PY3:
             super(VectorizedHistCollection, self).__init__(dimensions)
         else:
@@ -30,7 +32,7 @@ class VectorizedHistCollection(BaseHistCollection):
 
         self._innerBins = innerBins
         self._innerLabel = innerLabel
-        self._innerHist = Hist(100, 0, 100, name=innerLabel + '_' + name)
+        self._innerHist = Hist(100, 0, 100, name=innerLabel + '_' + self._name)
 
     def __getitem__(self, key):
         if not isinstance(key, (list, np.ndarray, np.generic)):
@@ -83,6 +85,11 @@ class VectorizedHistCollection(BaseHistCollection):
         if w is None:
             w = np.ones(np.size(x))
         self._innerHist.fill_array(x, w)
+
+    def to_root(self, output_file):
+        for func in self._execute_before_write:
+            func(self)
+        to_root([self, self._innerHist], output_file)
 
 
 class VectorizedBinProxy(object):
