@@ -52,6 +52,7 @@ analysis:
       outputs:
         - l1MetNot28HF
       method: l1MetNot28HF
+  filters: []
 
 output:
   # template is a list here that is joined (os.path.join) in the config parser
