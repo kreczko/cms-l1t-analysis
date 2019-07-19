@@ -1,0 +1,6 @@
+pipeline:
+  build:
+    image: python:3.6.9-alpine
+    commands:
+      - ./.ci/install.sh
+      - ./.ci/test.sh
