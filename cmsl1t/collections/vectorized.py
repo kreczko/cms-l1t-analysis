@@ -88,7 +88,7 @@ class VectorizedHistCollection(BaseHistCollection):
             len(names), ', '.join(names)))
 
     def _create_hist_names(self, name):
-        for i, (lowerEdge, upperEdge) in enumerate(pairwise(self._innerBins)):
+        for lowerEdge, upperEdge in pairwise(self._innerBins):
             yield f"{name}_{self._innerLabel}{lowerEdge}To{upperEdge}"
 
     def get_hist_name(self, name, innerIndex):
