@@ -111,6 +111,7 @@ def test_extend():
     innerValues = extend(innerValues, outerValues.starts, outerValues.stops)
     assert len(innerValues) == len(outerValues.content)
 
+
 def test_split_input():
     innerValues = [1, 12, 1, 50]
     outerValues = awkward.fromiter([
