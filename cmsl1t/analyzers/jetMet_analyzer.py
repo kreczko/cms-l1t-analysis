@@ -119,7 +119,7 @@ class Analyzer(BaseAnalyzer):
 
         lumiMuDict = dict()
         run_lumi_csv = os.path.join(cmsl1t.PROJECT_ROOT, 'run_lumi.csv')
-        with open(run_lumi_csv, 'rb') as runLumiFile:
+        with open(run_lumi_csv, 'r') as runLumiFile:
             reader = csv.reader(runLumiFile, delimiter=',')
             for line in reader:
                 lumiMuDict[(int(line[1]), int(line[2]))] = float(line[3])
@@ -348,6 +348,8 @@ class Analyzer(BaseAnalyzer):
     def fill_histograms(self, entry, event):
         offline, online = extractSums(
             event, self._doEmu, self._doReco, self._doGen)
+        print(offline, online)
+        return True
 
         recoNVtx = 1
         genNVtx = 1

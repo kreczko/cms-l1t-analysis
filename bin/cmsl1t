@@ -58,6 +58,7 @@ def process_tuples(config, nevents, analyzers, producers, filters=None):
         batch_size=config.try_get('analysis', 'batch_size', default=1),
     )
 
+    logger.info(section.format("Preparing analysis modules"))
     results = [analyzer.prepare_for_events(reader) for analyzer in analyzers]
     check(results, analyzers, 'prepare_for_events')
 
@@ -67,6 +68,7 @@ def process_tuples(config, nevents, analyzers, producers, filters=None):
     if nevents <= 10000 and not nevents < 0:
         counter_rate = nevents / 10
     for entry, event in enumerate(reader):
+        print(entry)
         if entry % counter_rate == 0:
             if nevents > 0:
                 logger.info("{} of {}".format(entry, nevents))
@@ -74,18 +76,21 @@ def process_tuples(config, nevents, analyzers, producers, filters=None):
                 logger.info("{} of <all>".format(entry))
         results = [p.produce(event) for p in producers]
         check(results, producers, 'produce')
-        # TODO: add filters
+        # # TODO: add filters
         if filters:
+            print(len(filters))
+            print(filters)
+            print("Creating event mask")
             mask = create_event_mask([f(event) for f in filters])
+            print("Filtering event")
             event = event.mask(mask)
-        if not event:
-            logger.debug('Event did not pass any of the filters')
-            continue
-        results = [analyzer.process_event(entry, event)
-                   for analyzer in analyzers]
-        check(results, analyzers, 'process_event')
-        if all(results) is not True:
-            break
+        # if not event:
+        #     logger.debug('Event did not pass any of the filters')
+        #     continue
+        # results = [analyzer.process_event(entry, event) for analyzer in analyzers]
+        # check(results, analyzers, 'process_event')
+        # if all(results) is not True:
+        #     break
 
 
 @timerfunc_log_to(logger.info)

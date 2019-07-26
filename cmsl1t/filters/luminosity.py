@@ -45,7 +45,9 @@ class LuminosityFilter(object):
 
     def __call__(self, event):
         to_test = np.array(list(zip(event.run, event.lumi)))
+        print('Test array done')
         mask = filter_lumis(to_test, self.valid_lumi_sections)
+        print('mask done')
         return mask
 
 

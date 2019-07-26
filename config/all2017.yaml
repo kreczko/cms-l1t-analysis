@@ -28,7 +28,7 @@ input:
 
 analysis:
   vectorized: True
-  batch_size: 1000
+  batch_size: 10000
   load_trees:
     - event
     - upgrade

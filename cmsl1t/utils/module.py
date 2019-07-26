@@ -30,6 +30,7 @@ def exists(module_name):
 
 
 def load_L1TNTupleLibrary(lib_name='L1TAnalysisDataformats.so'):
+    pass
     import ROOT
     external_includes = os.path.join(PROJECT_ROOT, 'external')
     if external_includes not in ROOT.gSystem.GetIncludePath():
