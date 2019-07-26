@@ -97,20 +97,14 @@ then
     echo "No CVMFS available, setting up Anaconda Python"
     if [ ! -d "${CMSL1T_CONDA_PATH}" ]
     then
-      wget -nv https://repo.continuum.io/miniconda/Miniconda2-latest-Linux-x86_64.sh -O /tmp/miniconda.sh
+      wget -nv https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O /tmp/miniconda.sh
       bash /tmp/miniconda.sh -b -p ${CMSL1T_CONDA_PATH}
       PATH=${CMSL1T_CONDA_PATH}/bin:$PATH; export PATH
-      rm -f miniconda.sh
+      rm -f /tmp/miniconda.sh
       echo "Finished conda installation, creating new conda environment"
-      conda config --add channels http://conda.anaconda.org/NLeSC
-      conda config --set show_channel_urls yes
-      conda create -n cms python=2.7 -yq
+      conda create -n cms python=3 -yq
       source activate cms
-      conda install -y -q \
-        matplotlib \
-        numpy \
-        root>=6.04 \
-        rootpy
+      conda install -y -q -c conda-forge root=6
       echo "Created conda environment, installing basic dependencies"
       pip install -U pip
       pip install -r requirements.txt
