@@ -1,8 +1,10 @@
 import json
 import six
 import six.moves.urllib as urllib
-import numba
 import numpy as np
+
+from .. import logger
+from ..math import isin_nd
 
 
 def _load_json(lumi_json):
@@ -11,6 +13,7 @@ def _load_json(lumi_json):
     has_local_prefix = input_file.startswith('file://')
     if not is_remote and not has_local_prefix:
         input_file = 'file://' + input_file
+    logger.debug('Loading file {} for LuminosityFilter'.format(input_file))
     input_stream = urllib.request.urlopen(input_file)
     data = json.load(input_stream)
     return data
@@ -45,19 +48,5 @@ class LuminosityFilter(object):
 
     def __call__(self, event):
         to_test = np.array(list(zip(event.run, event.lumi)))
-        print('Test array done')
-        mask = filter_lumis(to_test, self.valid_lumi_sections)
-        print('mask done')
+        mask = isin_nd(to_test, self.valid_lumi_sections)
         return mask
-
-
-@numba.jit(nopython=True, parallel=True)
-def filter_lumis(ranges_to_test, valid_lumi_sections):
-    result = np.zeros(ranges_to_test.shape[0], dtype=np.uint8)
-    for i in range(valid_lumi_sections.shape[0]):
-        valid_section = valid_lumi_sections[i, :]
-        for j in range(ranges_to_test.shape[0]):
-            to_test = ranges_to_test[j, :]
-            if np.equal(to_test, valid_section).all():
-                result[j] = 1
-    return result
