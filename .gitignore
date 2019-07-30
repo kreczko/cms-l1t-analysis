@@ -99,8 +99,8 @@ ENV/
 .*sw[po]
 
 # Custom ignores
-external
-workspace
-data
-benchmark
-output
+external/*
+workspace/*
+data/*
+benchmark/*
+output/*
