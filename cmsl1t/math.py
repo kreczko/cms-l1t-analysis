@@ -24,3 +24,22 @@ def _reversed_cumulative_sum(values):
     cumsum = np.cumsum(reversed_values)
     reversed_cumsum = np.array(np.flipud(cumsum))
     return reversed_cumsum
+
+
+def view1D(a, b):
+    """
+        From https://stackoverflow.com/a/45313353/
+    """
+    a = np.ascontiguousarray(a)
+    b = np.ascontiguousarray(b)
+    void_dt = np.dtype((np.void, a.dtype.itemsize * a.shape[1]))
+    return a.view(void_dt).ravel(),  b.view(void_dt).ravel()
+
+
+def isin_nd(a, b):
+    """
+        From https://stackoverflow.com/questions/54791950
+    """
+    # a,b are the 3D input arrays to give us "isin-like" functionality across them
+    A, B = view1D(a.reshape(a.shape[0], -1), b.reshape(b.shape[0], -1))
+    return np.isin(A, B)
