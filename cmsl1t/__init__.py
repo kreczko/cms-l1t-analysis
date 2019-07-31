@@ -8,8 +8,7 @@ __version__ = '0.5.1'
 
 # logging
 logger = logging.getLogger(__name__)
-logger.setLevel(logging.DEBUG)
-
+logger.propagate = False
 # add loggers
 ch = logging.StreamHandler()
 if not os.environ.get("DEBUG", False):
