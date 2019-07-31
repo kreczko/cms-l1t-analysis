@@ -2,6 +2,8 @@
 from __future__ import print_function
 import ROOT
 import os
+
+import numpy as np
 from datetime import datetime
 from importlib import import_module
 
@@ -64,25 +66,22 @@ def process_tuples(config, nevents, analyzers, producers, filters=None):
 
     logger.info(section.format("Processing events"))
     # Fill the histograms from the tuples
-    counter_rate = 1000
+    available_events = reader.numentries
+    counter_rate = available_events // 10
     if nevents <= 10000 and not nevents < 0:
         counter_rate = nevents / 10
     for entry, event in enumerate(reader):
-        print(entry)
         if entry % counter_rate == 0:
             if nevents > 0:
                 logger.info("{} of {}".format(entry, nevents))
             else:
-                logger.info("{} of <all>".format(entry))
+                logger.info("{} of {}".format(entry, available_events))
         results = [p.produce(event) for p in producers]
         check(results, producers, 'produce')
         # # TODO: add filters
         if filters:
-            print(len(filters))
-            print(filters)
-            print("Creating event mask")
-            mask = create_event_mask([f(event) for f in filters])
-            print("Filtering event")
+            masks = [f(event) for f in filters]
+            mask = create_event_mask(masks)
             event = event.mask(mask)
         # if not event:
         #     logger.debug('Event did not pass any of the filters')
