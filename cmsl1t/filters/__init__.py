@@ -40,6 +40,8 @@ def combine_with_OR(filters):
 def create_event_mask(filters, method=combine_with_AND):
     if not filters:
         return []
+    if len(filters) == 1:
+        return filters[0]
     return method(filters)
 
 
