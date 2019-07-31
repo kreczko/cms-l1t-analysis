@@ -76,10 +76,10 @@ test: lint test-code
 test-all: lint test-code-full
 
 test-code:
-	@pytest -v -m "not xrootdtest" test
+	@python -m pytest -v -m "not xrootdtest" test
 
 test-code-full:
-	@pytest -v test
+	@python -m pytest -v test
 
 changelog:
 	@github_changelog_generator -u cms-l1t-offline -p cms-l1t-analysis
