@@ -34,17 +34,12 @@ setup-build-dir:
 create-data-dir:
 		@mkdir -p data
 
-setup-data-dir: create-data-dir data/L1Ntuple_test_1.root data/L1Ntuple_test_2.root data/L1Ntuple_test_3.root
+setup-data-dir: create-data-dir
+
+download-test-data: data/L1Ntuple_test_1.root
 
 data/L1Ntuple_test_1.root:
-	@xrdcp root://eoscms.cern.ch//eos/cms/store/group/dpg_trigger/comm_trigger/L1Trigger/bundocka/cmsl1t/test_0.root ./data/L1Ntuple_test_1.root || true
-
-data/L1Ntuple_test_2.root:
-	@xrdcp root://eoscms.cern.ch//eos/cms/store/group/dpg_trigger/comm_trigger/L1Trigger/bundocka/cmsl1t/test_1.root ./data/L1Ntuple_test_2.root || true
-
-data/L1Ntuple_test_3.root:
-	@xrdcp root://eoscms.cern.ch//eos/cms/store/group/dpg_trigger/comm_trigger/L1Trigger/bundocka/cmsl1t/test_2.root ./data/L1Ntuple_test_3.root || true
-
+	@xrdcp root://eoscms.cern.ch//eos/cms/store/group/dpg_trigger/comm_trigger/L1Trigger/bundocka/SingleMuon/smMETa/190606_105654/0000/L1Ntuple_99.root ./data/L1Ntuple_test_1.root || true
 
 # tests
 pep8:

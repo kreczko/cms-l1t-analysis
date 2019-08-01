@@ -18,9 +18,11 @@ cd cms-l1t-analysis
 git remote add upstream https://github.com/cms-l1t-offline/cms-l1t-analysis.git
 git pull --rebase upstream master
 source setup.sh
+make setup
+# if you want to download test data:
 # you will need your grid cert
 voms-proxy-init --voms cms
-make setup
+make download-test-data
 ```
 
 ### On OS X/other Linux/Windows
@@ -38,9 +40,11 @@ vagrant up
 vagrant ssh
 cd /vagrant
 source setup.sh
+make setup
+# if you want to download test data:
 # you will need your grid cert
 voms-proxy-init --voms cms
-make setup
+make download-test-data
 ```
 
 ### running tests
