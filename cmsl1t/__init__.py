@@ -11,10 +11,11 @@ logger = logging.getLogger(__name__)
 logger.propagate = False
 # add loggers
 ch = logging.StreamHandler()
-if not os.environ.get("DEBUG", False):
-    ch.setLevel(logging.INFO)
-else:
-    ch.setLevel(logging.DEBUG)
+CMSL1T_LOGLEVEL = logging.INFO
+if os.environ.get("DEBUG", False):
+    CMSL1T_LOGLEVEL = logging.DEBUG
+
+ch.setLevel(CMSL1T_LOGLEVEL)
 # log format
 formatter = logging.Formatter(
     '%(asctime)s [%(name)s]  %(levelname)s: %(message)s')

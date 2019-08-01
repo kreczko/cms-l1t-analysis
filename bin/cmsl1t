@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-from __future__ import print_function
 import ROOT
 import os
 
@@ -12,23 +11,23 @@ import click_log
 import yaml
 import logging
 
+from cmsl1t import logger
 from cmsl1t.config import ConfigParser
 from cmsl1t.filters import create_event_mask
 from cmsl1t.io.eventreader import EventReader
 from cmsl1t.utils.module import load_L1TNTupleLibrary
 from cmsl1t.utils.timers import timerfunc_log_to
 
-logger = logging.getLogger(__name__)
 logging.getLogger("rootpy.tree.chain").setLevel(logging.WARNING)
-click_log.basic_config(logger)
+#click_log.basic_config(logger)
 
 TODAY = datetime.now().timetuple()
 ROOT.PyConfig.IgnoreCommandLineOptions = True
 ROOT.gROOT.SetBatch(1)
 ROOT.TH1.SetDefaultSumw2(True)
-separator = '=' * 80
+separator = '=' * 20
 section = [separator, '{0}', separator]
-section = '\n'.join(section)
+section = '    '.join(section)
 
 
 @timerfunc_log_to(logger.info)
@@ -40,13 +39,14 @@ def process_tuples(config, nevents, analyzers, producers, filters=None):
     logger.info("Input files:")
 
     if len(input_files) > 10:
-        file_msg = [input_files[:10], "... and",
+        file_msg = ['    ' + '\n'.join(input_files[:10]), "\n    ... and",
                     len(input_files) - 10, "more files"]
         file_msg = map(str, file_msg)
         file_msg = " ".join(file_msg)
         logger.info(file_msg)
     else:
-        logger.info(input_files)
+        for f in input_files:
+            logger.info('    ' + f)
 
     ntuple_map = config.get('input', 'ntuple_map_file')
     with open(ntuple_map) as f:
@@ -70,26 +70,26 @@ def process_tuples(config, nevents, analyzers, producers, filters=None):
     counter_rate = available_events // 10
     if nevents <= 10000 and not nevents < 0:
         counter_rate = nevents / 10
-    for entry, event in enumerate(reader):
-        if entry % counter_rate == 0:
+    for event in reader:
+        processed_events = reader.processed_events
+        if processed_events % counter_rate == 0:
             if nevents > 0:
-                logger.info("{} of {}".format(entry, nevents))
+                logger.info("{} of {}".format(processed_events, nevents))
             else:
-                logger.info("{} of {}".format(entry, available_events))
+                logger.info("{} of {}".format(processed_events, available_events))
         results = [p.produce(event) for p in producers]
         check(results, producers, 'produce')
-        # # TODO: add filters
         if filters:
             masks = [f(event) for f in filters]
             mask = create_event_mask(masks)
             event = event.mask(mask)
-        # if not event:
-        #     logger.debug('Event did not pass any of the filters')
-        #     continue
-        # results = [analyzer.process_event(entry, event) for analyzer in analyzers]
-        # check(results, analyzers, 'process_event')
-        # if all(results) is not True:
-        #     break
+        if not event:
+            logger.debug('Event did not pass any of the filters')
+            continue
+        results = [analyzer.process_event(processed_events, event) for analyzer in analyzers]
+        check(results, analyzers, 'process_event')
+        if all(results) is not True:
+            break
 
 
 @timerfunc_log_to(logger.info)
@@ -159,12 +159,13 @@ def run(config, nevents, reload_histograms):
         analyzer.write_histograms()
 
     # Turn the histograms to plots
+    logging.getLogger("ROOT.TCanvas.Print").setLevel(logging.WARNING)
     logger.info(section.format("Making plots"))
     results = [analyzer.make_plots() for analyzer in analyzers]
     check(results, analyzers, 'make_plots')
 
     # Finalize
-    print(section.format("Finalizing things"))
+    logger.info(section.format("Finalizing things"))
     results = [analyzer.finalize() for analyzer in analyzers]
     check(results, analyzers, 'finalize')
 
@@ -208,19 +209,19 @@ def analyze(config_file, nevents, reload_histograms, hist_files):
 
     isok = run(config, nevents, reload_histograms)
 
-    print('\n' + separator + '\n')
+    logger.info('\n' + separator + '\n')
     if isok is not True:
-        logger.info("There were errors during running:")
-        logger.info(isok)
-        logger.info('\n' + separator + '\n')
+        logger.error("There were errors during running:")
+        logger.error(isok)
+        logger.error('\n' + separator + '\n')
 
 
 def load_analyzer(analyzer, output_cfg):
     name = analyzer['name']
     module = analyzer.pop('module')
-    logger.info("Try loading analyzer: {0} ({1})".format(name, module))
+    logger.debug("Try loading analyzer: {0} ({1})".format(name, module))
     module = import_module(module)
-    logger.info("Successfully loaded analyzer: {0} ({1})".format(name, module))
+    logger.debug("Successfully loaded analyzer: {0} ({1})".format(name, module))
     cfg = dict(output_folder=output_cfg['folder'],
                plots_folder=output_cfg['plots_folder'],
                file_format=output_cfg.get('plot_format', 'pdf'),
@@ -232,9 +233,9 @@ def load_analyzer(analyzer, output_cfg):
 def load_producer(producer, output_cfg):
     name = producer.pop('name')
     module = producer.pop('module')
-    logger.info("Try loading producer: {0} ({1})".format(name, module))
+    logger.debug("Try loading producer: {0} ({1})".format(name, module))
     module = import_module(module)
-    logger.info("Successfully loaded producer: {0} ({1})".format(name, module))
+    logger.debug("Successfully loaded producer: {0} ({1})".format(name, module))
     # TODO: is this part needed for producers?
     cfg = dict(output_folder=output_cfg['folder'],
                plots_folder=output_cfg['plots_folder'],
@@ -247,12 +248,12 @@ def load_producer(producer, output_cfg):
 def load_filter(filter):
     name = filter.pop('name')
     module = filter.pop('module')
-    logger.info("Try loading filter: {0} ({1})".format(name, module))
+    logger.debug("Try loading filter: {0} ({1})".format(name, module))
     tokens = module.split('.')
     module_path = '.'.join(tokens[:-1])
     module = import_module(module_path)
     caller = getattr(module, tokens[-1])
-    logger.info("Successfully loaded filter: {0} ({1})".format(name, caller))
+    logger.debug("Successfully loaded filter: {0} ({1})".format(name, caller))
     cfg = {}
     cfg.update(filter)
     return caller(**cfg)
