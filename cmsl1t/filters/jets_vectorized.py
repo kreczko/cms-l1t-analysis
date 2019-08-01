@@ -21,8 +21,7 @@ def _pfJetID(jet):
         (isForwardCentralJet & (jet.nMult <= 2)) | \
         (isForwardJet & (jet.nemef >= 0.9)) | \
         (isForwardJet & (jet.nMult <= 10))
-
-    return jet.select(~reject_if)
+    return jet[~reject_if]
 
 
 def pfJetFilter(jets):

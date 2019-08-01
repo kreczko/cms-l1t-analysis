@@ -13,9 +13,10 @@ class Jet(object):
             self.et, self.eta, self.phi, self.etCorr = args
 
     def __getitem__(self, name):
-        # TODO: check if "name" is a list
-        # if yes --> to selection
-        return object.__getattribute__(self, name)
+        if isinstance(name, str):
+            return object.__getattribute__(self, name)
+        else:
+            return self.select(name)
 
     def select(self, mask):
         selected_values = [self[v][mask] for v in self.__slots__]
