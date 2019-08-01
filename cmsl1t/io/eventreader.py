@@ -67,7 +67,7 @@ class EventReader(object):
 
         self._used_arrays = vectorized
         self._used_trees = not vectorized
-        self._passed_events = 0
+        self._processed_events = {}
         self._batch_size = batch_size
 
         self._numentries = uproot.numentries(
@@ -118,6 +118,8 @@ class EventReader(object):
     def __iter__(self):
         # event loop
         for input_file in self.input_files:
+            self._current_file = input_file
+            self._processed_events[self._current_file] = 0
             nevents = self._numentries[input_file]
             logger.info('Opening file {} ({} events)'.format(input_file, nevents))
             if self._used_arrays:
@@ -141,15 +143,23 @@ class EventReader(object):
 
     def new_uproot_event(self):
         for treeGen in six.moves.zip(*six.itervalues(self._trees)):
+            processing_n_events = min(
+                self._batch_size,
+                self._numentries[self._current_file] - self._processed_events[self._current_file]
+            )
             data = dict(six.moves.zip(self._trees, treeGen))
-            yield UprootEvent(data, self._aliasMap, batch_size=self._batch_size)
-            self._passed_events += self._batch_size
-            if self.nevents > 0 and self._passed_events >= self.nevents:
+            yield UprootEvent(data, self._aliasMap, batch_size=processing_n_events)
+            self._processed_events[self._current_file] += processing_n_events
+            if self.nevents > 0 and self.processed_events >= self.nevents:
                 break
 
     @property
     def numentries(self):
         return sum([x for x in self._numentries.values()])
+
+    @property
+    def processed_events(self):
+        return sum([x for x in self._processed_events.values()])
 
 
 class UprootEvent(object):
@@ -192,6 +202,9 @@ class UprootEvent(object):
 
     def __getitem__(self, name):
         return object.__getattribute__(self, '__getattr__')(name)
+
+    def __len__(self):
+        return self._batch_size
 
     def mask(self, mask):
         mask_size = np.size(mask)
