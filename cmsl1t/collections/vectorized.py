@@ -25,8 +25,8 @@ def split_input(inner_indices, x, w):
 
     for u in np.unique(inner_indices):
         mask = inner_indices == u
-        if not isinstance(mask, (list, np.ndarray)):
-            mask = np.array([mask])
+        if not isinstance(mask, (tuple, list, np.ndarray, np.generic)):
+            mask = np.array(mask)
         yield u, content[mask], w[mask]
 
 
@@ -45,8 +45,8 @@ class VectorizedHistCollection(BaseHistCollection):
         self._innerHist = Hist(100, 0, 100, name=innerLabel + '_' + self._name)
 
     def __getitem__(self, key):
-        if not isinstance(key, (list, np.ndarray, np.generic)):
-            key = np.array([key])
+        if not isinstance(key, (tuple, list, np.ndarray, np.generic)):
+            key = np.array(key)
         real_keys = self._get_inner_indices(key)
         return VectorizedBinProxy(self, real_keys)
         # return [defaultdict.__getitem__(self, k) for k in real_keys.tolist()]
@@ -144,8 +144,8 @@ class VectorizedHistProxy(object):
         return defaultdict.__getitem__(self._bin_proxy.collection, inner_index)[hist_name]
 
     def fill(self, x, w=None):
-        if not isinstance(x, (list, np.ndarray, awkward.JaggedArray)):
-            x = np.array([x])
+        if not isinstance(x, (tuple, list, np.ndarray, awkward.JaggedArray)):
+            x = np.array(x)
         if w is None:
             n = np.size(x.content) if hasattr(x, 'content') else np.size(x)
             w = np.ones(n)
