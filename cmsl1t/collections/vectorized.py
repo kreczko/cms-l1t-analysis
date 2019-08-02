@@ -42,7 +42,7 @@ class VectorizedHistCollection(BaseHistCollection):
 
         self._innerBins = innerBins
         self._innerLabel = innerLabel
-        self._innerHist = Hist(100, 0, 100, name=innerLabel + '_' + self._name)
+        self._innerHist = Hist(innerBins, name=innerLabel + '_' + self._name)
 
     def __getitem__(self, key):
         if not isinstance(key, (tuple, list, np.ndarray, np.generic)):
@@ -70,16 +70,17 @@ class VectorizedHistCollection(BaseHistCollection):
             logger.error(
                 'No bins specified for histogram {0}'.format(name))
 
-        if name in defaultdict.__getitem__(self, 1):
+        if name in super(VectorizedHistCollection, self).__getitem__(1):
             logger.warning('Histogram {0} already exists!'.format(name))
             return
         names = []
         add_name = names.append
 
         for i, hist_name in enumerate(self._create_hist_names(name)):
-            if i + 1 not in self or hist_name not in defaultdict.__getitem__(self, i + 1):
+            __current_slice = super(VectorizedHistCollection, self).__getitem__(i + 1)
+            if i + 1 not in self or hist_name not in __current_slice:
                 add_name(hist_name)
-                defaultdict.__getitem__(self, i + 1)[hist_name] = hist_type(bins, name=hist_name, title=title)
+                __current_slice[hist_name] = hist_type(bins, name=hist_name, title=title)
         logger.debug('Created {0} histograms: {1}'.format(
             len(names), ', '.join(names)))
 
