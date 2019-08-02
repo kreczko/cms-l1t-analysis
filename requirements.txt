@@ -2,7 +2,7 @@ aghast
 git+https://github.com/scikit-hep/boost-histogram.git@develop
 numpy
 matplotlib
-pandas==0.23
+pandas==0.24
 memory_profiler
 flake8
 pep8
