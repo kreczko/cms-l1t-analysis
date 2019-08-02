@@ -2,7 +2,6 @@ from __future__ import absolute_import
 import logging
 import os
 from os import path
-import sys
 
 
 __version__ = '0.5.1'
@@ -30,5 +29,3 @@ if 'PROJECT_ROOT' not in os.environ:
     PROJECT_ROOT = path.abspath(path.join(HERE, path.pardir))
 else:
     PROJECT_ROOT = os.environ['PROJECT_ROOT']
-
-PY3 = sys.version_info[0] == 3

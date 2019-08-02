@@ -7,7 +7,6 @@ from rootpy.plotting import Hist
 
 from . import BaseHistCollection
 from ..utils.iterators import pairwise
-from .. import PY3
 from ..io import to_root
 
 logger = logging.getLogger(__name__)
@@ -39,10 +38,7 @@ class VectorizedHistCollection(BaseHistCollection):
         dimensions = kwargs.pop('dimensions', 2)
         self._name = kwargs.pop('name', str(hex(random.getrandbits(128)))[2:10])
         self._execute_before_write = kwargs.pop('execute_before_write', [])
-        if PY3:
-            super(VectorizedHistCollection, self).__init__(dimensions)
-        else:
-            BaseHistCollection.__init__(self, dimensions)
+        super(VectorizedHistCollection, self).__init__(dimensions)
 
         self._innerBins = innerBins
         self._innerLabel = innerLabel
