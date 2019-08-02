@@ -3,6 +3,8 @@ import csv
 from math import pi
 import os
 
+import numpy as np
+
 import cmsl1t
 from .BaseAnalyzer import BaseAnalyzer
 from ..energySums import EnergySum, Met
@@ -346,25 +348,20 @@ class Analyzer(BaseAnalyzer):
             )
 
     def fill_histograms(self, entry, event):
-        offline, online = extractSums(
-            event, self._doEmu, self._doReco, self._doGen)
-        print(offline, online)
-        return True
+        offline, online = extractSums(event, self._doEmu, self._doReco, self._doGen)
 
-        recoNVtx = 1
-        genNVtx = 1
+        recoNVtx = np.ones(len(event))
+        genNVtx = np.ones(len(event))
 
         if self._doReco or self._doVertex:
             recoNVtx = event.Vertex_nVtx
         if self._doGen:
             genNVtx = event.Generator_nVtx
+        return True
 
         # TODO: vectorize
         # pileup = self._lumiMu[(event['run'], event['lumi'])]
         pileup = 51
-        # print pileup
-        # if pileup >= 60 or pileup < 50:
-        #    return True
 
         for name in self._sumTypes:
             if 'pfMET' in name and not pfMetFilter(event):
