@@ -3,10 +3,11 @@ import pytest
 
 from cmsl1t.filters import combine_with_AND, combine_with_OR
 
-
 scalar_filters_all_passing = [True, True, True]
 scalar_filters_all_failing = [False, False, False]
 scalar_filters_all_but_one_failing = [False, True, False]
+# TODO: assumptions are wrong. The combination of those vectors
+# should be of size 3
 vector_filters_all_passing = [
     np.array([True, True, True]),
     np.array([True, True, True]),
