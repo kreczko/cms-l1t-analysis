@@ -84,7 +84,7 @@ def process_tuples(config, nevents, analyzers, producers, filters=None):
             mask = create_event_mask(masks)
             event = event.mask(mask)
         if not event:
-            logger.debug('Event did not pass any of the filters')
+            logger.warning('Event did not pass any of the filters')
             continue
         results = [analyzer.process_event(processed_events, event) for analyzer in analyzers]
         check(results, analyzers, 'process_event')
