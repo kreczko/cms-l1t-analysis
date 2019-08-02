@@ -7,11 +7,41 @@ from cmsl1t.collections.vectorized import VectorizedBinProxy, VectorizedHistProx
 
 
 @pytest.fixture
-def collection():
-    innerBins = np.array([0, 10, 15, 20, 30, 999])
-    coll = VectorizedHistCollection(innerBins)
-    # fill for [35, 90, 120]
+def scalarBins():
+    return [0, 10, 15, 20, 30, 999]
+
+
+@pytest.fixture
+def collection(scalarBins):
+    coll = VectorizedHistCollection(scalarBins)
     return coll
+
+
+@pytest.fixture
+def scalarDistribution():
+    return [1, 12, 1, 50]
+
+
+@pytest.fixture
+def vectorDistribution():
+    return awkward.fromiter([
+        [60, 50, 40, 30, 20],
+        [32, 23],
+        [56, 34, 31],
+        [],
+    ])
+
+
+@pytest.fixture(params=['event_weights', 'vector_weights', 'flat_vector_weights'])
+def weights(vectorDistribution, request):
+    if request.param == 'event_weights':
+        return np.ones(np.size(vectorDistribution))
+    if request.param == 'vector_weights':
+        return awkward.JaggedArray.fromoffsets(
+            (vectorDistribution.starts, vectorDistribution.stops),
+            np.ones(np.size(vectorDistribution.content))
+        )
+    return np.ones(np.size(vectorDistribution.content))
 
 
 @pytest.mark.parametrize(
@@ -33,10 +63,10 @@ def test_add(collection):
 
 def test_access(collection):
     collection.insert('test', bins=[35, 90, 120])
-    innerValues = [1, 12, 1, 50]
-    assert collection[innerValues] == collection[1] + collection[12] + collection[1] + collection[50]
+    values = [1, 12, 1, 50]
+    assert collection[values] == collection[1] + collection[12] + collection[1] + collection[50]
     # assert type(collection[innerValues]) == Hist
-    assert type(collection[innerValues]['test']) == VectorizedHistProxy
+    assert type(collection[values]['test']) == VectorizedHistProxy
 
 
 # def test_copy(collection):
@@ -77,26 +107,18 @@ def test_split(bins, x, expected):
         assert chunk.tolist() == exp.tolist()
 
 
-def test_fill(collection):
-    innerValues = [1, 12, 1, 50]
-    outerValues = awkward.fromiter([
-        [60, 50, 40, 30, 20],
-        [32, 23],
-        [56, 34, 31],
-        [],
-    ])
+def test_fill(collection, scalarDistribution, vectorDistribution, weights):
     expected = [
         [4.0, 4.0, 0.0, 0.0],
         [2.0, 0.0, 0.0, 0.0],
         [0.0, 0.0, 0.0, 0.0],
     ]
-
     hist_name = 'test'
     collection.insert(hist_name, bins=[35, 90, 120])
-    weights = np.ones(len(outerValues.content))
-    collection[innerValues][hist_name].fill(outerValues, weights)
-    for i in range(len(np.unique(innerValues))):
-        hist = collection[innerValues][hist_name]._get_hist(i + 1)
+    # event_weights = np.ones(np.size(vectorDistribution.content))
+    collection[scalarDistribution][hist_name].fill(vectorDistribution, weights)
+    for i in range(len(np.unique(scalarDistribution))):
+        hist = collection[scalarDistribution][hist_name]._get_hist(i + 1)
         assert list(hist.y(overflow=True)) == expected[i]
 
 
