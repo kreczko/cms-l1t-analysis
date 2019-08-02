@@ -63,7 +63,7 @@ class VectorizedHistCollection(BaseHistCollection):
         '''
         return np.digitize(values, self._innerBins)
 
-    def add(self, name, bins, hist_type=Hist, **kwargs):
+    def insert(self, name, bins, hist_type=Hist, **kwargs):
         title = kwargs.pop('title', name)
         bins = np.asarray(bins)
         if bins.size == 0:

@@ -37,7 +37,7 @@ class Analyzer(BaseAnalyzer):
         list(map(add_met_variable, self.met_calcs))
 
         for met, config in self.met_calcs.items():
-            self.hists.add(met, bins=bins, title=config['title'])
+            self.hists.insert(met, bins=bins, title=config['title'])
         return True
 
     def reload_histograms(self, input_file):

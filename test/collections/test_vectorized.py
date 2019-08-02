@@ -27,12 +27,12 @@ def test_inner_index(collection, values, expected):
 
 def test_add(collection):
     assert len(collection) == 0
-    collection.add('test', bins=[35, 90, 120])
+    collection.insert('test', bins=[35, 90, 120])
     assert len(collection) == len(collection._innerBins) - 1
 
 
 def test_access(collection):
-    collection.add('test', bins=[35, 90, 120])
+    collection.insert('test', bins=[35, 90, 120])
     innerValues = [1, 12, 1, 50]
     assert collection[innerValues] == collection[1] + collection[12] + collection[1] + collection[50]
     # assert type(collection[innerValues]) == Hist
@@ -92,7 +92,7 @@ def test_fill(collection):
     ]
 
     hist_name = 'test'
-    collection.add(hist_name, bins=[35, 90, 120])
+    collection.insert(hist_name, bins=[35, 90, 120])
     weights = np.ones(len(outerValues.content))
     collection[innerValues][hist_name].fill(outerValues, weights)
     for i in range(len(np.unique(innerValues))):
