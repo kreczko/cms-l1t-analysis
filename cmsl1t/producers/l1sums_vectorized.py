@@ -1,4 +1,3 @@
-from __future__ import print_function
 import ROOT
 
 from cmsl1t.energySums import EnergySum, Mex, Mey, Met

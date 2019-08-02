@@ -8,7 +8,6 @@ from .base import BaseProducer
 
 
 def _load_filter_module(filterPath):
-    print(filterPath)
     if filterPath is None:
         return None
     tokens = filterPath.split('.')
