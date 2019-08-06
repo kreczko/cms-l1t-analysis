@@ -1,15 +1,20 @@
+from hypothesis import given, settings, strategies as st
+import numpy as np
 import pytest
 import cmsl1t.hist.binning as binning
 
 
-def test_binning_base():
+@pytest.mark.parametrize(
+    'use_everything_bin, n_extra_bins',
+    [
+        (False, 2),
+        (True, 3),
+    ]
+)
+def test_binning_base(use_everything_bin, n_extra_bins):
     n_bins = 10
-    label = 'test'
-    b = binning.Base(n_bins, label, use_everything_bin=False)
-    assert len(b.values) == (n_bins + 2)
-
-    b = binning.Base(n_bins, label, use_everything_bin=True)
-    assert len(b.values) == (n_bins + 3)
+    b = binning.Base(n_bins, 'test', use_everything_bin=use_everything_bin)
+    assert len(b.values) == (n_bins + n_extra_bins)
 
 
 def test_find_all_bins():
@@ -20,9 +25,8 @@ def test_find_all_bins():
 # @raises(AttributeError)
 def test_get_bin_upper():
     b = binning.Base(10, 'test')
-    assert b.get_bin_upper('overflow') == 'overflow'
-    assert b.get_bin_upper('underflow') == 'underflow'
-    assert b.get_bin_upper('everything') == 'everything'
+    for name in ['overflow', 'underflow', 'everything']:
+        assert b.get_bin_upper(name) == name
 
 
 def test_get_bin_upper_invalid():
@@ -32,9 +36,8 @@ def test_get_bin_upper_invalid():
 
 def test_get_bin_lower():
     b = binning.Base(10, 'test')
-    assert b.get_bin_lower('overflow') == 'overflow'
-    assert b.get_bin_lower('underflow') == 'underflow'
-    assert b.get_bin_lower('everything') == 'everything'
+    for name in ['overflow', 'underflow', 'everything']:
+        assert b.get_bin_lower(name) == name
 
 
 def test_get_bin_lower_invalid():
@@ -42,23 +45,30 @@ def test_get_bin_lower_invalid():
     pytest.raises(AttributeError, b.get_bin_lower, 0)
 
 
-def test_sorted():
-    bins = [40, 60, 80, 99, 111]
-    unsorted_bins = [80, 99, 111, 40, 60]
-
+@given(st.one_of(
+    st.lists(st.integers()),
+    st.tuples(st.integers()),
+    st.lists(st.tuples(st.integers(), st.integers())),
+)
+)
+@settings(max_examples=100)
+def test_sorted(bins):
     b = binning.Sorted(bins, 'test')
-    assert b.bins == bins
-
-    b = binning.Sorted(unsorted_bins, 'test')
-    assert b.bins == bins
+    assert b.bins == sorted(bins)
 
 
-def test_get_bin_edges():
-    bins = [40, 60, 80, 99, 111]
-
+@given(st.one_of(
+    st.lists(st.integers()).map(sorted),
+    st.tuples(st.integers()).map(sorted),
+    st.lists(st.tuples(st.integers(), st.integers())).map(sorted),
+)
+)
+@settings(max_examples=100)
+def test_get_bin_edges(bins):
     b = binning.Sorted(bins, 'test')
-    assert b.get_bin_upper(2) == bins[3]
-    assert b.get_bin_lower(2) == bins[2]
+    for i in range(len(bins) - 1):
+        assert b.get_bin_upper(i) == bins[i + 1]
+        assert b.get_bin_lower(i) == bins[i]
 
     assert b.get_bin_lower(binning.Base.underflow) == binning.Base.underflow
     assert b.get_bin_lower(binning.Base.overflow) == binning.Base.overflow
