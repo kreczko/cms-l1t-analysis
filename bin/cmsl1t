@@ -19,6 +19,7 @@ from cmsl1t.utils.module import load_L1TNTupleLibrary
 from cmsl1t.utils.timers import timerfunc_log_to
 
 logging.getLogger("rootpy.tree.chain").setLevel(logging.WARNING)
+logging.getLogger("matplotlib").setLevel(logging.WARNING)
 #click_log.basic_config(logger)
 
 TODAY = datetime.now().timetuple()
