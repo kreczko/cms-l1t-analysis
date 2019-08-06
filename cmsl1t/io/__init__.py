@@ -4,6 +4,8 @@ from cmsl1t.hist.hist_collection import HistogramCollection
 # no pickles without dill
 import dill  # noqa: F401
 
+from .remote import RemoteFile
+
 
 def to_root(obj, output_file):
     '''
@@ -31,3 +33,10 @@ def from_root(input_file):
                     hist.SetDirectory(None)
 
     return reloaded
+
+
+__all__ = [
+    'to_root',
+    'from_root',
+    'RemoteFile',
+]
