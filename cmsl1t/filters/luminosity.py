@@ -1,22 +1,17 @@
 import json
 import six
-import six.moves.urllib as urllib
 import numpy as np
 
 from .. import logger
 from ..math import isin_nd
+from ..io import RemoteFile
 
 
 def _load_json(lumi_json):
-    input_file = lumi_json
-    is_remote = input_file.startswith('http')
-    has_local_prefix = input_file.startswith('file://')
-    if not is_remote and not has_local_prefix:
-        input_file = 'file://' + input_file
-    logger.debug('Loading file {} for LuminosityFilter'.format(input_file))
-    input_stream = urllib.request.urlopen(input_file)
-    data = json.load(input_stream)
-    return data
+    logger.debug('Loading file {} for LuminosityFilter'.format(lumi_json))
+    with RemoteFile(lumi_json) as f:
+        data = json.load(f)
+        return data
 
 
 def _expand_lumi_range(lumi_range):
