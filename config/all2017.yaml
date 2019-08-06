@@ -96,6 +96,14 @@ analysis:
       filter: null
       outputs:
         - l1Jets
+    pileup_from_json:
+      module: cmsl1t.producers.pileup_from_csv
+      inputs:
+        - run
+        - lumi
+      csv_file: run_lumi.csv
+      outputs:
+        - pileup_from_csv
 
 output:
   template:

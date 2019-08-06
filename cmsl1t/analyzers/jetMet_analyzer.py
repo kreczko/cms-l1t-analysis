@@ -1,11 +1,8 @@
 from collections import namedtuple
-import csv
 from math import pi
-import os
 
 import numpy as np
 
-import cmsl1t
 from .BaseAnalyzer import BaseAnalyzer
 from ..energySums import EnergySum, Met
 from ..filters import pfMetFilter
@@ -118,15 +115,6 @@ class Analyzer(BaseAnalyzer):
 
     def __init__(self, **kwargs):
         super(Analyzer, self).__init__(**kwargs)
-
-        lumiMuDict = dict()
-        run_lumi_csv = os.path.join(cmsl1t.PROJECT_ROOT, 'run_lumi.csv')
-        with open(run_lumi_csv, 'r') as runLumiFile:
-            reader = csv.reader(runLumiFile, delimiter=',')
-            for line in reader:
-                lumiMuDict[(int(line[1]), int(line[2]))] = float(line[3])
-        self._lumiMu = lumiMuDict
-
         # TODO: this needs changing, these should be analyser parameters
         # or even move out into separate calls of the same analyzer
         loaded_trees = self.params['load_trees']
@@ -357,11 +345,9 @@ class Analyzer(BaseAnalyzer):
             recoNVtx = event.Vertex_nVtx
         if self._doGen:
             genNVtx = event.Generator_nVtx
-        return True
 
-        # TODO: vectorize
-        # pileup = self._lumiMu[(event['run'], event['lumi'])]
-        pileup = 51
+        pileup = event['pileup_from_csv']
+        return True
 
         for name in self._sumTypes:
             if 'pfMET' in name and not pfMetFilter(event):
