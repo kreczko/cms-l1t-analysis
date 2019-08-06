@@ -36,7 +36,7 @@ class Producer(BaseProducer):
         try:
             pileup = self._data.loc[list(zip(*variables)), 'pileup'].fillna(0).to_numpy()
         except KeyError:
-            logger.warning('Could not find any (run, lum) combination in {}'.format(self._run_lumi_file))
+            logger.warning('Could not find any (run, lumi) combination in {}'.format(self._run_lumi_file))
         setattr(event, self._outputs[0], pileup)
 
         return True
