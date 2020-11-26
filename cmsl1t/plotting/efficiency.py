@@ -87,6 +87,18 @@ class EfficiencyPlot(BasePlotter):
                 passed = True
             efficiency.fill(passed, offline)
 
+    def fill_array(self, pileup, offline, online):
+        efficiencies = {(pu, thresh): eff
+                        for (pu,), thresholds in self.efficiencies[pileup].items()
+                        for thresh, eff in thresholds.items()}
+        for (pu_bin, threshold_bin), efficiency in efficiencies.items():
+            threshold = self.thresholds.get_bin_center(threshold_bin)
+            passed = np.zeros(np.size(offline))
+            if isinstance(threshold, str):
+                continue
+            passed = (online > threshold) * 1
+            efficiency.fill_array(passed, offline)
+
     def draw(self, with_fits=False):
         # Fit the efficiencies if requested
         if with_fits:

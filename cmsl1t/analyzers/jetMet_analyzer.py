@@ -347,23 +347,24 @@ class Analyzer(BaseAnalyzer):
             genNVtx = event.Generator_nVtx
 
         pileup = event['pileup_from_csv']
-        return True
 
         for name in self._sumTypes:
-            if 'pfMET' in name and not pfMetFilter(event):
-                continue
+            # if 'pfMET' in name and not pfMetFilter(event):
+            #     continue
             on = online[name]
             off = offline[name]
             for suffix in ['_eff', '_res', '_2D', '_eff_HR', '_2D_HR']:
-                if '_res' in suffix and (on.et < 0.01 or off.et < 30):
-                    continue
+                # if '_res' in suffix and (on.et < 0.01 or off.et < 30):
+                #     continue
                 pileup = recoNVtx
                 if 'gen' in name:
                     pileup = genNVtx
-                getattr(self, name + suffix).fill(pileup, off.et, on.et)
+                getattr(self, name + suffix).fill_array(pileup, off.et, on.et)
             if hasattr(self, name + "_phi_res"):
-                getattr(self, name + "_phi_res").fill(pileup, off.phi, on.phi)
-                getattr(self, name + "_phi_2D").fill(pileup, off.phi, on.phi)
+                getattr(self, name + "_phi_res").fill_array(pileup, off.phi, on.phi)
+                getattr(self, name + "_phi_2D").fill_array(pileup, off.phi, on.phi)
+
+        return True
 
         if self._doReco and self._doEmu:
             goodRefJets = event.goodPFJets

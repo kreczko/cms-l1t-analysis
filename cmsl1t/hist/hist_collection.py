@@ -1,6 +1,9 @@
 import collections
 from copy import deepcopy
 import logging
+
+import numpy as np
+
 from cmsl1t.hist.factory import HistFactory
 from cmsl1t.hist.binning import Base as BinningBase
 
@@ -27,6 +30,9 @@ class HistCollectionView(object):
     def fill(self, *vargs, **kwargs):
         self.__method("fill", *vargs, **kwargs)
 
+    def fill_array(self, *vargs, **kwargs):
+        self.__method("fill_array", *vargs, **kwargs)
+
     def __iter__(self):
         for hist in self.histograms:
             yield hist
@@ -50,8 +56,9 @@ class HistogramCollection(object):
         '''
             Should dimensions include or exclude histogram names?
         '''
-        if not isinstance(dimensions, list):
+        if not isinstance(dimensions, (list, tuple, np.array)):
             dimensions = [dimensions]
+        print(dimensions)
         for dim in dimensions:
             if not isinstance(dim, BinningBase):
                 raise RuntimeError("non-Dimension object given to histogram")
@@ -106,10 +113,11 @@ class HistogramCollection(object):
         if not isinstance(keys, collections.Sequence):
             keys = [keys]
 
-        n_keys = len(keys)
+        n_keys = np.size(keys)
 
         # Check every dimension if it contains these values
         bins = []
+        # TODO: this is the issue - it assumes keys are only scalar per dimension
         for key, dimension in zip(keys, self.__dimensions[:n_keys]):
             bins.append(dimension.find_all_bins(key))
 

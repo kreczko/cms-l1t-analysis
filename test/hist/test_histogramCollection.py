@@ -1,13 +1,26 @@
 from __future__ import print_function
+
+import numpy as np
+import pytest
+
 import cmsl1t.hist.hist_collection as hist
 import cmsl1t.hist.binning as binning
-import numpy as np
 from cmsl1t.hist.factory import HistFactory
 
 
-pileup = binning.Sorted([0, 10, 15, 20, 30, 999], "pileup")
-multi = binning.Overlapped([(0, 10), (100, 110), (5, 15)], "multi")
-regions = binning.EtaRegions()
+@pytest.fixture
+def pileup():
+    return binning.Sorted([0, 10, 15, 20, 30, 999], "pileup")
+
+
+@pytest.fixture
+def multi():
+    return binning.Overlapped([(0, 10), (100, 110), (5, 15)], "multi")
+
+
+@pytest.fixture
+def regions():
+    return binning.EtaRegions()
 
 
 class dummy_factory():
@@ -27,7 +40,7 @@ class dummy_factory():
         self.value += weight
 
 
-def test_dimension_sorted():
+def test_dimension_sorted(pileup):
     assert pileup.find_bins(-19) == [binning.Base.underflow]
     assert pileup.find_bins(9) == [0]
     assert pileup.find_bins(19) == [2]
@@ -35,14 +48,14 @@ def test_dimension_sorted():
     assert pileup.find_bins(9999) == [binning.Base.overflow]
 
 
-def test_dimension_multi():
+def test_dimension_multi(multi):
     assert multi.find_bins(3) == [0]
     assert multi.find_bins(7) == [0, 2]
     assert multi.find_bins(105) == [1]
     assert multi.find_bins(70) == [binning.Base.overflow]
 
 
-def test_dimension_region():
+def test_dimension_region(regions):
     assert sorted(regions.find_bins(0)) == sorted(["BE", "B"])
     assert sorted(regions.find_bins(2)) == sorted(["BE", "E"])
     assert regions.find_bins(3.1) == ["HF"]
@@ -57,7 +70,7 @@ def test_flatten_bin_list():
     assert flat_list == [(1, 2), (1, 3)]
 
 
-def test_find_bins():
+def test_find_bins(pileup):
     coll = hist.HistogramCollection(dimensions=[pileup],
                                     histogram_factory=dummy_factory)
     assert coll._find_bins(-20) == [(binning.Base.underflow, )]
@@ -66,7 +79,7 @@ def test_find_bins():
     assert coll._find_bins(9999) == [(binning.Base.overflow, )]
 
 
-def test_collection_1D():
+def test_collection_1D(pileup):
     coll = hist.HistogramCollection(dimensions=[pileup],
                                     histogram_factory=dummy_factory)
     coll[-3].fill(6)
@@ -79,7 +92,7 @@ def test_collection_1D():
     assert coll[9999].value == [49]
 
 
-def test_collection_2D():
+def test_collection_2D(pileup, multi):
     coll = hist.HistogramCollection(dimensions=[pileup, multi],
                                     histogram_factory=dummy_factory)
     coll[-3, 4].fill(6)
@@ -88,7 +101,7 @@ def test_collection_2D():
     assert coll[13, 108].value == [49]
 
 
-def test_iteration_2D():
+def test_iteration_2D(pileup, multi):
     coll = hist.HistogramCollection(dimensions=[pileup, multi],
                                     histogram_factory=dummy_factory)
 
@@ -111,7 +124,7 @@ def test_iteration_2D():
     assert coll[3, 13].value == [1]
 
 
-def test_coll1D_root_Hist1D():
+def test_coll1D_root_Hist1D(pileup):
     histogram_factory = HistFactory("Hist1D", 10, 0, 5)
     coll = hist.HistogramCollection(dimensions=[pileup],
                                     histogram_factory=histogram_factory)
@@ -119,3 +132,26 @@ def test_coll1D_root_Hist1D():
     coll[11].fill(2)
     integral = sum([h.Integral() for h in coll[12]])
     assert integral == 2
+
+
+def test_find_bins_vector_1D(pileup):
+    coll = hist.HistogramCollection(
+        dimensions=[pileup],
+        histogram_factory=HistFactory("Hist1D", 10, 0, 5)
+    )
+    bins_under_test = [1, 12, 31]
+    result = coll._find_bins(bins_under_test)
+    assert result == (np.digitize(bins_under_test, pileup.bins) -1).tolist()
+
+def test_vector_access_1D(pileup):
+    coll = hist.HistogramCollection(
+        dimensions=[pileup],
+        histogram_factory=HistFactory("Hist1D", 10, 0, 5)
+    )
+    # test separate bins off [0, 10, 15, 20, 30, 999]
+    bins_under_test = [1, 12, 31]
+    entries = [1, 2, 5]
+    assert len(coll[bins_under_test]) == np.size(np.digitize(bins_under_test, pileup))
+    coll[bins_under_test].fill_array(entries)
+    for b, e in zip(bins_under_test, entries):
+        assert sum([h.Integral() for h in coll[b]]) == e
